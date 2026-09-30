@@ -1,29 +1,53 @@
 // Головний контролер студії «3D Кузня Чудес»
 (function () {
+  const STORAGE_KEY = '3d_kuznya_project_autosave_v1';
+
   class StudioApp {
     constructor() {
       this.activeTab = 'minecraft'; // 'minecraft', 'illusion', 'physics', 'mob'
+      this.viewMode = 'split';      // 'editor', 'split', 'viewport'
       this.sceneManager = null;
+
+      this.undoStack = [];
+      this.redoStack = [];
+      this.maxHistory = 35;
+      this._isRestoring = false;
 
       this.mcGen = new window.MinecraftForgeGenerator();
       this.illusionGen = new window.DualIllusionGenerator();
       this.physicsGen = new window.PhysicsMechanicsGenerator();
       this.mobGen = new window.MobMutatorGenerator();
+
+      this.mcGen.onBeforeMutate = () => this.recordUndoSnapshot();
+      this.mcGen.onAfterMutate = () => {
+        this.updateMinecraftConnectivityUI();
+        this.markModelModified();
+        this.autosave();
+      };
     }
 
     init() {
       this.sceneManager = new window.SceneManager('viewport-container');
       this.sceneManager.init();
+      this.sceneManager.onDimensionsUpdated = () => {
+        this.updateDiagnosticsUI();
+      };
 
-      this.bindTabs();
-      this.bindTopActions();
-      this.bindMinecraftControls();
-      this.bindIllusionControls();
-      this.bindPhysicsControls();
-      this.bindMobControls();
-
-      // Кешуємо DOM-елементи один раз після прив'язки контролів
+      // Кешуємо DOM-елементи
       this._domCache = {
+        workspace: document.getElementById('main-workspace'),
+        autosaveTag: document.getElementById('autosave-tag'),
+        btnUndo: document.getElementById('btn-undo'),
+        btnRedo: document.getElementById('btn-redo'),
+        btnMcUndo: document.getElementById('btn-mc-undo'),
+        btnToggleMono: document.getElementById('btn-toggle-mono'),
+        btnHudMono: document.getElementById('btn-hud-mono'),
+        monoColorPicker: document.getElementById('mono-color-picker'),
+        verificationBadge: document.getElementById('print-verification-badge'),
+        verificationSelect: document.getElementById('verification-status-select'),
+        slicerTimeInput: document.getElementById('slicer-time-input'),
+        geomCheckPill: document.getElementById('geom-check-pill'),
+        mcConnectivityStatus: document.getElementById('mc-connectivity-status'),
         illusionCameraBar: document.getElementById('illusion-camera-bar'),
         physicsActionBar: document.getElementById('physics-action-bar'),
         mcVoxelSize: document.getElementById('mc-voxel-size'),
@@ -67,9 +91,396 @@
         valMobBulk: document.getElementById('val-mob-bulk')
       };
 
-      // Рендеримо піксель-сітку Майнкрафт-Кузні та будуємо першу модель
-      this.mcGen.renderCanvasUI();
-      this.rebuildCurrentModel(true);
+      this.bindTabs();
+      this.bindTopActions();
+      this.bindViewModeControls();
+      this.bindVerificationControls();
+      this.bindMinecraftControls();
+      this.bindIllusionControls();
+      this.bindPhysicsControls();
+      this.bindMobControls();
+
+      // Відновлюємо попереднє автозбереження (якщо є) або рендеримо стартовий стан
+      const restored = this.restoreAutosave();
+      if (!restored) {
+        this.mcGen.renderCanvasUI();
+        this.rebuildCurrentModel(true);
+      }
+      this.updateHistoryButtons();
+    }
+
+    // -------------------------------------------------------------------------
+    // ІСТОРІЯ ЗМІН (UNDO / REDO) ТА ЗБЕРЕЖЕННЯ ПРОЄКТУ (.JSON + LOCALSTORAGE)
+    // -------------------------------------------------------------------------
+    serializeState() {
+      const dom = this._domCache || {};
+      return {
+        app: '3d-club-studio',
+        version: '1.2.0',
+        savedAt: new Date().toISOString(),
+        activeTab: this.activeTab,
+        monochrome: this.sceneManager ? this.sceneManager.isMonochrome : false,
+        monoColor: dom.monoColorPicker?.value || '#cfd6df',
+        verificationStatus: dom.verificationSelect?.value || 'generated',
+        slicerNote: dom.slicerTimeInput?.value || '',
+        minecraft: this.mcGen.getState(),
+        controls: {
+          mcVoxelSize: dom.mcVoxelSize?.value,
+          mcHeightStep: dom.mcHeightStep?.value,
+          mcSolidBase: dom.mcSolidBase?.checked,
+          mcMountType: dom.mcMountType?.value,
+          mcCustomLabel: dom.mcCustomLabel?.value,
+          ilWord1: dom.ilWord1?.value,
+          ilWord2: dom.ilWord2?.value,
+          ilVoxelSize: dom.ilVoxelSize?.value,
+          ilSafeSupports: dom.ilSafeSupports?.checked,
+          ilLayoutMode: dom.ilLayoutMode?.value,
+          ilColorPrimary: dom.ilColorPrimary?.value,
+          phSubmode: dom.phSubmode?.value,
+          phExtrudeHeight: dom.phExtrudeHeight?.value,
+          phSpringThickness: dom.phSpringThickness?.value,
+          phWingWeight: dom.phWingWeight?.value,
+          phArmLength: dom.phArmLength?.value,
+          phIncludeAmmo: dom.phIncludeAmmo?.checked,
+          phCustomText: dom.phCustomText?.value,
+          mobArchetype: dom.mobArchetype?.value,
+          mobHeadScale: dom.mobHeadScale?.value,
+          mobBodyBulk: dom.mobBodyBulk?.value,
+          mobEyeType: dom.mobEyeType?.value,
+          mobHeadgear: dom.mobHeadgear?.value,
+          mobBackgear: dom.mobBackgear?.value,
+          mobWeapon: dom.mobWeapon?.value,
+          mobName: dom.mobName?.value,
+          mobTinkercadBlank: dom.mobTinkercadBlank?.checked
+        }
+      };
+    }
+
+    applyState(state, animatePop = false) {
+      if (!state || typeof state !== 'object') return;
+      this._isRestoring = true;
+      const dom = this._domCache || {};
+      const c = state.controls || {};
+
+      const setVal = (el, val) => {
+        if (el && val !== undefined && val !== null) el.value = val;
+      };
+      const setChk = (el, val) => {
+        if (el && typeof val === 'boolean') el.checked = val;
+      };
+
+      setVal(dom.mcVoxelSize, c.mcVoxelSize);
+      setVal(dom.mcHeightStep, c.mcHeightStep);
+      setChk(dom.mcSolidBase, c.mcSolidBase);
+      setVal(dom.mcMountType, c.mcMountType);
+      setVal(dom.mcCustomLabel, c.mcCustomLabel);
+
+      setVal(dom.ilWord1, c.ilWord1);
+      setVal(dom.ilWord2, c.ilWord2);
+      setVal(dom.ilVoxelSize, c.ilVoxelSize);
+      setChk(dom.ilSafeSupports, c.ilSafeSupports);
+      setVal(dom.ilLayoutMode, c.ilLayoutMode);
+      setVal(dom.ilColorPrimary, c.ilColorPrimary);
+
+      setVal(dom.phSubmode, c.phSubmode);
+      setVal(dom.phExtrudeHeight, c.phExtrudeHeight);
+      setVal(dom.phSpringThickness, c.phSpringThickness);
+      setVal(dom.phWingWeight, c.phWingWeight);
+      setVal(dom.phArmLength, c.phArmLength);
+      setChk(dom.phIncludeAmmo, c.phIncludeAmmo);
+      setVal(dom.phCustomText, c.phCustomText);
+
+      if (dom.phSubmode) {
+        const isBalancer = dom.phSubmode.value === 'balancer';
+        if (dom.phSpringGroup) dom.phSpringGroup.style.display = isBalancer ? 'none' : 'block';
+        if (dom.phWeightGroup) dom.phWeightGroup.style.display = isBalancer ? 'block' : 'none';
+        if (dom.btnPhysicsDemo) {
+          dom.btnPhysicsDemo.textContent = isBalancer
+            ? '👆 Протестувати Магічний Баланс!'
+            : '🚀 ВИСТРІЛИТИ З КАТАПУЛЬТИ!';
+        }
+      }
+
+      setVal(dom.mobArchetype, c.mobArchetype);
+      setVal(dom.mobHeadScale, c.mobHeadScale);
+      setVal(dom.mobBodyBulk, c.mobBodyBulk);
+      setVal(dom.mobEyeType, c.mobEyeType);
+      setVal(dom.mobHeadgear, c.mobHeadgear);
+      setVal(dom.mobBackgear, c.mobBackgear);
+      setVal(dom.mobWeapon, c.mobWeapon);
+      setVal(dom.mobName, c.mobName);
+      setChk(dom.mobTinkercadBlank, c.mobTinkercadBlank);
+
+      if (state.minecraft) {
+        this.mcGen.setState(state.minecraft, false);
+        document.querySelectorAll('[data-mc-preset]').forEach((b) => {
+          b.classList.toggle('active', b.getAttribute('data-mc-preset') === this.mcGen.currentPresetKey);
+        });
+      }
+
+      setVal(dom.verificationSelect, state.verificationStatus || 'generated');
+      setVal(dom.slicerTimeInput, state.slicerNote || '');
+      this.syncVerificationBadgeUI();
+
+      if (state.monoColor && dom.monoColorPicker) {
+        dom.monoColorPicker.value = state.monoColor;
+        this.sceneManager.setMonochromeColor(parseInt(state.monoColor.replace('#', '0x'), 16));
+      }
+      if (typeof state.monochrome === 'boolean') {
+        this.setMonochromeMode(state.monochrome);
+      }
+
+      this.updateValueLabels();
+      const targetTab = state.activeTab || 'minecraft';
+      this.switchTab(targetTab, true);
+      this.rebuildCurrentModel(animatePop, true);
+      this._isRestoring = false;
+    }
+
+    recordUndoSnapshot() {
+      if (this._isRestoring) return;
+      const snap = JSON.stringify(this.serializeState());
+      if (this.undoStack.length > 0 && this.undoStack[this.undoStack.length - 1] === snap) {
+        return;
+      }
+      this.undoStack.push(snap);
+      if (this.undoStack.length > this.maxHistory) {
+        this.undoStack.shift();
+      }
+      this.redoStack = [];
+      this.updateHistoryButtons();
+    }
+
+    undo() {
+      if (this.undoStack.length === 0) return;
+      const currentSnap = JSON.stringify(this.serializeState());
+      this.redoStack.push(currentSnap);
+      const prevSnap = this.undoStack.pop();
+      this.applyState(JSON.parse(prevSnap), false);
+      this.updateHistoryButtons();
+      this.autosave();
+      if (window.StudioSound) window.StudioSound.playPop(360);
+    }
+
+    redo() {
+      if (this.redoStack.length === 0) return;
+      const currentSnap = JSON.stringify(this.serializeState());
+      this.undoStack.push(currentSnap);
+      const nextSnap = this.redoStack.pop();
+      this.applyState(JSON.parse(nextSnap), false);
+      this.updateHistoryButtons();
+      this.autosave();
+      if (window.StudioSound) window.StudioSound.playPop(520);
+    }
+
+    updateHistoryButtons() {
+      const dom = this._domCache || {};
+      const canUndo = this.undoStack.length > 0;
+      const canRedo = this.redoStack.length > 0;
+      if (dom.btnUndo) dom.btnUndo.disabled = !canUndo;
+      if (dom.btnMcUndo) dom.btnMcUndo.disabled = !canUndo;
+      if (dom.btnRedo) dom.btnRedo.disabled = !canRedo;
+    }
+
+    autosave() {
+      if (this._isRestoring) return;
+      try {
+        const payload = JSON.stringify(this.serializeState());
+        localStorage.setItem(STORAGE_KEY, payload);
+        const dom = this._domCache || {};
+        if (dom.autosaveTag) {
+          const now = new Date();
+          const hh = String(now.getHours()).padStart(2, '0');
+          const mm = String(now.getMinutes()).padStart(2, '0');
+          const ss = String(now.getSeconds()).padStart(2, '0');
+          dom.autosaveTag.textContent = `💾 Автозбережено о ${hh}:${mm}:${ss}`;
+        }
+      } catch (_) {
+        // Ігноруємо помилки квоти або приватного режиму браузера
+      }
+    }
+
+    restoreAutosave() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const parsed = JSON.parse(raw);
+        if (!parsed || parsed.app !== '3d-club-studio') return false;
+        this.applyState(parsed, false);
+        const dom = this._domCache || {};
+        if (dom.autosaveTag) {
+          dom.autosaveTag.textContent = '💾 Відновлено попередню роботу';
+        }
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    saveProjectToFile() {
+      const state = this.serializeState();
+      const jsonStr = JSON.stringify(state, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const baseName = this.getSuggestedFilename().replace(/\.stl$/i, '');
+      a.download = `${baseName}_project.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      if (window.StudioSound) window.StudioSound.playExportSuccess();
+    }
+
+    loadProjectFromFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (!parsed || parsed.app !== '3d-club-studio') {
+            alert('Цей файл не схожий на проєкт «3D Кузні Чудес» (.json).');
+            return;
+          }
+          this.recordUndoSnapshot();
+          this.applyState(parsed, true);
+          this.autosave();
+          if (window.StudioSound) window.StudioSound.playMagicGenerate();
+        } catch (_) {
+          alert('Не вдалося прочитати файл проєкту. Перевірте, що це правильний .json файл.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // При будь-якій зміні геометрії скидаємо статус "Надруковано/Перевірено" на "Згенеровано"
+    markModelModified() {
+      if (this._isRestoring) return;
+      const dom = this._domCache || {};
+      if (dom.verificationSelect && dom.verificationSelect.value !== 'generated') {
+        dom.verificationSelect.value = 'generated';
+        this.syncVerificationBadgeUI();
+      }
+    }
+
+    setMonochromeMode(enable) {
+      const active = this.sceneManager.toggleMonochrome(enable);
+      const dom = this._domCache || {};
+      if (dom.btnToggleMono) {
+        dom.btnToggleMono.classList.toggle('active', active);
+        dom.btnToggleMono.textContent = active ? '🪨 1 Пластик: ВКЛ' : '🪨 1 Пластик';
+      }
+      if (dom.btnHudMono) {
+        dom.btnHudMono.classList.toggle('active', active);
+        dom.btnHudMono.textContent = active ? '🪨 1 Пластик: ВКЛ' : '🪨 Одним пластиком';
+      }
+      return active;
+    }
+
+    bindViewModeControls() {
+      const viewBtns = document.querySelectorAll('[data-view-mode]');
+      viewBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const mode = btn.getAttribute('data-view-mode') || 'split';
+          this.setViewMode(mode);
+        });
+      });
+    }
+
+    setViewMode(mode) {
+      this.viewMode = mode;
+      const dom = this._domCache || {};
+      if (dom.workspace) {
+        dom.workspace.classList.remove('mode-editor', 'mode-split', 'mode-viewport');
+        dom.workspace.classList.add(`mode-${mode}`);
+      }
+      document.querySelectorAll('[data-view-mode]').forEach((b) => {
+        b.classList.toggle('active', b.getAttribute('data-view-mode') === mode);
+      });
+      if (this.sceneManager) {
+        requestAnimationFrame(() => this.sceneManager.onResize());
+      }
+    }
+
+    bindVerificationControls() {
+      const dom = this._domCache || {};
+      if (dom.verificationSelect) {
+        dom.verificationSelect.addEventListener('change', () => {
+          this.syncVerificationBadgeUI();
+          this.autosave();
+        });
+      }
+      if (dom.slicerTimeInput) {
+        dom.slicerTimeInput.addEventListener('input', () => {
+          this.sceneManager.updateDimensionsUI(dom.slicerTimeInput.value.trim());
+          this.autosave();
+        });
+      }
+    }
+
+    syncVerificationBadgeUI() {
+      const dom = this._domCache || {};
+      const badge = dom.verificationBadge;
+      const sel = dom.verificationSelect;
+      if (!badge || !sel) return;
+      badge.classList.remove('status-generated', 'status-sliced', 'status-printed');
+      badge.classList.add(`status-${sel.value || 'generated'}`);
+    }
+
+    updateDiagnosticsUI() {
+      const dom = this._domCache || {};
+      const d = this.sceneManager?.dimensions;
+      if (!d) return;
+
+      const note = dom.slicerTimeInput?.value?.trim() || '';
+      this.sceneManager.updateDimensionsUI(note);
+
+      const pill = dom.geomCheckPill;
+      if (!pill) return;
+
+      // Перевірка габаритів столу та зв'язності
+      const conn = this.mcGen?.lastConnectivity;
+      if (!d.fitsBed) {
+        pill.textContent = `🚨 Габарит ${d.x}×${d.y} мм виходить за межі столу 200×200 мм!`;
+        pill.className = 'geom-check-pill danger';
+      } else if (!d.safeBed) {
+        pill.textContent = `⚠️ ${d.x}×${d.y} мм — майже впритул до краю столу (>190 мм)`;
+        pill.className = 'geom-check-pill warn';
+      } else if (this.activeTab === 'minecraft' && conn && conn.activeCount > 0 && conn.finalIslands > 1) {
+        pill.textContent = `⚠️ Деталь розірвана на ${conn.finalIslands} частини!`;
+        pill.className = 'geom-check-pill danger';
+      } else if (d.isMini) {
+        pill.textContent = '🌟 Міні-виріб (<=38 мм) • Плоске дно Z=0';
+        pill.className = 'geom-check-pill';
+      } else {
+        pill.textContent = '📐 У межах столу • Плоске дно Z=0';
+        pill.className = 'geom-check-pill';
+      }
+    }
+
+    updateMinecraftConnectivityUI() {
+      const dom = this._domCache || {};
+      const pill = dom.mcConnectivityStatus;
+      if (!pill || !this.mcGen) return;
+
+      const c = this.mcGen.lastConnectivity;
+      if (!c || c.activeCount === 0) {
+        pill.textContent = '✏️ Полотно порожнє: намалюй власний знак або обери шаблон.';
+        pill.className = 'connectivity-pill warn';
+      } else if (c.finalIslands === 1 && c.bridgedCount > 0) {
+        pill.textContent = `🔗 Суцільна підкладка автоматично з'єднала ${c.rawIslands} острови в 1 деталь!`;
+        pill.className = 'connectivity-pill bridged';
+      } else if (c.finalIslands === 1 && c.hasDiagonalOnly && !dom.mcSolidBase?.checked) {
+        pill.textContent = '⚠️ Є тонкі кутики по діагоналі: увімкніть «Суцільна підкладка» для міцності!';
+        pill.className = 'connectivity-pill warn';
+      } else if (c.finalIslands === 1) {
+        pill.textContent = '✅ 1 суцільна деталь: усі частини значка надійно з\'єднані.';
+        pill.className = 'connectivity-pill';
+      } else {
+        pill.textContent = `🚨 Розірвано на ${c.finalIslands} окремих частин! Увімкніть «Суцільна підкладка» або домалюйте з'єднання.`;
+        pill.className = 'connectivity-pill danger';
+      }
     }
 
     bindTabs() {
@@ -77,14 +488,16 @@
       tabBtns.forEach((btn) => {
         btn.addEventListener('click', () => {
           const tab = btn.getAttribute('data-tab');
+          this.recordUndoSnapshot();
           this.switchTab(tab);
+          this.autosave();
         });
       });
     }
 
-    switchTab(tabName) {
+    switchTab(tabName, skipRebuild = false) {
       this.activeTab = tabName;
-      if (window.StudioSound) window.StudioSound.playTabSwitch(tabName);
+      if (!skipRebuild && window.StudioSound) window.StudioSound.playTabSwitch(tabName);
 
       document.querySelectorAll('.gen-tab-btn').forEach((b) => {
         b.classList.toggle('active', b.getAttribute('data-tab') === tabName);
@@ -107,7 +520,9 @@
         this.sceneManager.setCameraView('iso');
       }
 
-      this.rebuildCurrentModel(true, true);
+      if (!skipRebuild) {
+        this.rebuildCurrentModel(true, true);
+      }
     }
 
     // Універсальний звуковий відгук для повзунків, полів вводу, чекбоксів та селектів
@@ -145,6 +560,62 @@
         });
       }
 
+      // Кнопки Скасувати / Повернути (Undo / Redo)
+      const dom = this._domCache || {};
+      if (dom.btnUndo) dom.btnUndo.addEventListener('click', () => this.undo());
+      if (dom.btnMcUndo) dom.btnMcUndo.addEventListener('click', () => this.undo());
+      if (dom.btnRedo) dom.btnRedo.addEventListener('click', () => this.redo());
+
+      // Гарячі клавіші Ctrl+Z / Ctrl+Y
+      window.addEventListener('keydown', (e) => {
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+          e.preventDefault();
+          if (e.shiftKey) this.redo();
+          else this.undo();
+        } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+          e.preventDefault();
+          this.redo();
+        }
+      });
+
+      // Перемикач одноколірного прев'ю ("Як виглядатиме одним пластиком")
+      const toggleMonoHandler = () => {
+        const isMono = this.setMonochromeMode();
+        if (window.StudioSound) window.StudioSound.playPop(isMono ? 440 : 560);
+        this.autosave();
+      };
+      if (dom.btnToggleMono) dom.btnToggleMono.addEventListener('click', toggleMonoHandler);
+      if (dom.btnHudMono) dom.btnHudMono.addEventListener('click', toggleMonoHandler);
+      if (dom.monoColorPicker) {
+        dom.monoColorPicker.addEventListener('input', () => {
+          const hex = parseInt(dom.monoColorPicker.value.replace('#', '0x'), 16);
+          this.sceneManager.setMonochromeColor(hex);
+          if (!this.sceneManager.isMonochrome) {
+            this.setMonochromeMode(true);
+          }
+          this.autosave();
+        });
+      }
+
+      // Збереження та відкриття редагованого проєкту (.json)
+      const btnSaveProj = document.getElementById('btn-save-project');
+      const btnLoadProj = document.getElementById('btn-load-project');
+      const inpLoadProj = document.getElementById('input-load-project');
+      if (btnSaveProj) {
+        btnSaveProj.addEventListener('click', () => this.saveProjectToFile());
+      }
+      if (btnLoadProj && inpLoadProj) {
+        btnLoadProj.addEventListener('click', () => inpLoadProj.click());
+        inpLoadProj.addEventListener('change', (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            this.loadProjectFromFile(file);
+            inpLoadProj.value = '';
+          }
+        });
+      }
+
       const btnSound = document.getElementById('btn-toggle-sound');
       const btnMusic = document.getElementById('btn-toggle-music');
 
@@ -152,10 +623,10 @@
       if (btnSound) {
         btnSound.addEventListener('click', () => {
           const on = window.StudioSound.toggle();
-          btnSound.textContent = on ? '🔊 Звук: ВКЛ' : '🔇 Звук: ВИКЛ';
+          btnSound.textContent = on ? '🔊 Звук' : '🔇 Тихо';
           btnSound.classList.toggle('muted', !on);
           if (!on && btnMusic) {
-            btnMusic.textContent = '🎵 Музика: ВИКЛ';
+            btnMusic.textContent = '🎵 Музика';
             btnMusic.classList.remove('playing');
           }
         });
@@ -165,10 +636,10 @@
       if (btnMusic) {
         btnMusic.addEventListener('click', () => {
           const playing = window.StudioSound.toggleMusic();
-          btnMusic.textContent = playing ? '🎵 Музика: ВКЛ' : '🎵 Музика: ВИКЛ';
+          btnMusic.textContent = playing ? '🎵 Грає' : '🎵 Музика';
           btnMusic.classList.toggle('playing', playing);
           if (playing && btnSound) {
-            btnSound.textContent = '🔊 Звук: ВКЛ';
+            btnSound.textContent = '🔊 Звук';
             btnSound.classList.remove('muted');
           }
         });
@@ -181,8 +652,8 @@
           const started = this.sceneManager.startSlicerSimulation();
           if (window.StudioSound) window.StudioSound.playPop(started ? 580 : 320);
           btnSim.textContent = started
-            ? '⏹️ Зупинити Друк'
-            : '🔥 Симуляція 3D-Принтера';
+            ? '⏹️ Стоп'
+            : '🔥 Симуляція';
         });
       }
 
@@ -190,7 +661,10 @@
       const btnRandom = document.getElementById('btn-random-wow');
       if (btnRandom) {
         btnRandom.addEventListener('click', () => {
+          this.recordUndoSnapshot();
           this.randomizeCurrentTab();
+          this.markModelModified();
+          this.autosave();
         });
       }
 
@@ -225,7 +699,7 @@
       }
       if (this.activeTab === 'physics') {
         const sub = dom.phSubmode?.value || 'catapult';
-        return `physics_${sub}_print_safe.stl`;
+        return `physics_${sub}.stl`;
       }
       if (this.activeTab === 'mob') {
         const arch = dom.mobArchetype?.value || 'boss';
@@ -239,17 +713,33 @@
     // 1. КОНТРОЛЕРИ МАЙНКРАФТ-КУЗНІ
     // -------------------------------------------------------------------------
     bindMinecraftControls() {
-      // Пресети з фірмовими тематичними звуками (меч, кріпер, TNT, серце, дракон тощо)
+      // Пресети з фірмовими тематичними звуками
       document.querySelectorAll('[data-mc-preset]').forEach((btn) => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('[data-mc-preset]').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           const key = btn.getAttribute('data-mc-preset');
           if (window.StudioSound) window.StudioSound.playThemeSound(key);
-          this.mcGen.loadPreset(key, false);
+          this.mcGen.loadPreset(key, false, true);
           this.rebuildCurrentModel(true, true);
         });
       });
+
+      // Швидкий пресет "Міні-значок (~35 мм)"
+      const btnMini = document.getElementById('btn-mc-mini-preset');
+      if (btnMini) {
+        btnMini.addEventListener('click', () => {
+          this.recordUndoSnapshot();
+          const dom = this._domCache || {};
+          if (dom.mcVoxelSize) dom.mcVoxelSize.value = '2.2';
+          if (dom.mcHeightStep) dom.mcHeightStep.value = '1.2';
+          if (dom.mcSolidBase) dom.mcSolidBase.checked = true;
+          this.updateValueLabels();
+          this.markModelModified();
+          this.rebuildCurrentModel(true);
+          this.autosave();
+        });
+      }
 
       // Вибір пензля (рівня висоти 1..4 або Гумки 0)
       document.querySelectorAll('[data-mc-brush]').forEach((btn) => {
@@ -278,10 +768,14 @@
       ids.forEach((id) => {
         const el = document.getElementById(id);
         if (el) {
+          el.addEventListener('focus', () => this.recordUndoSnapshot());
+          el.addEventListener('mousedown', () => this.recordUndoSnapshot());
           el.addEventListener('input', () => {
             this._playControlFeedback(el);
             this.updateValueLabels();
+            this.markModelModified();
             this.rebuildCurrentModel(false);
+            this.autosave();
           });
         }
       });
@@ -291,14 +785,33 @@
     // 2. КОНТРОЛЕРИ ПОДВІЙНОЇ ОПТИЧНОЇ ІЛЮЗІЇ
     // -------------------------------------------------------------------------
     bindIllusionControls() {
+      // Швидка кнопка короткого знака (1-2 літери)
+      const btnShort = document.getElementById('btn-il-short-mode');
+      if (btnShort) {
+        btnShort.addEventListener('click', () => {
+          this.recordUndoSnapshot();
+          const dom = this._domCache || {};
+          if (dom.ilWord1) dom.ilWord1.value = '3D';
+          if (dom.ilWord2) dom.ilWord2.value = '★!';
+          if (dom.ilVoxelSize) dom.ilVoxelSize.value = '2.4';
+          this.updateValueLabels();
+          this.markModelModified();
+          this.rebuildCurrentModel(true);
+          this.autosave();
+        });
+      }
+
       // Пресети слів
       document.querySelectorAll('[data-il-preset]').forEach((btn) => {
         btn.addEventListener('click', () => {
+          this.recordUndoSnapshot();
           const w1 = btn.getAttribute('data-w1');
           const w2 = btn.getAttribute('data-w2');
           document.getElementById('il-word1').value = w1;
           document.getElementById('il-word2').value = w2;
+          this.markModelModified();
           this.rebuildCurrentModel(true);
+          this.autosave();
         });
       });
 
@@ -307,10 +820,15 @@
       ['il-word1', 'il-word2'].forEach((id) => {
         const inp = document.getElementById(id);
         if (inp) {
-          inp.addEventListener('focus', () => { lastFocusedInput = inp; });
+          inp.addEventListener('focus', () => {
+            lastFocusedInput = inp;
+            this.recordUndoSnapshot();
+          });
           inp.addEventListener('input', () => {
             this._playControlFeedback(inp);
+            this.markModelModified();
             this.rebuildCurrentModel(false);
+            this.autosave();
           });
         }
       });
@@ -328,11 +846,14 @@
         btn.addEventListener('click', () => {
           const sym = btn.getAttribute('data-insert-sym');
           if (lastFocusedInput && lastFocusedInput.value.length < 9) {
+            this.recordUndoSnapshot();
             lastFocusedInput.value += sym;
             if (window.StudioSound) {
               window.StudioSound.playThemeSound(symThemeMap[sym] || 'totem');
             }
+            this.markModelModified();
             this.rebuildCurrentModel(false);
+            this.autosave();
           }
         });
       });
@@ -340,10 +861,13 @@
       ['il-voxel-size', 'il-safe-supports', 'il-layout-mode', 'il-color-primary'].forEach((id) => {
         const el = document.getElementById(id);
         if (el) {
+          el.addEventListener('mousedown', () => this.recordUndoSnapshot());
           el.addEventListener('input', () => {
             this._playControlFeedback(el);
             this.updateValueLabels();
+            this.markModelModified();
             this.rebuildCurrentModel(false);
+            this.autosave();
           });
         }
       });
@@ -356,6 +880,7 @@
       const subSelect = document.getElementById('ph-submode');
       if (subSelect) {
         subSelect.addEventListener('change', () => {
+          this.recordUndoSnapshot();
           const isBalancer = subSelect.value === 'balancer';
           document.getElementById('ph-spring-group').style.display = isBalancer ? 'none' : 'block';
           document.getElementById('ph-weight-group').style.display = isBalancer ? 'block' : 'none';
@@ -370,17 +895,22 @@
               ? '👆 Протестувати Магічний Баланс!'
               : '🚀 ВИСТРІЛИТИ З КАТАПУЛЬТИ!';
           }
+          this.markModelModified();
           this.rebuildCurrentModel(true);
+          this.autosave();
         });
       }
 
       ['ph-extrude-height', 'ph-spring-thickness', 'ph-wing-weight', 'ph-arm-length', 'ph-include-ammo', 'ph-custom-text'].forEach((id) => {
         const el = document.getElementById(id);
         if (el) {
+          el.addEventListener('mousedown', () => this.recordUndoSnapshot());
           el.addEventListener('input', () => {
             this._playControlFeedback(el);
             this.updateValueLabels();
+            this.markModelModified();
             this.rebuildCurrentModel(false);
+            this.autosave();
           });
         }
       });
@@ -406,11 +936,14 @@
       ids.forEach((id) => {
         const el = document.getElementById(id);
         if (el) {
+          el.addEventListener('mousedown', () => this.recordUndoSnapshot());
           el.addEventListener('input', () => {
             this._playControlFeedback(el);
             this.updateValueLabels();
             const isArch = id === 'mob-archetype';
+            this.markModelModified();
             this.rebuildCurrentModel(isArch, true);
+            this.autosave();
           });
         }
       });
@@ -448,8 +981,8 @@
 
       if (this.activeTab === 'illusion') {
         const pairs = [
+          ['3D', '★!'],
           ['МАЙН!', 'КРАФТ'],
-          ['КРІПЕР', '⚔💀⛏♥👑★'],
           ['ГЕРОЙ', '★PRO★'],
           ['ЛІДЕР', '👑100👑'],
           ['ДРАКОН', '⚔БОС!⚔'],
@@ -502,6 +1035,7 @@
           mountType: dom.mcMountType?.value,
           customLabel: dom.mcCustomLabel?.value
         });
+        this.updateMinecraftConnectivityUI();
       } else if (this.activeTab === 'illusion') {
         const colorHex = dom.ilColorPrimary?.value || '#10b981';
         group = this.illusionGen.build3D({
