@@ -1,5 +1,17 @@
 // Генератор 2: Магія Подвійного Тексту (3D Оптична Ілюзія / Перевертень з підтримкою Української Кирилиці та Іконок)
 (function () {
+  const IL_CONFIG = {
+    DEFAULT_VOXEL_SIZE: 2.6,
+    DEFAULT_BASE_HEIGHT: 4.0,
+    SUPPORT_SCALE: 0.78,
+    GRID_ROWS: 7,
+    GRID_COLS: 5,
+    CHAR_SPACING: 6,
+    PAD_EXTRA: 1.4,
+    RIM_HEIGHT: 1.4,
+    RIM_EXTRA: 1.0
+  };
+
   class DualIllusionGenerator {
     constructor() {
       this.presets = [
@@ -38,8 +50,8 @@
 
       const word1 = params.word1 || 'МАКСИМ';
       const word2 = params.word2 || '★BOSS★';
-      const voxelSize = parseFloat(params.voxelSize) || 2.6; // мм на 1 воксель літери
-      const baseHeight = parseFloat(params.baseHeight) || 4.0; // мм висота платформи
+      const voxelSize = parseFloat(params.voxelSize) || IL_CONFIG.DEFAULT_VOXEL_SIZE; // мм на 1 воксель літери
+      const baseHeight = parseFloat(params.baseHeight) || IL_CONFIG.DEFAULT_BASE_HEIGHT; // мм висота платформи
       const safeSupports = params.safeSupports !== false;
       const layoutMode = params.layoutMode || 'diagonal'; // 'diagonal' або 'line'
 
@@ -69,8 +81,15 @@
         metalness: 0.15
       });
 
-      const charSpan = 6 * voxelSize; // 5 вокселів + 1 проміжок
-      const letterBlockSize = 5 * voxelSize;
+      const charSpan = IL_CONFIG.CHAR_SPACING * voxelSize; // 5 вокселів + 1 проміжок
+      const letterBlockSize = IL_CONFIG.GRID_COLS * voxelSize;
+
+      const voxelGeo = new THREE.BoxGeometry(voxelSize, voxelSize, voxelSize);
+      const sSize = voxelSize * IL_CONFIG.SUPPORT_SCALE;
+      const supportGeo = new THREE.BoxGeometry(sSize, voxelSize, sSize);
+      const padSize = letterBlockSize + voxelSize * IL_CONFIG.PAD_EXTRA;
+      const padGeo = new THREE.BoxGeometry(padSize, baseHeight, padSize);
+      const rimGeo = new THREE.BoxGeometry(padSize + IL_CONFIG.RIM_EXTRA, IL_CONFIG.RIM_HEIGHT, padSize + IL_CONFIG.RIM_EXTRA);
 
       // Будуємо кожну пару літер (Char1[i] перетинається з Char2[i] під кутом 90°)
       for (let i = 0; i < length; i++) {
@@ -80,16 +99,16 @@
         const charGroup = new THREE.Group();
 
         // 3D-масив зайнятості [yLevel 0..6][x 0..4][z 0..4], де yLevel 0 — самий низ, 6 — верх
-        const grid3D = Array.from({ length: 7 }, () =>
-          Array.from({ length: 5 }, () => Array(5).fill(0))
+        const grid3D = Array.from({ length: IL_CONFIG.GRID_ROWS }, () =>
+          Array.from({ length: IL_CONFIG.GRID_COLS }, () => Array(IL_CONFIG.GRID_COLS).fill(0))
         );
 
-        for (let row = 0; row < 7; row++) {
+        for (let row = 0; row < IL_CONFIG.GRID_ROWS; row++) {
           const yLevel = 6 - row;
           let row1Active = [];
           let row2Active = [];
 
-          for (let c = 0; c < 5; c++) {
+          for (let c = 0; c < IL_CONFIG.GRID_COLS; c++) {
             if (m1[row][c] === 1) row1Active.push(c);
             if (m2[row][c] === 1) row2Active.push(c);
           }
@@ -107,9 +126,9 @@
         // Якщо увімкнено "Бронебійний друк без підтримок":
         // Перевіряємо знизу вгору (yLevel = 1..6), щоб кожен воксель мав опору знизу або під кутом 45°
         if (safeSupports) {
-          for (let y = 1; y < 7; y++) {
-            for (let x = 0; x < 5; x++) {
-              for (let z = 0; z < 5; z++) {
+          for (let y = 1; y < IL_CONFIG.GRID_ROWS; y++) {
+            for (let x = 0; x < IL_CONFIG.GRID_COLS; x++) {
+              for (let z = 0; z < IL_CONFIG.GRID_COLS; z++) {
                 if (grid3D[y][x][z] > 0) {
                   // Чи є опора прямо під ним у (x, y-1, z)?
                   if (grid3D[y - 1][x][z] === 0) {
@@ -129,13 +148,12 @@
         }
 
         // Створюємо меші вокселів для поточної 3D-літери
-        for (let y = 0; y < 7; y++) {
-          for (let x = 0; x < 5; x++) {
-            for (let z = 0; z < 5; z++) {
+        for (let y = 0; y < IL_CONFIG.GRID_ROWS; y++) {
+          for (let x = 0; x < IL_CONFIG.GRID_COLS; x++) {
+            for (let z = 0; z < IL_CONFIG.GRID_COLS; z++) {
               const cellType = grid3D[y][x][z];
               if (cellType === 1) {
-                const geo = new THREE.BoxGeometry(voxelSize, voxelSize, voxelSize);
-                const mesh = new THREE.Mesh(geo, y === 6 ? matAccent : matPrimary);
+                const mesh = new THREE.Mesh(voxelGeo, y === 6 ? matAccent : matPrimary);
                 mesh.position.set(
                   (x - 2) * voxelSize,
                   baseHeight + y * voxelSize + voxelSize / 2,
@@ -144,9 +162,7 @@
                 charGroup.add(mesh);
               } else if (cellType === 2) {
                 // Трохи тонший опорний стовпчик (80% ширини), щоб не заважав читанню літер, але тримав нависання!
-                const sSize = voxelSize * 0.78;
-                const geo = new THREE.BoxGeometry(sSize, voxelSize, sSize);
-                const mesh = new THREE.Mesh(geo, matSupport);
+                const mesh = new THREE.Mesh(supportGeo, matSupport);
                 mesh.position.set(
                   (x - 2) * voxelSize,
                   baseHeight + y * voxelSize + voxelSize / 2,
@@ -159,14 +175,11 @@
         }
 
         // Індивідуальна сходинка-п'єдестал під кожною 3D-літерою
-        const padSize = letterBlockSize + voxelSize * 1.4;
-        const padGeo = new THREE.BoxGeometry(padSize, baseHeight, padSize);
         const padMesh = new THREE.Mesh(padGeo, matBase);
         padMesh.position.set(0, baseHeight / 2, 0);
         charGroup.add(padMesh);
 
         // Золотий ободок навколо п'єдесталу літери
-        const rimGeo = new THREE.BoxGeometry(padSize + 1.0, 1.4, padSize + 1.0);
         const rimMesh = new THREE.Mesh(rimGeo, matAccent);
         rimMesh.position.set(0, 0.7, 0);
         charGroup.add(rimMesh);
@@ -186,6 +199,8 @@
 
       // З'єднуємо всі п'єдестали літер єдиною міцною монолітною балкою знизу, щоб модель була одним цілим!
       if (length > 1) {
+        const bridgeW = letterBlockSize * 1.15;
+        const bridgeGeo = new THREE.BoxGeometry(bridgeW, baseHeight * 0.9, bridgeW);
         for (let i = 0; i < length - 1; i++) {
           const i1 = i - (length - 1) / 2;
           const i2 = i + 1 - (length - 1) / 2;
@@ -198,8 +213,6 @@
           const midX = (x1 + x2) / 2;
           const midZ = (z1 + z2) / 2;
 
-          const bridgeW = letterBlockSize * 1.15;
-          const bridgeGeo = new THREE.BoxGeometry(bridgeW, baseHeight * 0.9, bridgeW);
           const bridgeMesh = new THREE.Mesh(bridgeGeo, matBase);
           bridgeMesh.position.set(midX, (baseHeight * 0.9) / 2, midZ);
           group.add(bridgeMesh);

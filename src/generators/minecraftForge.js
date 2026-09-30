@@ -186,6 +186,21 @@
     }
   };
 
+  const MC_CONFIG = {
+    GRID_SIZE: 16,
+    BASE_PLATE_HEIGHT: 2.0,
+    DEFAULT_VOXEL_SIZE: 3.5,
+    DEFAULT_HEIGHT_STEP: 1.5,
+    BASE_HEIGHT_OFFSET: 2.5,
+    KEYCHAIN_RING_OUTER: 7.5,
+    KEYCHAIN_RING_INNER: 3.2,
+    KEYCHAIN_SEGMENTS: 24,
+    LABEL_PIXEL_MIN: 1.8,
+    LABEL_PIXEL_SCALE: 0.52,
+    LABEL_PLATE_HEIGHT: 3.0,
+    LABEL_LETTER_HEIGHT: 2.2
+  };
+
   class MinecraftForgeGenerator {
     constructor() {
       this.currentPresetKey = 'sword';
@@ -193,6 +208,8 @@
       this.isPainting = false;
       this.grid = [];
       this.colors = { 1: 0x5c3a21, 2: 0x0284c7, 3: 0x38bdf8, 4: 0xe0f2fe };
+      this._onMouseUp = () => { this.isPainting = false; };
+      window.addEventListener('mouseup', this._onMouseUp);
       this.loadPreset('sword', false);
     }
 
@@ -210,9 +227,10 @@
     }
 
     clearGrid() {
-      this.grid = Array.from({ length: 16 }, () => Array(16).fill(0));
+      this.grid = Array.from({ length: MC_CONFIG.GRID_SIZE }, () => Array(MC_CONFIG.GRID_SIZE).fill(0));
       this.renderCanvasUI();
-      if (window.StudioApp) window.StudioApp.rebuildCurrentModel(true);
+      if (window.StudioSound) window.StudioSound.playClearCanvas();
+      if (window.StudioApp) window.StudioApp.rebuildCurrentModel(true, true);
     }
 
     // Випадковий симетричний тотем/меч/артефакт (діти обожнюють кнопку рандому!)
@@ -224,7 +242,7 @@
         { 1: 0x7f1d1d, 2: 0xdc2626, 3: 0xf97316, 4: 0xfef08a }
       ];
       this.colors = palettes[Math.floor(Math.random() * palettes.length)];
-      this.grid = Array.from({ length: 16 }, () => Array(16).fill(0));
+      this.grid = Array.from({ length: MC_CONFIG.GRID_SIZE }, () => Array(MC_CONFIG.GRID_SIZE).fill(0));
 
       for (let r = 1; r < 15; r++) {
         for (let c = 2; c < 8; c++) {
@@ -242,7 +260,7 @@
       }
 
       this.renderCanvasUI();
-      if (window.StudioApp) window.StudioApp.rebuildCurrentModel(true);
+      if (window.StudioApp) window.StudioApp.rebuildCurrentModel(true, true);
     }
 
     renderCanvasUI() {
@@ -252,8 +270,8 @@
 
       const hexStr = (num) => '#' + num.toString(16).padStart(6, '0');
 
-      for (let r = 0; r < 16; r++) {
-        for (let c = 0; c < 16; c++) {
+      for (let r = 0; r < MC_CONFIG.GRID_SIZE; r++) {
+        for (let c = 0; c < MC_CONFIG.GRID_SIZE; c++) {
           const cell = document.createElement('div');
           cell.className = 'pixel-cell';
           const val = this.grid[r][c];
@@ -275,7 +293,7 @@
                 cell.style.backgroundColor = '#0f172a';
                 cell.textContent = '';
               }
-              if (window.StudioSound) window.StudioSound.playPop(320 + this.activeBrush * 80);
+              if (window.StudioSound) window.StudioSound.playPaintNote(r, c, this.activeBrush);
               if (window.StudioApp) window.StudioApp.rebuildCurrentModel(false);
             }
           };
@@ -292,28 +310,24 @@
           container.appendChild(cell);
         }
       }
-
-      window.addEventListener('mouseup', () => {
-        this.isPainting = false;
-      }, { once: true });
     }
 
     // Генерація 3D-геометрії у реальних міліметрах
     build3D(params) {
       const group = new THREE.Group();
 
-      const voxelSize = parseFloat(params.voxelSize) || 3.5; // мм
-      const basePlateHeight = params.solidBase ? 2.0 : 0.0;  // мм
-      const heightStep = parseFloat(params.heightStep) || 1.5; // мм різниця між шарами
+      const voxelSize = parseFloat(params.voxelSize) || MC_CONFIG.DEFAULT_VOXEL_SIZE; // мм
+      const basePlateHeight = params.solidBase ? MC_CONFIG.BASE_PLATE_HEIGHT : 0.0;  // мм
+      const heightStep = parseFloat(params.heightStep) || MC_CONFIG.DEFAULT_HEIGHT_STEP; // мм різниця між шарами
       const mountType = params.mountType || 'keychain';      // 'none', 'keychain', 'stand'
       const customLabel = (params.customLabel || '').trim();
 
       // Висоти для кожного з 4 рівнів (мм)
       const levelHeights = {
-        1: basePlateHeight + 2.5,
-        2: basePlateHeight + 2.5 + heightStep,
-        3: basePlateHeight + 2.5 + heightStep * 2,
-        4: basePlateHeight + 2.5 + heightStep * 3
+        1: basePlateHeight + MC_CONFIG.BASE_HEIGHT_OFFSET,
+        2: basePlateHeight + MC_CONFIG.BASE_HEIGHT_OFFSET + heightStep,
+        3: basePlateHeight + MC_CONFIG.BASE_HEIGHT_OFFSET + heightStep * 2,
+        4: basePlateHeight + MC_CONFIG.BASE_HEIGHT_OFFSET + heightStep * 3
       };
 
       const materials = {
@@ -324,27 +338,27 @@
         4: new THREE.MeshStandardMaterial({ color: this.colors[4], roughness: 0.25, metalness: 0.3 })
       };
 
-      const totalWidth = 16 * voxelSize;
+      const totalWidth = MC_CONFIG.GRID_SIZE * voxelSize;
       const offset = -totalWidth / 2 + voxelSize / 2;
 
       // Якщо увімкнено "Суцільна основа (Бронебійна міцність)" — будуємо підкладку під активними клітинками та їх сусідами
       if (params.solidBase) {
-        for (let r = 0; r < 16; r++) {
-          for (let c = 0; c < 16; c++) {
+        const baseGeo = new THREE.BoxGeometry(voxelSize, basePlateHeight, voxelSize);
+        for (let r = 0; r < MC_CONFIG.GRID_SIZE; r++) {
+          for (let c = 0; c < MC_CONFIG.GRID_SIZE; c++) {
             let hasNeighbor = this.grid[r][c] > 0;
             if (!hasNeighbor) {
               for (let dr = -1; dr <= 1; dr++) {
                 for (let dc = -1; dc <= 1; dc++) {
                   const nr = r + dr, nc = c + dc;
-                  if (nr >= 0 && nr < 16 && nc >= 0 && nc < 16 && this.grid[nr][nc] > 0) {
+                  if (nr >= 0 && nr < MC_CONFIG.GRID_SIZE && nc >= 0 && nc < MC_CONFIG.GRID_SIZE && this.grid[nr][nc] > 0) {
                     hasNeighbor = true;
                   }
                 }
               }
             }
             if (hasNeighbor && this.grid[r][c] === 0) {
-              const geo = new THREE.BoxGeometry(voxelSize, basePlateHeight, voxelSize);
-              const mesh = new THREE.Mesh(geo, materials[0]);
+              const mesh = new THREE.Mesh(baseGeo, materials[0]);
               mesh.position.set(offset + c * voxelSize, basePlateHeight / 2, offset + r * voxelSize);
               group.add(mesh);
             }
@@ -353,12 +367,19 @@
       }
 
       // Будуємо основні різнорівневі вокселі
-      for (let r = 0; r < 16; r++) {
-        for (let c = 0; c < 16; c++) {
+      const levelGeos = {
+        1: new THREE.BoxGeometry(voxelSize, levelHeights[1], voxelSize),
+        2: new THREE.BoxGeometry(voxelSize, levelHeights[2], voxelSize),
+        3: new THREE.BoxGeometry(voxelSize, levelHeights[3], voxelSize),
+        4: new THREE.BoxGeometry(voxelSize, levelHeights[4], voxelSize)
+      };
+
+      for (let r = 0; r < MC_CONFIG.GRID_SIZE; r++) {
+        for (let c = 0; c < MC_CONFIG.GRID_SIZE; c++) {
           const lvl = this.grid[r][c];
           if (lvl > 0) {
             const h = levelHeights[lvl] || 4.0;
-            const geo = new THREE.BoxGeometry(voxelSize, h, voxelSize);
+            const geo = levelGeos[lvl];
             const mesh = new THREE.Mesh(geo, materials[lvl]);
             mesh.position.set(offset + c * voxelSize, h / 2, offset + r * voxelSize);
             group.add(mesh);
@@ -368,9 +389,9 @@
 
       // Додаємо вушко для брелока (товсте, надійне для старого принтера)
       if (mountType === 'keychain') {
-        const ringOuter = 7.5;
-        const ringInner = 3.2;
-        const ringHeight = Math.max(3.5, basePlateHeight + 2.5);
+        const ringOuter = MC_CONFIG.KEYCHAIN_RING_OUTER;
+        const ringInner = MC_CONFIG.KEYCHAIN_RING_INNER;
+        const ringHeight = Math.max(3.5, basePlateHeight + MC_CONFIG.BASE_HEIGHT_OFFSET);
 
         const shape = new THREE.Shape();
         shape.absarc(0, 0, ringOuter, 0, Math.PI * 2, false);
@@ -381,7 +402,7 @@
         const extrudeGeo = new THREE.ExtrudeGeometry(shape, {
           depth: ringHeight,
           bevelEnabled: false,
-          curveSegments: 24
+          curveSegments: MC_CONFIG.KEYCHAIN_SEGMENTS
         });
         extrudeGeo.rotateX(Math.PI / 2);
 
@@ -401,11 +422,11 @@
       if (customLabel.length > 0 || mountType === 'stand') {
         const labelText = customLabel.length > 0 ? customLabel : 'МАЙНКРАФТ';
         const charMatrices = window.VoxelFont.textToCharMatrices(labelText, 9);
-        const px = Math.max(1.8, voxelSize * 0.52);
+        const px = Math.max(MC_CONFIG.LABEL_PIXEL_MIN, voxelSize * MC_CONFIG.LABEL_PIXEL_SCALE);
         const textWidth = charMatrices.length * 6 * px;
         const plateW = Math.max(totalWidth * 0.85, textWidth + 8);
         const plateD = 9 * px;
-        const plateH = 3.0;
+        const plateH = MC_CONFIG.LABEL_PLATE_HEIGHT;
 
         const plateZ = -offset + voxelSize * 0.8 + plateD / 2;
 
@@ -423,14 +444,14 @@
         // Воксельні літери імені зверху на табличці
         const startX = -textWidth / 2 + px / 2;
         const startZ = plateZ - (7 * px) / 2 + px / 2;
-        const letterH = 2.2;
+        const letterH = MC_CONFIG.LABEL_LETTER_HEIGHT;
+        const lGeo = new THREE.BoxGeometry(px, letterH, px);
 
         charMatrices.forEach((item, cIdx) => {
           const mat = item.matrix;
           for (let r = 0; r < 7; r++) {
             for (let c = 0; c < 5; c++) {
               if (mat[r][c] === 1) {
-                const lGeo = new THREE.BoxGeometry(px, letterH, px);
                 const lMesh = new THREE.Mesh(lGeo, materials[3]);
                 lMesh.position.set(
                   startX + (cIdx * 6 + c) * px,
