@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D Кузня Чудес — Студія 3D-Моделювання (2–6 класи)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ВЕРХНЯ ПАНЕЛЬ (ШАПКА СТУДІЇ) -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">⚒️</div>
+      <div class="brand-title">
+        <h1>3D КУЗНЯ ЧУДЕС</h1>
+        <p>Minecraft &amp; Print-Safe 3D Генератор • Tinkercad / Makers Empire / 3D-Принтер</p>
+      </div>
+    </div>
+
+    <!-- ПЕРЕМИКАЧ 4 ГЕНЕРАТОРІВ -->
+    <nav class="gen-tabs">
+      <button class="gen-tab-btn active" data-tab="minecraft">
+        ⛏️ Майнкрафт-Кузня
+      </button>
+      <button class="gen-tab-btn" data-tab="illusion">
+        🔮 Оптичний Перевертень
+      </button>
+      <button class="gen-tab-btn" data-tab="physics">
+        🎯 Катапульта і Баланс
+      </button>
+      <button class="gen-tab-btn" data-tab="mob">
+        👾 Мутатор Мобів
+      </button>
+    </nav>
+
+    <!-- ДІЇ: ЗВУК, РАНДОМ, СИМУЛЯТОР ДРУКУ, ЕКСПОРТ .STL -->
+    <div class="top-actions">
+      <button id="btn-toggle-sound" class="btn-action btn-sound" title="Увімкнути/вимкнути звукові ефекти">
+        🔊 Звук: ВКЛ
+      </button>
+      <button id="btn-random-wow" class="btn-action btn-random" title="Випадкова генерація / Мутація!">
+        🎲 Випадковий ВАУ!
+      </button>
+      <button id="btn-simulate-print" class="btn-action btn-sim" title="Показати дітям, як принтер друкує модель шар за шаром">
+        🔥 Симуляція 3D-Принтера
+      </button>
+      <button id="btn-export-stl" class="btn-action btn-export" title="Завантажити готовий .STL файл для друку або Tinkercad">
+        💾 Скачати .STL
+      </button>
+    </div>
+  </header>
+
+  <!-- ОСНОВНИЙ РОБОЧИЙ ПРОСТІР -->
+  <main class="workspace">
+
+    <!-- ЛІВА ПАНЕЛЬ НАЛАШТУВАНЬ -->
+    <aside class="sidebar">
+
+      <!-- ===================================================================
+           ВКЛАДКА 1: МАЙНКРАФТ-КУЗНЯ (ВОКСЕЛЬНИЙ 3D-РЕЛЬЄФ)
+           =================================================================== -->
+      <section id="panel-minecraft" class="panel-section active">
+        <div class="printer-safe-tip">
+          🛡️ <b>Старий принтер ОК:</b> Кожен колір має власну висоту в міліметрах! Модель має ідеально пласке дно й друкується без жодних підтримок.
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span>📦 Готові Артефакти (Шаблони)</span>
+          </div>
+          <div class="preset-grid">
+            <button class="preset-btn active" data-mc-preset="sword">⚔️ Алмазний Меч</button>
+            <button class="preset-btn" data-mc-preset="pickaxe">⛏️ Алмазна Кірка</button>
+            <button class="preset-btn" data-mc-preset="creeper">💚 Кріпер-Трофей</button>
+            <button class="preset-btn" data-mc-preset="tnt">🧨 Динаміт TNT</button>
+            <button class="preset-btn" data-mc-preset="heart">❤️ Серце Життя</button>
+            <button class="preset-btn" data-mc-preset="shield">🛡️ Щит (Tinkercad)</button>
+            <button class="preset-btn" data-mc-preset="totem">🏆 Тотем Безсмертя</button>
+            <button class="preset-btn" data-mc-preset="dragon">🐉 Дракон Енду</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span>🎨 Малюй 3D-Висоту (16×16 блоків)</span>
+            <button id="btn-mc-clear" class="sym-btn" title="Очистити полотно">🗑️ Очистити</button>
+          </div>
+
+          <div class="brush-bar">
+            <button class="brush-btn" data-mc-brush="0">🧽 Гумка (0)</button>
+            <button class="brush-btn" data-mc-brush="1">🟫 Шар 1 (Низ)</button>
+            <button class="brush-btn" data-mc-brush="2">🟦 Шар 2 (Сер)</button>
+            <button class="brush-btn active" data-mc-brush="3">💎 Шар 3 (Вис)</button>
+            <button class="brush-btn" data-mc-brush="4">✨ Шар 4 (Пік)</button>
+          </div>
+
+          <div class="pixel-grid-wrapper">
+            <div id="mc-pixel-grid" class="pixel-grid"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span>⚙️ Налаштування під 3D-Принтер та Tinkercad</span>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label">
+              <span>Розмір 1 кубика (вокселя):</span>
+              <span id="val-mc-voxel" class="control-val">3.5 мм</span>
+            </div>
+            <input id="mc-voxel-size" type="range" min="2.2" max="5.0" step="0.1" value="3.5" />
+          </div>
+
+          <div class="control-row">
+            <div class="control-label">
+              <span>Сходинка висоти між шарами:</span>
+              <span id="val-mc-step" class="control-val">1.5 мм</span>
+            </div>
+            <input id="mc-height-step" type="range" min="0.8" max="2.8" step="0.1" value="1.5" />
+          </div>
+
+          <label class="checkbox-row">
+            <input id="mc-solid-base" type="checkbox" checked />
+            <span>Суцільна підкладка 2 мм (щоб діагоналі не ламалися)</span>
+          </label>
+
+          <div class="control-row">
+            <div class="control-label"><span>Тип кріплення / підставки:</span></div>
+            <select id="mc-mount-type">
+              <option value="keychain" selected>🔑 Міцне вушко для брелока (отвір 6 мм)</option>
+              <option value="none">🧱 Чиста фігурка (для Tinkercad / значка)</option>
+              <option value="stand">🏆 З іменною табличкою внизу</option>
+            </select>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label"><span>Ім'я учня (об'ємні літери внизу):</span></div>
+            <input id="mc-custom-label" type="text" maxlength="9" placeholder="Напр.: МАКСИМ (необов'язково)" />
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           ВКЛАДКА 2: ОПТИЧНИЙ ПЕРЕВЕРТЕНЬ (ПОДВІЙНИЙ 3D-ТЕКСТ)
+           =================================================================== -->
+      <section id="panel-illusion" class="panel-section">
+        <div class="printer-safe-tip">
+          🔮 <b>ВАУ-Магія без механіки:</b> Під кутом 0° читається перше слово (наприклад, ім'я дитини), а при повороті на 90° — друге слово або іконки Minecraft!
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span>⚡ Швидкі Шаблони Ілюзій</span>
+          </div>
+          <div class="preset-grid">
+            <button class="preset-btn" data-il-preset="1" data-w1="МАКСИМ" data-w2="★BOSS★">👦 МАКСИМ ↔ BOSS</button>
+            <button class="preset-btn" data-il-preset="2" data-w1="МАЙН!" data-w2="КРАФТ">⛏️ МАЙН! ↔ КРАФТ</button>
+            <button class="preset-btn" data-il-preset="3" data-w1="КРІПЕР" data-w2="⚔💀⛏♥👑★">💀 КРІПЕР ↔ ІКОНКИ</button>
+            <button class="preset-btn" data-il-preset="4" data-w1="СОФІЯ" data-w2="★PRO★">👧 СОФІЯ ↔ ★PRO★</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span>✍️ Введіть Два Слова (Укр / Англ / Іконки)</span>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label"><span>Слово 1 (Вигляд Спереду 0°):</span></div>
+            <input id="il-word1" type="text" maxlength="9" value="МАКСИМ" />
+          </div>
+
+          <div class="control-row">
+            <div class="control-label"><span>Слово 2 (Вигляд Збоку 90°):</span></div>
+            <input id="il-word2" type="text" maxlength="9" value="★BOSS★" />
+          </div>
+
+          <div class="control-row">
+            <div class="control-label"><span>Додати 3D-іконку в активне поле:</span></div>
+            <div class="sym-bar">
+              <button class="sym-btn" data-insert-sym="⚔" title="Меч">⚔ Меч</button>
+              <button class="sym-btn" data-insert-sym="⛏" title="Кірка">⛏ Кірка</button>
+              <button class="sym-btn" data-insert-sym="💀" title="Кріпер">💀 Кріпер</button>
+              <button class="sym-btn" data-insert-sym="👑" title="Корона">👑 Корона</button>
+              <button class="sym-btn" data-insert-sym="♥" title="Серце">♥ Серце</button>
+              <button class="sym-btn" data-insert-sym="★" title="Зірка">★ Зірка</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span>🛡️ Параметри Друку Ілюзії</span>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label">
+              <span>Товщина вокселя літер:</span>
+              <span id="val-il-voxel" class="control-val">2.6 мм</span>
+            </div>
+            <input id="il-voxel-size" type="range" min="2.0" max="4.0" step="0.1" value="2.6" />
+          </div>
+
+          <label class="checkbox-row">
+            <input id="il-safe-supports" type="checkbox" checked />
+            <span>Авто-опори під нависаючими частинами літер (Без підтримок!)</span>
+          </label>
+
+          <div class="control-row">
+            <div class="control-label"><span>Розташування літер на подіумі:</span></div>
+            <select id="il-layout-mode">
+              <option value="diagonal" selected>📐 По діагоналі (обидва слова видно на 100%)</option>
+              <option value="line">📏 В одну лінію (компактна підставка)</option>
+            </select>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label"><span>Колір моделі на екрані:</span></div>
+            <input id="il-color-primary" type="color" value="#10b981" style="height:36px; width:100%; background:#0f172a; border:1px solid #334155; border-radius:8px; cursor:pointer;" />
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           ВКЛАДКА 3: ФІЗИКА БЕЗ ШЕСТЕРЕНЬ (КАТАПУЛЬТА ТА БАЛАНСИР)
+           =================================================================== -->
+      <section id="panel-physics" class="panel-section">
+        <div class="printer-safe-tip">
+          🎯 <b>Механіка для старого принтера:</b> Жодних осей і шестерень, що злипаються! Монолітна пружна ресора має зазор 23 мм і друкується пласко одним шматком.
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span>🚀 Оберіть Фізичну Модель</span>
+          </div>
+
+          <div class="control-row">
+            <select id="ph-submode">
+              <option value="catapult" selected>🏹 Монолітна Пружинна Міні-Катапульта + TNT</option>
+              <option value="balancer">🦅 Гравітаційний Балансир «Дракон на Пальці»</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span>🔧 Параметри Міцності та Пружності</span>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label">
+              <span>Висота екструзії (товщина моделі):</span>
+              <span id="val-ph-height" class="control-val">10.0 мм</span>
+            </div>
+            <input id="ph-extrude-height" type="range" min="5.0" max="15.0" step="0.5" value="10.0" />
+          </div>
+
+          <div id="ph-spring-group" class="control-row">
+            <div class="control-label">
+              <span>Товщина пластикової ресори (сила пострілу):</span>
+              <span id="val-ph-spring" class="control-val">2.4 мм</span>
+            </div>
+            <input id="ph-spring-thickness" type="range" min="1.8" max="3.6" step="0.1" value="2.4" />
+          </div>
+
+          <div id="ph-weight-group" class="control-row" style="display:none;">
+            <div class="control-label">
+              <span>Вага баласту на кінцях крил:</span>
+              <span id="val-ph-weight" class="control-val">11.0 мм</span>
+            </div>
+            <input id="ph-wing-weight" type="range" min="7.0" max="16.0" step="0.5" value="11.0" />
+          </div>
+
+          <div class="control-row">
+            <div class="control-label">
+              <span>Довжина важеля / Розмах крил:</span>
+              <span id="val-ph-arm" class="control-val">68 мм</span>
+            </div>
+            <input id="ph-arm-length" type="range" min="52" max="85" step="1" value="68" />
+          </div>
+
+          <label class="checkbox-row">
+            <input id="ph-include-ammo" type="checkbox" checked />
+            <span>Додати снаряд TNT / Пірамідку-п'єдестал поруч на стіл</span>
+          </label>
+
+          <div class="control-row">
+            <div class="control-label"><span>Напис на корпусі катапульти:</span></div>
+            <input id="ph-custom-text" type="text" maxlength="6" value="ТАНК" />
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           ВКЛАДКА 4: МУТАТОР ВОКСЕЛЬНИХ МОБІВ ТА БОСІВ
+           =================================================================== -->
+      <section id="panel-mob" class="panel-section">
+        <div class="printer-safe-tip">
+          👾 <b>100% Без Підтримок:</b> Зброя та щит моба спираються прямо на п'єдестал як колони, а під руками та головою є східчасті фаски!
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span>🧬 Генетика та Клас Боса</span>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label"><span>Базовий архетип:</span></div>
+            <select id="mob-archetype">
+              <option value="golem" selected>🛡️ Залізний Титан-Голем</option>
+              <option value="creeper">💚 Мутант-Кріпер (4 лапи)</option>
+              <option value="knight">⚔️ Алмазний Паладин</option>
+              <option value="dragon">🐉 Володар Енду</option>
+              <option value="cyborg">🤖 Кібер-Робот 3000</option>
+            </select>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label">
+              <span>Масштаб голови:</span>
+              <span id="val-mob-head" class="control-val">1.05x</span>
+            </div>
+            <input id="mob-head-scale" type="range" min="0.75" max="1.45" step="0.05" value="1.05" />
+          </div>
+
+          <div class="control-row">
+            <div class="control-label">
+              <span>Масивність броні та тулуба:</span>
+              <span id="val-mob-bulk" class="control-val">1.05x</span>
+            </div>
+            <input id="mob-body-bulk" type="range" min="0.8" max="1.35" step="0.05" value="1.05" />
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span>⚔️ Спорядження та Мутації</span>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label"><span>Тип очей / Візора:</span></div>
+            <select id="mob-eye-type">
+              <option value="two" selected>👀 Два бойові ока</option>
+              <option value="creeper">💀 Обличчя Кріпера</option>
+              <option value="visor">🕶️ Лазерний Кібер-Візор</option>
+              <option value="one">👁️ Око Циклопа</option>
+              <option value="three">👽 Три ока Мутанта</option>
+            </select>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label"><span>Шолом / Роги / Корона:</span></div>
+            <select id="mob-headgear">
+              <option value="crown" selected>👑 Золота Корона Боса</option>
+              <option value="horns">🐂 Роги Вікінга / Дракона</option>
+              <option value="antenna">📡 Антена Робота</option>
+              <option value="ears">🐺 Бойові Вуха</option>
+              <option value="none">Немає</option>
+            </select>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label"><span>Спина (Крила / Ранець):</span></div>
+            <select id="mob-backgear">
+              <option value="wings" selected>🦇 Ступінчасті Крила Дракона</option>
+              <option value="jetpack">🚀 Турбо-Джетпак</option>
+              <option value="cape">🧣 Лицарський Плащ</option>
+              <option value="none">Немає</option>
+            </select>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label"><span>Зброя (спирається на базу):</span></div>
+            <select id="mob-weapon">
+              <option value="sword" selected>⚔️ Дворучний Алмазний Меч</option>
+              <option value="hammer">🔨 Громовий Молот Тора</option>
+              <option value="shield">🛡️ Бастіонний Щит</option>
+              <option value="dual_axes">🪓 Подвійні Бойові Сокири</option>
+            </select>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label"><span>Ім'я на п'єдесталі:</span></div>
+            <input id="mob-name" type="text" maxlength="7" value="ТИТАН" />
+          </div>
+
+          <label class="checkbox-row">
+            <input id="mob-tinkercad-blank" type="checkbox" />
+            <span>🧩 Режим «Заготовка для Tinkercad» (без дрібних деталей, щоб діти самі доробили обличчя в Tinkercad!)</span>
+          </label>
+        </div>
+      </section>
+
+    </aside>
+
+    <!-- ПРАВА ЧАСТИНА — ІНТЕРАКТИВНА 3D-СЦЕНА -->
+    <section class="viewport-area">
+      <div id="viewport-container"></div>
+
+      <!-- ВЕРХНІ ІНФОРМАЦІЙНІ БЕЙДЖІ -->
+      <div class="viewport-hud-top">
+        <div id="model-dimensions-badge" class="hud-badge">
+          📏 Розмір: <b>56 × 56 × 8 мм</b> &nbsp;|&nbsp; ⏱️ Друк: <b>~18 хв</b>
+        </div>
+        <div class="hud-badge safe-badge">
+          ✅ Старий принтер: 100% ОК (Пласке дно Z=0, Без підтримок)
+        </div>
+      </div>
+
+      <!-- НИЖНІ ПАНЕЛІ КЕРУВАННЯ КАМЕРОЮ ТА ДЕМО-ЕФЕКТАМИ -->
+      <div class="viewport-hud-bottom">
+        <div class="camera-bar">
+          <button class="cam-btn" data-cam-view="iso">🧊 3D Огляд</button>
+          <button class="cam-btn" data-cam-view="front">👁️ Спереду (0°)</button>
+          <button class="cam-btn" data-cam-view="side90">🔄 Збоку (90°)</button>
+          <button class="cam-btn" data-cam-view="top">⬇️ Зверху</button>
+        </div>
+
+        <!-- Спеціальні кнопки для демонстрації Оптичної Ілюзії -->
+        <div id="illusion-camera-bar" class="context-action-bar" style="display:none;">
+          <button class="cam-btn illusion-highlight" data-cam-view="front">
+            👁️ Показати СЛОВО 1 (Ракурс 0°)
+          </button>
+          <button class="cam-btn illusion-highlight" data-cam-view="side90">
+            🔄 Повернути на СЛОВО 2 (Ракурс 90°)
+          </button>
+        </div>
+
+        <!-- Спеціальна кнопка для пострілу з катапульти та тесту балансира -->
+        <div id="physics-action-bar" class="context-action-bar" style="display:none;">
+          <button id="btn-physics-demo" class="btn-big-demo">
+            🚀 ВИСТРІЛИТИ З КАТАПУЛЬТИ!
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ПІДКЛЮЧЕННЯ СКРИПТІВ (Працює 100% офлайн без інтернету та серверів!) -->
+  <script src="lib/three.min.js"></script>
+  <script src="src/soundEffects.js"></script>
+  <script src="src/voxelFont.js"></script>
+  <script src="src/sceneManager.js"></script>
+  <script src="src/generators/minecraftForge.js"></script>
+  <script src="src/generators/dualIllusion.js"></script>
+  <script src="src/generators/physicsMechanics.js"></script>
+  <script src="src/generators/mobMutator.js"></script>
+  <script src="src/app.js"></script>
+</body>
+</html>
