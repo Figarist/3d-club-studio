@@ -44,8 +44,29 @@
       // Фізична анімація (катапульта / балансир)
       this.physicsUpdateFn = null;
 
-      // Розміри поточної моделі (мм)
-      this.dimensions = { x: 0, y: 0, z: 0, volumeCm3: 0, estMinutes: 0 };
+      // Одноколірне прев'ю ("Як виглядатиме одним пластиком")
+      this.isMonochrome = false;
+      this.monochromeColor = 0xcfd6df; // Нейтральний сіро-сріблястий PLA пластик
+      this.monochromeMaterial = new THREE.MeshStandardMaterial({
+        color: this.monochromeColor,
+        roughness: 0.52,
+        metalness: 0.08,
+        clippingPlanes: [this.clipPlane],
+        clipShadows: true
+      });
+
+      // Розміри та чесна діагностика моделі (мм)
+      this.dimensions = {
+        x: 0,
+        y: 0,
+        z: 0,
+        volumeCm3: 0,
+        roughMinutes: 0,
+        fitsBed: true,
+        safeBed: true,
+        isMini: false
+      };
+      this.onDimensionsUpdated = null;
     }
 
     init() {
@@ -229,7 +250,67 @@
         this.targetSpherical.radius = Math.max(45, Math.min(340, this.targetSpherical.radius + e.deltaY * 0.12));
       }, { passive: false });
 
+      // Сенсорне керування для планшетів та вузьких екранів
+      let prevTouchDist = 0;
+      dom.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          this.isDragging = true;
+          this.isRightDrag = false;
+          this.prevMouse.x = e.touches[0].clientX;
+          this.prevMouse.y = e.touches[0].clientY;
+        } else if (e.touches.length === 2) {
+          this.isDragging = false;
+          const dx = e.touches[0].clientX - e.touches[1].clientX;
+          const dy = e.touches[0].clientY - e.touches[1].clientY;
+          prevTouchDist = Math.hypot(dx, dy);
+        }
+      }, { passive: true });
+
+      dom.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 1 && this.isDragging) {
+          const dx = e.touches[0].clientX - this.prevMouse.x;
+          const dy = e.touches[0].clientY - this.prevMouse.y;
+          this.prevMouse.x = e.touches[0].clientX;
+          this.prevMouse.y = e.touches[0].clientY;
+          this.targetSpherical.theta -= dx * 0.0085;
+          this.targetSpherical.phi = Math.max(0.12, Math.min(Math.PI / 2 - 0.02, this.targetSpherical.phi - dy * 0.0085));
+        } else if (e.touches.length === 2) {
+          const dx = e.touches[0].clientX - e.touches[1].clientX;
+          const dy = e.touches[0].clientY - e.touches[1].clientY;
+          const dist = Math.hypot(dx, dy);
+          if (prevTouchDist > 0) {
+            this.targetSpherical.radius = Math.max(45, Math.min(340, this.targetSpherical.radius - (dist - prevTouchDist) * 0.45));
+          }
+          prevTouchDist = dist;
+        }
+      }, { passive: true });
+
+      dom.addEventListener('touchend', () => {
+        this.isDragging = false;
+        prevTouchDist = 0;
+      });
+
       dom.addEventListener('contextmenu', (e) => e.preventDefault());
+    }
+
+    // Перемикач одноколірного прев'ю ("Як виглядатиме одним пластиком")
+    toggleMonochrome(forceState) {
+      this.isMonochrome = typeof forceState === 'boolean' ? forceState : !this.isMonochrome;
+      if (this.modelGroup) {
+        this.modelGroup.traverse((child) => {
+          if (child.isMesh && child.userData._origMaterial) {
+            child.material = this.isMonochrome ? this.monochromeMaterial : child.userData._origMaterial;
+          }
+        });
+      }
+      return this.isMonochrome;
+    }
+
+    setMonochromeColor(hexNum) {
+      this.monochromeColor = hexNum;
+      if (this.monochromeMaterial) {
+        this.monochromeMaterial.color.setHex(hexNum);
+      }
     }
 
     // Плавний поворот камери в заданий ракурс (наприклад, для оптичної ілюзії 0° та 90°)
@@ -263,11 +344,14 @@
         }
       }
       if (obj.geometry) obj.geometry.dispose();
-      if (obj.material) {
-        if (Array.isArray(obj.material)) {
-          obj.material.forEach(m => m.dispose());
+      const matToDispose = (obj.userData && obj.userData._origMaterial) || obj.material;
+      if (matToDispose && matToDispose !== this.monochromeMaterial) {
+        if (Array.isArray(matToDispose)) {
+          matToDispose.forEach(m => {
+            if (m && m !== this.monochromeMaterial) m.dispose();
+          });
         } else {
-          obj.material.dispose();
+          matToDispose.dispose();
         }
       }
     }
@@ -307,7 +391,7 @@
       this.modelGroup.add(group);
       this.modelGroup.updateMatrixWorld(true);
 
-      // Підключаємо площину зрізу для симулятора друку та тіні
+      // Підключаємо площину зрізу для симулятора друку, тіні та одноколірний режим
       const meshes = [];
       group.traverse((child) => {
         if (child.isMesh) {
@@ -316,6 +400,10 @@
           if (child.material) {
             child.material.clippingPlanes = [this.clipPlane];
             child.material.clipShadows = true;
+            child.userData._origMaterial = child.material;
+            if (this.isMonochrome) {
+              child.material = this.monochromeMaterial;
+            }
           }
           meshes.push(child);
         }
@@ -326,16 +414,26 @@
       const size = new THREE.Vector3();
       finalBox.getSize(size);
 
-      this.dimensions = {
-        x: Math.round(size.x * 10) / 10,
-        y: Math.round(size.z * 10) / 10, // Глибина на столі
-        z: Math.round(size.y * 10) / 10  // Висота друку
-      };
+      const dx = Math.round(size.x * 10) / 10;
+      const dy = Math.round(size.z * 10) / 10; // Глибина на столі
+      const dz = Math.round(size.y * 10) / 10; // Висота друку
 
-      // Орієнтовний час друку на простому принтері (швидкість ~40 мм/с, шар 0.25 мм)
-      const approxVolCm3 = Math.max(1, (size.x * size.y * size.z * 0.32) / 1000);
-      this.dimensions.volumeCm3 = Math.round(approxVolCm3 * 10) / 10;
-      this.dimensions.estMinutes = Math.max(8, Math.round(approxVolCm3 * 3.2));
+      // Груба оцінка об'єму за габаритним паралелепіпедом (НЕ є заміром слайсера)
+      const approxVolCm3 = Math.max(0.5, (size.x * size.y * size.z * 0.32) / 1000);
+      const volRounded = Math.round(approxVolCm3 * 10) / 10;
+      const roughMinutes = Math.max(6, Math.round(approxVolCm3 * 3.2));
+
+      this.dimensions = {
+        x: dx,
+        y: dy,
+        z: dz,
+        volumeCm3: volRounded,
+        roughMinutes,
+        estMinutes: roughMinutes,
+        fitsBed: dx <= 200 && dy <= 200,
+        safeBed: dx <= 190 && dy <= 190,
+        isMini: dx <= 38 && dy <= 38
+      };
 
       this.slicerMaxY = Math.max(10, size.y + 2);
       this.clipPlane.constant = 500;
@@ -364,13 +462,28 @@
       }
 
       this.updateDimensionsUI();
+      if (this.onDimensionsUpdated) {
+        this.onDimensionsUpdated(this.dimensions);
+      }
     }
 
-    updateDimensionsUI() {
+    updateDimensionsUI(slicerNote = '') {
       const dimEl = document.getElementById('model-dimensions-badge');
-      if (dimEl) {
-        dimEl.textContent = `📏 Розмір: ${this.dimensions.x} × ${this.dimensions.y} × ${this.dimensions.z} мм | ⏱️ Друк: ~${this.dimensions.estMinutes} хв`;
-      }
+      if (!dimEl) return;
+      const d = this.dimensions;
+      const sizeCategory = !d.fitsBed
+        ? '🚨 ЗА МЕЖАМИ СТОЛУ (>200 мм)'
+        : !d.safeBed
+          ? '⚠️ Впритул до краю (>190 мм)'
+          : d.isMini
+            ? '🌟 Міні-формат'
+            : '📐 Габарит';
+      const timeText = slicerNote
+        ? `⏱️ Слайсер: ${slicerNote}`
+        : `⏱️ Час: перевір у слайсері (чернетка за габаритом ~${d.roughMinutes} хв, ~${d.volumeCm3} см³)`;
+      dimEl.textContent = `${sizeCategory}: ${d.x} × ${d.y} × ${d.z} мм | ${timeText}`;
+      dimEl.classList.toggle('badge-warn', !d.safeBed);
+      dimEl.classList.toggle('badge-danger', !d.fitsBed);
     }
 
     // Запуск лазерної симуляції пошарового 3D-друку

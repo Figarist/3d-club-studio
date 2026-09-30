@@ -13,7 +13,10 @@
     <div class="brand">
       <div class="brand-logo" title="Дзенькнути молотом по ковадлу! ⚒️">⚒️</div>
       <div class="brand-title">
-        <h1>3D КУЗНЯ ЧУДЕС</h1>
+        <div class="brand-title-row">
+          <h1>3D КУЗНЯ ЧУДЕС</h1>
+          <span id="app-version-pill" class="version-pill" title="Версія програми: v1.2.0">v1.2.0</span>
+        </div>
         <p>Minecraft &amp; Print-Safe 3D Генератор • Tinkercad / Makers Empire / 3D-Принтер</p>
       </div>
     </div>
@@ -34,38 +37,66 @@
       </button>
     </nav>
 
-    <!-- ДІЇ: ЗВУК, МУЗИКА, РАНДОМ, СИМУЛЯТОР ДРУКУ, ЕКСПОРТ .STL -->
+    <!-- ДІЇ: СКАСУВАННЯ, ОДНОКОЛІРНЕ ПРЕВ'Ю, ЗБЕРЕЖЕННЯ ПРОЄКТУ, СИМУЛЯТОР, STL -->
     <div class="top-actions">
-      <button id="btn-toggle-sound" class="btn-action btn-sound" title="Увімкнути/вимкнути веселі звукові ефекти">
-        🔊 Звук: ВКЛ
+      <button id="btn-undo" class="btn-action btn-history" title="Скасувати останню дію (Ctrl+Z)">
+        ↩️
       </button>
-      <button id="btn-toggle-music" class="btn-action btn-music" title="Увімкнути/вимкнути веселу 8-бітну фонову мелодію кузні">
-        🎵 Музика: ВИКЛ
+      <button id="btn-redo" class="btn-action btn-history" title="Повернути скасовану дію (Ctrl+Y)">
+        ↪️
+      </button>
+      <button id="btn-toggle-mono" class="btn-action btn-mono" title="Перемкнути: кольори прев'ю чи реальний вигляд одним пластиком">
+        🪨 1 Пластик
+      </button>
+      <button id="btn-save-project" class="btn-action btn-project" title="Зберегти редагований проєкт у файл .json (щоб продовжити наступного разу)">
+        📥 Зберегти
+      </button>
+      <button id="btn-load-project" class="btn-action btn-project" title="Відкрити збережений файл проєкту .json">
+        📂 Відкрити
+      </button>
+      <input id="input-load-project" type="file" accept=".json" style="display:none;" aria-hidden="true" />
+      <button id="btn-toggle-sound" class="btn-action btn-sound" title="Увімкнути/вимкнути веселі звукові ефекти">
+        🔊 Звук
+      </button>
+      <button id="btn-toggle-music" class="btn-action btn-music" title="Увімкнути/вимкнути фонову мелодію кузні">
+        🎵 Музика
       </button>
       <button id="btn-random-wow" class="btn-action btn-random" title="Випадкова генерація / Мутація!">
-        🎲 Випадковий ВАУ!
+        🎲 ВАУ!
       </button>
-      <button id="btn-simulate-print" class="btn-action btn-sim" title="Показати дітям, як принтер друкує модель шар за шаром">
-        🔥 Симуляція 3D-Принтера
+      <button id="btn-simulate-print" class="btn-action btn-sim" title="Показати, як принтер друкує модель шар за шаром">
+        🔥 Симуляція
       </button>
-      <button id="btn-export-stl" class="btn-action btn-export" title="Завантажити готовий .STL файл для друку або Tinkercad">
-        💾 Скачати .STL
+      <button id="btn-export-stl" class="btn-action btn-export" title="Експортувати 3D-геометрію у .STL для слайсера (Cura / PrusaSlicer / Tinkercad)">
+        💾 Експорт .STL
       </button>
     </div>
   </header>
 
+  <!-- СМУГА АДАПТАЦІЇ ДЛЯ ВУЗЬКИХ ЕКРАНІВ ТА РЕЖИМУ ПРОЄКТОРА -->
+  <div id="view-mode-bar" class="view-mode-bar">
+    <div class="view-mode-group">
+      <button class="view-btn" data-view-mode="editor">🛠️ Редактор</button>
+      <button class="view-btn active" data-view-mode="split">🌗 Редактор + 3D</button>
+      <button class="view-btn" data-view-mode="viewport">🧊 Тільки 3D (Проєктор)</button>
+    </div>
+    <div id="autosave-tag" class="autosave-tag" title="Стан автоматично зберігається у пам'яті браузера">
+      💾 Автозбережено
+    </div>
+  </div>
+
   <!-- ОСНОВНИЙ РОБОЧИЙ ПРОСТІР -->
-  <main class="workspace">
+  <main class="workspace" id="main-workspace">
 
     <!-- ЛІВА ПАНЕЛЬ НАЛАШТУВАНЬ -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="app-sidebar">
 
       <!-- ===================================================================
            ВКЛАДКА 1: МАЙНКРАФТ-КУЗНЯ (ВОКСЕЛЬНИЙ 3D-РЕЛЬЄФ)
            =================================================================== -->
       <section id="panel-minecraft" class="panel-section active">
         <div class="printer-safe-tip">
-          🛡️ <b>Старий принтер ОК:</b> Кожен колір має власну висоту в міліметрах! Модель має ідеально пласке дно й друкується без жодних підтримок.
+          🛡️ <b>Рельєф і силует для одного пластику:</b> Кожен рівень має власну висоту (мм). Модель лежить на столі (Z=0). Перевіряй виразність рельєфу кнопкою «🪨 1 Пластик»!
         </div>
 
         <div class="card">
@@ -87,7 +118,10 @@
         <div class="card">
           <div class="card-header">
             <span>🎨 Малюй 3D-Висоту (16×16 блоків)</span>
-            <button id="btn-mc-clear" class="sym-btn" title="Очистити полотно">🗑️ Очистити</button>
+            <div class="card-header-actions">
+              <button id="btn-mc-undo" class="sym-btn" title="Скасувати останній штрих (Ctrl+Z)">↩️ Скасувати</button>
+              <button id="btn-mc-clear" class="sym-btn" title="Очистити полотно">🗑️ Очистити</button>
+            </div>
           </div>
 
           <div class="brush-bar">
@@ -98,6 +132,11 @@
             <button class="brush-btn" data-mc-brush="4">✨ Шар 4 (Пік)</button>
           </div>
 
+          <!-- Індикатор фізичної зв'язності деталей -->
+          <div id="mc-connectivity-status" class="connectivity-pill">
+            🔍 Перевірка зв'язності деталей...
+          </div>
+
           <div class="pixel-grid-wrapper">
             <div id="mc-pixel-grid" class="pixel-grid" role="grid" aria-label="Піксельна сітка 16 на 16 для малювання 3D-висоти"></div>
           </div>
@@ -105,7 +144,8 @@
 
         <div class="card">
           <div class="card-header">
-            <span>⚙️ Налаштування під 3D-Принтер та Tinkercad</span>
+            <span>⚙️ Налаштування друку та габаритів</span>
+            <button id="btn-mc-mini-preset" class="btn-subtle" title="Встановити воксель 2.2 мм для швидкого міні-значка до 35 мм">🎯 Міні-значок (~35 мм)</button>
           </div>
 
           <div class="control-row">
@@ -113,7 +153,7 @@
               <span>Розмір 1 кубика (вокселя):</span>
               <span id="val-mc-voxel" class="control-val">3.5 мм</span>
             </div>
-            <input id="mc-voxel-size" type="range" min="2.2" max="5.0" step="0.1" value="3.5" aria-label="Розмір 1 кубика (вокселя), мм" />
+            <input id="mc-voxel-size" type="range" min="2.0" max="5.0" step="0.1" value="3.5" aria-label="Розмір 1 кубика (вокселя), мм" />
           </div>
 
           <div class="control-row">
@@ -124,9 +164,9 @@
             <input id="mc-height-step" type="range" min="0.8" max="2.8" step="0.1" value="1.5" aria-label="Сходинка висоти між шарами, мм" />
           </div>
 
-          <label class="checkbox-row">
-            <input id="mc-solid-base" type="checkbox" checked aria-label="Суцільна підкладка 2 мм" />
-            <span>Суцільна підкладка 2 мм (щоб діагоналі не ламалися)</span>
+          <label class="checkbox-row" title="Створює спільну підошву 2 мм та автоматичні містки між віддаленими островами">
+            <input id="mc-solid-base" type="checkbox" checked aria-label="Суцільна підкладка 2 мм та авто-містки" />
+            <span>Суцільна підкладка 2 мм + авто-містки (1 суцільна деталь)</span>
           </label>
 
           <div class="control-row">
@@ -150,17 +190,18 @@
            =================================================================== -->
       <section id="panel-illusion" class="panel-section">
         <div class="printer-safe-tip">
-          🔮 <b>ВАУ-Магія без механіки:</b> Під кутом 0° читається перше слово (наприклад, ім'я дитини), а при повороті на 90° — друге слово або іконки Minecraft!
+          🔮 <b>Оптичний силует 0° / 90°:</b> Для 1-годинного заняття обирайте короткі знаки (1–3 символи), щоб модель швидко друкувалася і гарантовано вміщувалася у безпечне поле 190×190 мм!
         </div>
 
         <div class="card">
           <div class="card-header">
             <span>⚡ Швидкі Шаблони Ілюзій</span>
+            <button id="btn-il-short-mode" class="btn-subtle" title="Короткий знак із 2 символів (~30 мм) для швидкого друку">⚡ Короткий знак (1–2 літери)</button>
           </div>
           <div class="preset-grid">
+            <button class="preset-btn" data-il-preset="short" data-w1="3D" data-w2="★!">⚡ 3D ↔ ★! (Короткий)</button>
             <button class="preset-btn" data-il-preset="1" data-w1="МАКСИМ" data-w2="★BOSS★">👦 МАКСИМ ↔ BOSS</button>
             <button class="preset-btn" data-il-preset="2" data-w1="МАЙН!" data-w2="КРАФТ">⛏️ МАЙН! ↔ КРАФТ</button>
-            <button class="preset-btn" data-il-preset="3" data-w1="КРІПЕР" data-w2="⚔💀⛏♥👑★">💀 КРІПЕР ↔ ІКОНКИ</button>
             <button class="preset-btn" data-il-preset="4" data-w1="СОФІЯ" data-w2="★PRO★">👧 СОФІЯ ↔ ★PRO★</button>
           </div>
         </div>
@@ -208,13 +249,13 @@
 
           <label class="checkbox-row">
             <input id="il-safe-supports" type="checkbox" checked aria-label="Авто-опори під нависаючими частинами літер" />
-            <span>Авто-опори під нависаючими частинами літер (Без підтримок!)</span>
+            <span>Внутрішні стовпчики під нависаючими вокселями літер</span>
           </label>
 
           <div class="control-row">
             <div class="control-label"><span>Розташування літер на подіумі:</span></div>
             <select id="il-layout-mode" aria-label="Розташування літер на подіумі">
-              <option value="diagonal" selected>📐 По діагоналі (обидва слова видно на 100%)</option>
+              <option value="diagonal" selected>📐 По діагоналі (обидва слова видно без перекриття)</option>
               <option value="line">📏 В одну лінію (компактна підставка)</option>
             </select>
           </div>
@@ -231,7 +272,7 @@
            =================================================================== -->
       <section id="panel-physics" class="panel-section">
         <div class="printer-safe-tip">
-          🎯 <b>Механіка для старого принтера:</b> Жодних осей і шестерень, що злипаються! Монолітна пружна ресора має зазор 23 мм і друкується пласко одним шматком.
+          🎯 <b>Демонстраційний експеримент:</b> Монолітна пружна ресора друкується пласко на боці. Перед друком обов'язково перевірте кількість периметрів (стінок) у слайсері!
         </div>
 
         <div class="card">
@@ -301,7 +342,7 @@
            =================================================================== -->
       <section id="panel-mob" class="panel-section">
         <div class="printer-safe-tip">
-          👾 <b>100% Без Підтримок:</b> Зброя та щит моба спираються прямо на п'єдестал як колони, а під руками та головою є східчасті фаски!
+          👾 <b>Демонстраційна фігурка:</b> Зброя та щит моба спираються на п'єдестал як колони. Через великий об'єм друк тривалий — перевірте час і шари у слайсері!
         </div>
 
         <div class="card">
@@ -399,26 +440,38 @@
     </aside>
 
     <!-- ПРАВА ЧАСТИНА — ІНТЕРАКТИВНА 3D-СЦЕНА -->
-    <section class="viewport-area">
+    <section class="viewport-area" id="app-viewport">
       <div id="viewport-container" role="region" aria-label="Інтерактивна 3D-сцена столу принтера"></div>
 
-      <!-- ВЕРХНІ ІНФОРМАЦІЙНІ БЕЙДЖІ -->
+      <!-- ВЕРХНІ ІНФОРМАЦІЙНІ БЕЙДЖІ (ЧЕСНА ДІАГНОСТИКА ТА СТАТУС ПЕРЕВІРКИ) -->
       <div class="viewport-hud-top">
         <div id="model-dimensions-badge" class="hud-badge">
-          📏 Розмір: <b>56 × 56 × 8 мм</b> &nbsp;|&nbsp; ⏱️ Друк: <b>~18 хв</b>
+          📐 Габарит: 56 × 56 × 8 мм | ⏱️ Час: перевір у слайсері
         </div>
-        <div class="hud-badge safe-badge">
-          ✅ Старий принтер: 100% ОК (Пласке дно Z=0, Без підтримок)
+        <div id="print-verification-badge" class="hud-badge verification-badge status-generated">
+          <div class="verification-row">
+            <span id="geom-check-pill" class="geom-check-pill">🔍 Перевірка геометрії...</span>
+            <select id="verification-status-select" class="hud-select" aria-label="Статус перевірки моделі для друку">
+              <option value="generated" selected>🧪 Статус: Згенеровано (не перевірено)</option>
+              <option value="sliced">🔍 Статус: Перевірено у слайсері</option>
+              <option value="printed">🖨️ Статус: Надруковано на принтері</option>
+            </select>
+          </div>
+          <div class="verification-row slicer-note-row">
+            <input id="slicer-time-input" class="hud-input" type="text" maxlength="28" placeholder="Запис зі слайсера (напр.: 14 хв, PLA 0.2)" aria-label="Запис фактичного часу та профілю зі слайсера" />
+          </div>
         </div>
       </div>
 
-      <!-- НИЖНІ ПАНЕЛІ КЕРУВАННЯ КАМЕРОЮ ТА ДЕМО-ЕФЕКТАМИ -->
+      <!-- НИЖНІ ПАНЕЛІ КЕРУВАННЯ КАМЕРОЮ, ПЛАСТИКОМ ТА ДЕМО-ЕФЕКТАМИ -->
       <div class="viewport-hud-bottom">
         <div class="camera-bar">
           <button class="cam-btn" data-cam-view="iso">🧊 3D Огляд</button>
           <button class="cam-btn" data-cam-view="front">👁️ Спереду (0°)</button>
           <button class="cam-btn" data-cam-view="side90">🔄 Збоку (90°)</button>
           <button class="cam-btn" data-cam-view="top">⬇️ Зверху</button>
+          <button id="btn-hud-mono" class="cam-btn mono-hud-btn" title="Як виглядатиме одним пластиком без кольору">🪨 Одним пластиком</button>
+          <input id="mono-color-picker" type="color" value="#cfd6df" title="Колір пластику для одноколірного прев'ю" aria-label="Колір пластику для одноколірного прев'ю" class="mono-color-input" />
         </div>
 
         <!-- Спеціальні кнопки для демонстрації Оптичної Ілюзії -->
@@ -436,6 +489,11 @@
           <button id="btn-physics-demo" class="btn-big-demo">
             🚀 ВИСТРІЛИТИ З КАТАПУЛЬТИ!
           </button>
+        </div>
+
+        <!-- Кутовий бейдж версії програми -->
+        <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • Версія v1.2.0 (Чесна діагностика, авто-містки, одноколірне прев'ю, збереження .json)">
+          ⚒️ v1.2.0
         </div>
       </div>
     </section>
