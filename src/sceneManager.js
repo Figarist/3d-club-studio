@@ -9,7 +9,6 @@
       this.renderer = null;
       this.modelGroup = null;     // Головна група 3D-моделі (експортується в .STL)
       this.effectsGroup = null;   // Допоміжні візуальні ефекти (снаряди, лазер сопла, маркер центру мас)
-      this.bboxHelper = null;
 
       // Камера (сферичні координати для плавного керування мишкою та анімації ракурсів)
       this.spherical = {
@@ -28,6 +27,8 @@
       this.isDragging = false;
       this.isRightDrag = false;
       this.prevMouse = { x: 0, y: 0 };
+      this._panTempVec = new THREE.Vector3(); // Попередньо алокований вектор для панорамування
+      this._popMinScale = new THREE.Vector3(0.01, 0.01, 0.01); // Попередньо алокований вектор для анімації появи
 
       // Анімація збирання блоків
       this.popAnimBlocks = [];
@@ -211,7 +212,7 @@
         if (this.isRightDrag) {
           // Панорамування
           const panSpeed = 0.18;
-          const right = new THREE.Vector3();
+          const right = this._panTempVec;
           this.camera.getWorldDirection(right);
           right.cross(this.camera.up).normalize();
           this.targetSpherical.target.addScaledVector(right, -dx * panSpeed);
@@ -233,7 +234,7 @@
 
     // Плавний поворот камери в заданий ракурс (наприклад, для оптичної ілюзії 0° та 90°)
     setCameraView(preset) {
-      if (window.StudioSound) window.StudioSound.playPop(460);
+      if (window.StudioSound) window.StudioSound.playCameraSwoosh(preset);
       if (preset === 'front') {
         this.targetSpherical.theta = 0;
         this.targetSpherical.phi = Math.PI / 2.25;
@@ -254,6 +255,23 @@
       }
     }
 
+    // Рекурсивне звільнення GPU-ресурсів (геометрії та матеріалів) для запобігання витоку WebGL-пам'яті
+    _disposeRecursive(obj) {
+      if (obj.children) {
+        for (let i = obj.children.length - 1; i >= 0; i--) {
+          this._disposeRecursive(obj.children[i]);
+        }
+      }
+      if (obj.geometry) obj.geometry.dispose();
+      if (obj.material) {
+        if (Array.isArray(obj.material)) {
+          obj.material.forEach(m => m.dispose());
+        } else {
+          obj.material.dispose();
+        }
+      }
+    }
+
     clearModel() {
       this.stopSlicerSimulation();
       this.physicsUpdateFn = null;
@@ -261,10 +279,12 @@
 
       while (this.modelGroup.children.length > 0) {
         const obj = this.modelGroup.children[0];
+        this._disposeRecursive(obj);
         this.modelGroup.remove(obj);
       }
       while (this.effectsGroup.children.length > 0) {
         const obj = this.effectsGroup.children[0];
+        this._disposeRecursive(obj);
         this.effectsGroup.remove(obj);
       }
     }
@@ -294,7 +314,6 @@
           child.castShadow = true;
           child.receiveShadow = true;
           if (child.material) {
-            child.material = child.material.clone();
             child.material.clippingPlanes = [this.clipPlane];
             child.material.clipShadows = true;
           }
@@ -326,6 +345,9 @@
 
       // Анімація "падіння блоків як у Майнкрафті"
       if (animatePop) {
+        if (window.StudioSound && meshes.length > 0) {
+          window.StudioSound.playBlockCascade(meshes.length);
+        }
         meshes.forEach((m, idx) => {
           const targetY = m.position.y;
           const targetScale = m.scale.clone();
@@ -347,7 +369,7 @@
     updateDimensionsUI() {
       const dimEl = document.getElementById('model-dimensions-badge');
       if (dimEl) {
-        dimEl.innerHTML = `📏 Розмір: <b>${this.dimensions.x} × ${this.dimensions.y} × ${this.dimensions.z} мм</b> &nbsp;|&nbsp; ⏱️ Друк: <b>~${this.dimensions.estMinutes} хв</b>`;
+        dimEl.textContent = `📏 Розмір: ${this.dimensions.x} × ${this.dimensions.y} × ${this.dimensions.z} мм | ⏱️ Друк: ~${this.dimensions.estMinutes} хв`;
       }
     }
 
@@ -370,7 +392,10 @@
       this.clipPlane.constant = 500;
       if (this.nozzleMesh) this.nozzleMesh.visible = false;
       const btn = document.getElementById('btn-simulate-print');
-      if (btn) btn.classList.remove('active-sim');
+      if (btn) {
+        btn.classList.remove('active-sim');
+        btn.textContent = '🔥 Симуляція 3D-Принтера';
+      }
     }
 
     // Експорт поточної моделі у бінарний .STL файл (100% сумісний з Tinkercad, Makers Empire, Cura, PrusaSlicer)
@@ -386,11 +411,16 @@
         geom.applyMatrix4(child.matrixWorld);
 
         if (geom.index !== null) {
-          geom = geom.toNonIndexed();
+          const nonIndexed = geom.toNonIndexed();
+          geom.dispose();
+          geom = nonIndexed;
         }
 
         const pos = geom.attributes.position;
-        if (!pos) return;
+        if (!pos) {
+          geom.dispose();
+          return;
+        }
 
         for (let i = 0; i < pos.count; i += 3) {
           // Перетворення з координат Three.js (X, Y-висота, Z-глибина)
@@ -401,12 +431,14 @@
 
           const e1 = new THREE.Vector3().subVectors(v2, v1);
           const e2 = new THREE.Vector3().subVectors(v3, v1);
-          const normal = new THREE.Vector3().crossVectors(e1, e2).normalize();
+          const normal = new THREE.Vector3().crossVectors(e1, e2);
 
-          if (!isNaN(normal.x)) {
+          if (normal.lengthSq() > 1e-12) {
+            normal.normalize();
             triangles.push({ v1, v2, v3, normal });
           }
         }
+        geom.dispose();
       });
 
       if (triangles.length === 0) {
@@ -519,7 +551,7 @@
           // Spring ease-out
           const ease = 1 - Math.pow(1 - t, 3);
           item.mesh.position.y = item.targetY + (1 - ease) * 28;
-          item.mesh.scale.lerpVectors(new THREE.Vector3(0.01, 0.01, 0.01), item.targetScale, ease);
+          item.mesh.scale.lerpVectors(this._popMinScale, item.targetScale, ease);
           if (t < 1) anyActive = true;
         }
         if (!anyActive) this.popAnimBlocks = [];
@@ -530,7 +562,7 @@
         this.slicerProgress += dt * 0.22;
         if (this.slicerProgress >= 1.05) {
           this.stopSlicerSimulation();
-          if (window.StudioSound) window.StudioSound.playMagicGenerate();
+          if (window.StudioSound) window.StudioSound.playPrintComplete();
         } else {
           const currentH = this.slicerProgress * this.slicerMaxY;
           this.clipPlane.constant = currentH;

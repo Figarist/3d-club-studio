@@ -1,5 +1,29 @@
 // Генератор 4: Мутатор Воксельних Мобів та Босів (100% друк без підтримок: зброя та щит спираються на п'єдестал!)
 (function () {
+  const MOB_CONFIG = {
+    PEDESTAL_H1: 3.5,
+    PEDESTAL_H2: 2.5,
+    PEDESTAL_W: 54,
+    PEDESTAL_D: 44,
+    LEG_HEIGHT: 16,
+    TORSO_HEIGHT: 20,
+    ARM_WIDTH: 7.5,
+    ARM_HEIGHT: 19,
+    ARM_DEPTH: 9.5,
+    NAME_PIXEL_SIZE: 1.3,
+    NAME_MAX_CHARS: 7
+  };
+
+  function createMaterials(palette) {
+    return {
+      main: new THREE.MeshStandardMaterial({ color: palette.main, roughness: 0.4, metalness: 0.15 }),
+      dark: new THREE.MeshStandardMaterial({ color: palette.dark, roughness: 0.5, metalness: 0.15 }),
+      accent: new THREE.MeshStandardMaterial({ color: palette.accent, roughness: 0.3, metalness: 0.3 }),
+      metal: new THREE.MeshStandardMaterial({ color: palette.metal, roughness: 0.35, metalness: 0.45 }),
+      glow: new THREE.MeshStandardMaterial({ color: palette.glow, roughness: 0.2, emissive: palette.glow, emissiveIntensity: 0.25 })
+    };
+  }
+
   class MobMutatorGenerator {
     constructor() {}
 
@@ -27,14 +51,23 @@
 
       const pal = palettes[archetype] || palettes.golem;
 
-      const matMain = new THREE.MeshStandardMaterial({ color: pal.main, roughness: 0.4, metalness: 0.15 });
-      const matDark = new THREE.MeshStandardMaterial({ color: pal.dark, roughness: 0.5, metalness: 0.15 });
-      const matAccent = new THREE.MeshStandardMaterial({ color: pal.accent, roughness: 0.3, metalness: 0.3 });
-      const matMetal = new THREE.MeshStandardMaterial({ color: pal.metal, roughness: 0.35, metalness: 0.45 });
-      const matGlow = new THREE.MeshStandardMaterial({ color: pal.glow, roughness: 0.2, emissive: pal.glow, emissiveIntensity: 0.25 });
+      const {
+        main: matMain,
+        dark: matDark,
+        accent: matAccent,
+        metal: matMetal,
+        glow: matGlow
+      } = createMaterials(pal);
+
+      const geoCache = new Map();
+      const getGeo = (w, h, d) => {
+        const key = `${w}_${h}_${d}`;
+        if (!geoCache.has(key)) geoCache.set(key, new THREE.BoxGeometry(w, h, d));
+        return geoCache.get(key);
+      };
 
       const addBox = (w, h, d, x, yBottom, z, mat) => {
-        const geo = new THREE.BoxGeometry(w, h, d);
+        const geo = getGeo(w, h, d);
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(x, yBottom + h / 2, z);
         group.add(mesh);
@@ -42,10 +75,10 @@
       };
 
       // 1. Іменний двоступеневий п'єдестал (гарантує ідеальне прилипання першого шару до столу!)
-      const pedH1 = 3.5;
-      const pedH2 = 2.5;
-      const pedW = 54;
-      const pedD = 44;
+      const pedH1 = MOB_CONFIG.PEDESTAL_H1;
+      const pedH2 = MOB_CONFIG.PEDESTAL_H2;
+      const pedW = MOB_CONFIG.PEDESTAL_W;
+      const pedD = MOB_CONFIG.PEDESTAL_D;
 
       addBox(pedW, pedH1, pedD, 0, 0, 0, matDark);
       addBox(pedW - 6, pedH2, pedD - 6, 0, pedH1, 0, matMetal);
@@ -54,8 +87,8 @@
 
       // Об'ємний напис імені моба спереду на п'єдесталі
       if (mobName.length > 0 && !tinkercadBlank) {
-        const chars = window.VoxelFont.textToCharMatrices(mobName, 7);
-        const px = 1.3;
+        const chars = window.VoxelFont.textToCharMatrices(mobName, MOB_CONFIG.NAME_MAX_CHARS);
+        const px = MOB_CONFIG.NAME_PIXEL_SIZE;
         const totalW = chars.length * 6 * px;
         const startX = -totalW / 2;
         const plateZ = pedD / 2 + 1.5;
@@ -83,7 +116,7 @@
       }
 
       // 2. Ноги (або 4 лапи у Кріпера)
-      const legH = 16;
+      const legH = MOB_CONFIG.LEG_HEIGHT;
       const legW = 9.5 * bodyBulk;
       const legD = 10.5 * bodyBulk;
 
@@ -109,7 +142,7 @@
 
       // 3. Тулуб і броня
       const torsoW = 22 * bodyBulk;
-      const torsoH = 20;
+      const torsoH = MOB_CONFIG.TORSO_HEIGHT;
       const torsoD = 14 * bodyBulk;
 
       // Східчастий пояс (фаска 45° від ніг до широкого торсу)
@@ -123,9 +156,9 @@
       }
 
       // 4. Руки (притиснуті до тулуба + спираються знизу на скошені ребра жорсткості!)
-      const armW = 7.5;
-      const armH = 19;
-      const armD = 9.5;
+      const armW = MOB_CONFIG.ARM_WIDTH;
+      const armH = MOB_CONFIG.ARM_HEIGHT;
+      const armD = MOB_CONFIG.ARM_DEPTH;
       const leftArmX = -(torsoW / 2 + armW / 2 - 0.5);
       const rightArmX = (torsoW / 2 + armW / 2 - 0.5);
 
@@ -170,7 +203,7 @@
         } else if (eyeType === 'creeper') {
           // Класичне обличчя Кріпера
           addBox(4.5 * headScale, 4.5 * headScale, 2.5, -4.5 * headScale, eyeY, faceZ, matDark);
-          addBox(4.5 * headScale, 4.5 * headScale, 2.5,  4.5 * headScale, faceZ > 0 ? eyeY : eyeY, faceZ, matDark);
+          addBox(4.5 * headScale, 4.5 * headScale, 2.5,  4.5 * headScale, eyeY, faceZ, matDark);
           addBox(5 * headScale, 6 * headScale, 2.5, 0, headBottomY + 3, faceZ, matDark);
           addBox(2.5 * headScale, 4.5 * headScale, 2.5, -3.5 * headScale, headBottomY + 1.5, faceZ, matDark);
           addBox(2.5 * headScale, 4.5 * headScale, 2.5,  3.5 * headScale, headBottomY + 1.5, faceZ, matDark);
