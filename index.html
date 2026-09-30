@@ -11,7 +11,7 @@
   <!-- ВЕРХНЯ ПАНЕЛЬ (ШАПКА СТУДІЇ) -->
   <header class="topbar">
     <div class="brand">
-      <div class="brand-logo">⚒️</div>
+      <div class="brand-logo" title="Дзенькнути молотом по ковадлу! ⚒️">⚒️</div>
       <div class="brand-title">
         <h1>3D КУЗНЯ ЧУДЕС</h1>
         <p>Minecraft &amp; Print-Safe 3D Генератор • Tinkercad / Makers Empire / 3D-Принтер</p>
@@ -34,10 +34,13 @@
       </button>
     </nav>
 
-    <!-- ДІЇ: ЗВУК, РАНДОМ, СИМУЛЯТОР ДРУКУ, ЕКСПОРТ .STL -->
+    <!-- ДІЇ: ЗВУК, МУЗИКА, РАНДОМ, СИМУЛЯТОР ДРУКУ, ЕКСПОРТ .STL -->
     <div class="top-actions">
-      <button id="btn-toggle-sound" class="btn-action btn-sound" title="Увімкнути/вимкнути звукові ефекти">
+      <button id="btn-toggle-sound" class="btn-action btn-sound" title="Увімкнути/вимкнути веселі звукові ефекти">
         🔊 Звук: ВКЛ
+      </button>
+      <button id="btn-toggle-music" class="btn-action btn-music" title="Увімкнути/вимкнути веселу 8-бітну фонову мелодію кузні">
+        🎵 Музика: ВИКЛ
       </button>
       <button id="btn-random-wow" class="btn-action btn-random" title="Випадкова генерація / Мутація!">
         🎲 Випадковий ВАУ!
@@ -96,7 +99,7 @@
           </div>
 
           <div class="pixel-grid-wrapper">
-            <div id="mc-pixel-grid" class="pixel-grid"></div>
+            <div id="mc-pixel-grid" class="pixel-grid" role="grid" aria-label="Піксельна сітка 16 на 16 для малювання 3D-висоти"></div>
           </div>
         </div>
 
@@ -110,7 +113,7 @@
               <span>Розмір 1 кубика (вокселя):</span>
               <span id="val-mc-voxel" class="control-val">3.5 мм</span>
             </div>
-            <input id="mc-voxel-size" type="range" min="2.2" max="5.0" step="0.1" value="3.5" />
+            <input id="mc-voxel-size" type="range" min="2.2" max="5.0" step="0.1" value="3.5" aria-label="Розмір 1 кубика (вокселя), мм" />
           </div>
 
           <div class="control-row">
@@ -118,17 +121,17 @@
               <span>Сходинка висоти між шарами:</span>
               <span id="val-mc-step" class="control-val">1.5 мм</span>
             </div>
-            <input id="mc-height-step" type="range" min="0.8" max="2.8" step="0.1" value="1.5" />
+            <input id="mc-height-step" type="range" min="0.8" max="2.8" step="0.1" value="1.5" aria-label="Сходинка висоти між шарами, мм" />
           </div>
 
           <label class="checkbox-row">
-            <input id="mc-solid-base" type="checkbox" checked />
+            <input id="mc-solid-base" type="checkbox" checked aria-label="Суцільна підкладка 2 мм" />
             <span>Суцільна підкладка 2 мм (щоб діагоналі не ламалися)</span>
           </label>
 
           <div class="control-row">
             <div class="control-label"><span>Тип кріплення / підставки:</span></div>
-            <select id="mc-mount-type">
+            <select id="mc-mount-type" aria-label="Тип кріплення або підставки">
               <option value="keychain" selected>🔑 Міцне вушко для брелока (отвір 6 мм)</option>
               <option value="none">🧱 Чиста фігурка (для Tinkercad / значка)</option>
               <option value="stand">🏆 З іменною табличкою внизу</option>
@@ -137,7 +140,7 @@
 
           <div class="control-row">
             <div class="control-label"><span>Ім'я учня (об'ємні літери внизу):</span></div>
-            <input id="mc-custom-label" type="text" maxlength="9" placeholder="Напр.: МАКСИМ (необов'язково)" />
+            <input id="mc-custom-label" type="text" maxlength="9" placeholder="Напр.: МАКСИМ (необов'язково)" aria-label="Ім'я учня (об'ємні літери внизу)" />
           </div>
         </div>
       </section>
@@ -169,12 +172,12 @@
 
           <div class="control-row">
             <div class="control-label"><span>Слово 1 (Вигляд Спереду 0°):</span></div>
-            <input id="il-word1" type="text" maxlength="9" value="МАКСИМ" />
+            <input id="il-word1" type="text" maxlength="9" value="МАКСИМ" aria-label="Слово 1 (Вигляд Спереду 0 градусів)" />
           </div>
 
           <div class="control-row">
             <div class="control-label"><span>Слово 2 (Вигляд Збоку 90°):</span></div>
-            <input id="il-word2" type="text" maxlength="9" value="★BOSS★" />
+            <input id="il-word2" type="text" maxlength="9" value="★BOSS★" aria-label="Слово 2 (Вигляд Збоку 90 градусів)" />
           </div>
 
           <div class="control-row">
@@ -200,17 +203,17 @@
               <span>Товщина вокселя літер:</span>
               <span id="val-il-voxel" class="control-val">2.6 мм</span>
             </div>
-            <input id="il-voxel-size" type="range" min="2.0" max="4.0" step="0.1" value="2.6" />
+            <input id="il-voxel-size" type="range" min="2.0" max="4.0" step="0.1" value="2.6" aria-label="Товщина вокселя літер, мм" />
           </div>
 
           <label class="checkbox-row">
-            <input id="il-safe-supports" type="checkbox" checked />
+            <input id="il-safe-supports" type="checkbox" checked aria-label="Авто-опори під нависаючими частинами літер" />
             <span>Авто-опори під нависаючими частинами літер (Без підтримок!)</span>
           </label>
 
           <div class="control-row">
             <div class="control-label"><span>Розташування літер на подіумі:</span></div>
-            <select id="il-layout-mode">
+            <select id="il-layout-mode" aria-label="Розташування літер на подіумі">
               <option value="diagonal" selected>📐 По діагоналі (обидва слова видно на 100%)</option>
               <option value="line">📏 В одну лінію (компактна підставка)</option>
             </select>
@@ -218,7 +221,7 @@
 
           <div class="control-row">
             <div class="control-label"><span>Колір моделі на екрані:</span></div>
-            <input id="il-color-primary" type="color" value="#10b981" style="height:36px; width:100%; background:#0f172a; border:1px solid #334155; border-radius:8px; cursor:pointer;" />
+            <input id="il-color-primary" type="color" value="#10b981" aria-label="Колір моделі на екрані" style="height:36px; width:100%; background:#0f172a; border:1px solid #334155; border-radius:8px; cursor:pointer;" />
           </div>
         </div>
       </section>
@@ -237,7 +240,7 @@
           </div>
 
           <div class="control-row">
-            <select id="ph-submode">
+            <select id="ph-submode" aria-label="Оберіть фізичну модель">
               <option value="catapult" selected>🏹 Монолітна Пружинна Міні-Катапульта + TNT</option>
               <option value="balancer">🦅 Гравітаційний Балансир «Дракон на Пальці»</option>
             </select>
@@ -254,7 +257,7 @@
               <span>Висота екструзії (товщина моделі):</span>
               <span id="val-ph-height" class="control-val">10.0 мм</span>
             </div>
-            <input id="ph-extrude-height" type="range" min="5.0" max="15.0" step="0.5" value="10.0" />
+            <input id="ph-extrude-height" type="range" min="5.0" max="15.0" step="0.5" value="10.0" aria-label="Висота екструзії (товщина моделі), мм" />
           </div>
 
           <div id="ph-spring-group" class="control-row">
@@ -262,7 +265,7 @@
               <span>Товщина пластикової ресори (сила пострілу):</span>
               <span id="val-ph-spring" class="control-val">2.4 мм</span>
             </div>
-            <input id="ph-spring-thickness" type="range" min="1.8" max="3.6" step="0.1" value="2.4" />
+            <input id="ph-spring-thickness" type="range" min="1.8" max="3.6" step="0.1" value="2.4" aria-label="Товщина пластикової ресори (сила пострілу), мм" />
           </div>
 
           <div id="ph-weight-group" class="control-row" style="display:none;">
@@ -270,7 +273,7 @@
               <span>Вага баласту на кінцях крил:</span>
               <span id="val-ph-weight" class="control-val">11.0 мм</span>
             </div>
-            <input id="ph-wing-weight" type="range" min="7.0" max="16.0" step="0.5" value="11.0" />
+            <input id="ph-wing-weight" type="range" min="7.0" max="16.0" step="0.5" value="11.0" aria-label="Вага баласту на кінцях крил, мм" />
           </div>
 
           <div class="control-row">
@@ -278,17 +281,17 @@
               <span>Довжина важеля / Розмах крил:</span>
               <span id="val-ph-arm" class="control-val">68 мм</span>
             </div>
-            <input id="ph-arm-length" type="range" min="52" max="85" step="1" value="68" />
+            <input id="ph-arm-length" type="range" min="52" max="85" step="1" value="68" aria-label="Довжина важеля або розмах крил, мм" />
           </div>
 
           <label class="checkbox-row">
-            <input id="ph-include-ammo" type="checkbox" checked />
+            <input id="ph-include-ammo" type="checkbox" checked aria-label="Додати снаряд TNT або пірамідку-п'єдестал поруч на стіл" />
             <span>Додати снаряд TNT / Пірамідку-п'єдестал поруч на стіл</span>
           </label>
 
           <div class="control-row">
             <div class="control-label"><span>Напис на корпусі катапульти:</span></div>
-            <input id="ph-custom-text" type="text" maxlength="6" value="ТАНК" />
+            <input id="ph-custom-text" type="text" maxlength="6" value="ТАНК" aria-label="Напис на корпусі катапульти" />
           </div>
         </div>
       </section>
@@ -308,7 +311,7 @@
 
           <div class="control-row">
             <div class="control-label"><span>Базовий архетип:</span></div>
-            <select id="mob-archetype">
+            <select id="mob-archetype" aria-label="Базовий архетип моба">
               <option value="golem" selected>🛡️ Залізний Титан-Голем</option>
               <option value="creeper">💚 Мутант-Кріпер (4 лапи)</option>
               <option value="knight">⚔️ Алмазний Паладин</option>
@@ -322,7 +325,7 @@
               <span>Масштаб голови:</span>
               <span id="val-mob-head" class="control-val">1.05x</span>
             </div>
-            <input id="mob-head-scale" type="range" min="0.75" max="1.45" step="0.05" value="1.05" />
+            <input id="mob-head-scale" type="range" min="0.75" max="1.45" step="0.05" value="1.05" aria-label="Масштаб голови" />
           </div>
 
           <div class="control-row">
@@ -330,7 +333,7 @@
               <span>Масивність броні та тулуба:</span>
               <span id="val-mob-bulk" class="control-val">1.05x</span>
             </div>
-            <input id="mob-body-bulk" type="range" min="0.8" max="1.35" step="0.05" value="1.05" />
+            <input id="mob-body-bulk" type="range" min="0.8" max="1.35" step="0.05" value="1.05" aria-label="Масивність броні та тулуба" />
           </div>
         </div>
 
@@ -341,7 +344,7 @@
 
           <div class="control-row">
             <div class="control-label"><span>Тип очей / Візора:</span></div>
-            <select id="mob-eye-type">
+            <select id="mob-eye-type" aria-label="Тип очей або візора">
               <option value="two" selected>👀 Два бойові ока</option>
               <option value="creeper">💀 Обличчя Кріпера</option>
               <option value="visor">🕶️ Лазерний Кібер-Візор</option>
@@ -352,7 +355,7 @@
 
           <div class="control-row">
             <div class="control-label"><span>Шолом / Роги / Корона:</span></div>
-            <select id="mob-headgear">
+            <select id="mob-headgear" aria-label="Шолом, роги або корона">
               <option value="crown" selected>👑 Золота Корона Боса</option>
               <option value="horns">🐂 Роги Вікінга / Дракона</option>
               <option value="antenna">📡 Антена Робота</option>
@@ -363,7 +366,7 @@
 
           <div class="control-row">
             <div class="control-label"><span>Спина (Крила / Ранець):</span></div>
-            <select id="mob-backgear">
+            <select id="mob-backgear" aria-label="Спорядження на спині (крила, ранець або плащ)">
               <option value="wings" selected>🦇 Ступінчасті Крила Дракона</option>
               <option value="jetpack">🚀 Турбо-Джетпак</option>
               <option value="cape">🧣 Лицарський Плащ</option>
@@ -373,7 +376,7 @@
 
           <div class="control-row">
             <div class="control-label"><span>Зброя (спирається на базу):</span></div>
-            <select id="mob-weapon">
+            <select id="mob-weapon" aria-label="Зброя моба">
               <option value="sword" selected>⚔️ Дворучний Алмазний Меч</option>
               <option value="hammer">🔨 Громовий Молот Тора</option>
               <option value="shield">🛡️ Бастіонний Щит</option>
@@ -383,11 +386,11 @@
 
           <div class="control-row">
             <div class="control-label"><span>Ім'я на п'єдесталі:</span></div>
-            <input id="mob-name" type="text" maxlength="7" value="ТИТАН" />
+            <input id="mob-name" type="text" maxlength="7" value="ТИТАН" aria-label="Ім'я на п'єдесталі" />
           </div>
 
           <label class="checkbox-row">
-            <input id="mob-tinkercad-blank" type="checkbox" />
+            <input id="mob-tinkercad-blank" type="checkbox" aria-label="Режим заготовки для Tinkercad" />
             <span>🧩 Режим «Заготовка для Tinkercad» (без дрібних деталей, щоб діти самі доробили обличчя в Tinkercad!)</span>
           </label>
         </div>
@@ -397,7 +400,7 @@
 
     <!-- ПРАВА ЧАСТИНА — ІНТЕРАКТИВНА 3D-СЦЕНА -->
     <section class="viewport-area">
-      <div id="viewport-container"></div>
+      <div id="viewport-container" role="region" aria-label="Інтерактивна 3D-сцена столу принтера"></div>
 
       <!-- ВЕРХНІ ІНФОРМАЦІЙНІ БЕЙДЖІ -->
       <div class="viewport-hud-top">
@@ -441,13 +444,13 @@
 
   <!-- ПІДКЛЮЧЕННЯ СКРИПТІВ (Працює 100% офлайн без інтернету та серверів!) -->
   <script src="lib/three.min.js"></script>
-  <script src="src/soundEffects.js"></script>
   <script src="src/voxelFont.js"></script>
-  <script src="src/sceneManager.js"></script>
+  <script src="src/soundEffects.js"></script>
   <script src="src/generators/minecraftForge.js"></script>
   <script src="src/generators/dualIllusion.js"></script>
   <script src="src/generators/physicsMechanics.js"></script>
   <script src="src/generators/mobMutator.js"></script>
+  <script src="src/sceneManager.js"></script>
   <script src="src/app.js"></script>
 </body>
 </html>
