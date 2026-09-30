@@ -206,14 +206,57 @@
       this.currentPresetKey = 'sword';
       this.activeBrush = 3; // 0 = Гумка, 1..4 = Рівні висоти
       this.isPainting = false;
+      this._strokeRecorded = false;
+      this.onBeforeMutate = null;
+      this.onAfterMutate = null;
       this.grid = [];
       this.colors = { 1: 0x5c3a21, 2: 0x0284c7, 3: 0x38bdf8, 4: 0xe0f2fe };
-      this._onMouseUp = () => { this.isPainting = false; };
+      this.lastConnectivity = {
+        activeCount: 0,
+        rawIslands: 1,
+        finalIslands: 1,
+        bridgedCount: 0,
+        hasDiagonalOnly: false
+      };
+      this._onMouseUp = () => {
+        if (this.isPainting) {
+          this.isPainting = false;
+          this._strokeRecorded = false;
+          if (this.onAfterMutate) this.onAfterMutate();
+        }
+      };
       window.addEventListener('mouseup', this._onMouseUp);
       this.loadPreset('sword', false);
     }
 
-    loadPreset(key, triggerRebuild = true) {
+    getState() {
+      return {
+        currentPresetKey: this.currentPresetKey,
+        colors: Object.assign({}, this.colors),
+        grid: this.grid.map(row => row.slice())
+      };
+    }
+
+    setState(state, triggerRebuild = true) {
+      if (!state || !Array.isArray(state.grid)) return;
+      this.currentPresetKey = state.currentPresetKey || 'sword';
+      if (state.colors) {
+        this.colors = Object.assign({}, state.colors);
+      }
+      this.grid = state.grid.map(row =>
+        row.slice(0, MC_CONFIG.GRID_SIZE).map(v => Math.max(0, Math.min(4, parseInt(v, 10) || 0)))
+      );
+      while (this.grid.length < MC_CONFIG.GRID_SIZE) {
+        this.grid.push(Array(MC_CONFIG.GRID_SIZE).fill(0));
+      }
+      this.renderCanvasUI();
+      if (triggerRebuild && window.StudioApp) {
+        window.StudioApp.rebuildCurrentModel(false, true);
+      }
+    }
+
+    loadPreset(key, triggerRebuild = true, recordHistory = false) {
+      if (recordHistory && this.onBeforeMutate) this.onBeforeMutate();
       const p = PRESETS[key] || PRESETS.sword;
       this.currentPresetKey = key;
       this.colors = Object.assign({}, p.colors);
@@ -221,20 +264,24 @@
         row.split('').map(ch => (ch === '.' ? 0 : parseInt(ch, 10) || 0))
       );
       this.renderCanvasUI();
+      if (recordHistory && this.onAfterMutate) this.onAfterMutate();
       if (triggerRebuild && window.StudioApp) {
         window.StudioApp.rebuildCurrentModel(true);
       }
     }
 
     clearGrid() {
+      if (this.onBeforeMutate) this.onBeforeMutate();
       this.grid = Array.from({ length: MC_CONFIG.GRID_SIZE }, () => Array(MC_CONFIG.GRID_SIZE).fill(0));
       this.renderCanvasUI();
+      if (this.onAfterMutate) this.onAfterMutate();
       if (window.StudioSound) window.StudioSound.playClearCanvas();
       if (window.StudioApp) window.StudioApp.rebuildCurrentModel(true, true);
     }
 
     // Випадковий симетричний тотем/меч/артефакт (діти обожнюють кнопку рандому!)
     randomizeArtifact() {
+      if (this.onBeforeMutate) this.onBeforeMutate();
       const palettes = [
         { 1: 0x5c3a21, 2: 0x0284c7, 3: 0x38bdf8, 4: 0xe0f2fe },
         { 1: 0x31102f, 2: 0x9333ea, 3: 0xc084fc, 4: 0xfef08a },
@@ -260,7 +307,148 @@
       }
 
       this.renderCanvasUI();
+      if (this.onAfterMutate) this.onAfterMutate();
       if (window.StudioApp) window.StudioApp.rebuildCurrentModel(true, true);
+    }
+
+    // Пошук зв'язних компонент (4-сусідство по гранях або 8-сусідство з діагоналями)
+    _findComponents(maskGrid, allowDiagonal = false) {
+      const N = MC_CONFIG.GRID_SIZE;
+      const visited = Array.from({ length: N }, () => Array(N).fill(false));
+      const components = [];
+      const dirs = allowDiagonal
+        ? [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [-1, 1], [1, -1], [1, 1]]
+        : [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+      for (let r = 0; r < N; r++) {
+        for (let c = 0; c < N; c++) {
+          if (maskGrid[r][c] && !visited[r][c]) {
+            const comp = [];
+            const queue = [[r, c]];
+            visited[r][c] = true;
+            while (queue.length > 0) {
+              const [cr, cc] = queue.shift();
+              comp.push([cr, cc]);
+              for (const [dr, dc] of dirs) {
+                const nr = cr + dr;
+                const nc = cc + dc;
+                if (nr >= 0 && nr < N && nc >= 0 && nc < N && maskGrid[nr][nc] && !visited[nr][nc]) {
+                  visited[nr][nc] = true;
+                  queue.push([nr, nc]);
+                }
+              }
+            }
+            components.push(comp);
+          }
+        }
+      }
+      return components;
+    }
+
+    // Аналізує зв'язність малюнка та будує маску суцільної основи (з автоматичними містками між островами)
+    computeBaseAndConnectivity(solidBase) {
+      const N = MC_CONFIG.GRID_SIZE;
+      const occupied = Array.from({ length: N }, (_, r) =>
+        Array.from({ length: N }, (_, c) => this.grid[r][c] > 0)
+      );
+
+      let activeCount = 0;
+      for (let r = 0; r < N; r++) {
+        for (let c = 0; c < N; c++) {
+          if (occupied[r][c]) activeCount++;
+        }
+      }
+
+      const rawComps4 = this._findComponents(occupied, false);
+      const rawComps8 = this._findComponents(occupied, true);
+      const hasDiagonalOnly = rawComps4.length > rawComps8.length;
+
+      const baseMask = Array.from({ length: N }, () => Array(N).fill(false));
+      let bridgedCount = 0;
+
+      if (solidBase && activeCount > 0) {
+        // 1. Контур 1 клітинка навколо всіх активних вокселів
+        for (let r = 0; r < N; r++) {
+          for (let c = 0; c < N; c++) {
+            if (occupied[r][c]) {
+              for (let dr = -1; dr <= 1; dr++) {
+                for (let dc = -1; dc <= 1; dc++) {
+                  const nr = r + dr;
+                  const nc = c + dc;
+                  if (nr >= 0 && nr < N && nc >= 0 && nc < N) {
+                    baseMask[nr][nc] = true;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // 2. Якщо після контуру залишилися окремі острови — з'єднуємо їх містками шириною 2 клітинки
+        let baseComps = this._findComponents(baseMask, false);
+        while (baseComps.length > 1) {
+          let bestDist = Infinity;
+          let bestA = null;
+          let bestB = null;
+
+          const comp0 = baseComps[0];
+          for (let k = 1; k < baseComps.length; k++) {
+            for (const [r1, c1] of comp0) {
+              for (const [r2, c2] of baseComps[k]) {
+                const d = Math.abs(r1 - r2) + Math.abs(c1 - c2);
+                if (d < bestDist) {
+                  bestDist = d;
+                  bestA = [r1, c1];
+                  bestB = [r2, c2];
+                }
+              }
+            }
+          }
+
+          if (!bestA || !bestB) break;
+
+          const markThick = (rr, cc) => {
+            for (let dr = 0; dr <= 1; dr++) {
+              for (let dc = 0; dc <= 1; dc++) {
+                const nr = Math.min(N - 1, Math.max(0, rr + dr));
+                const nc = Math.min(N - 1, Math.max(0, cc + dc));
+                if (!baseMask[nr][nc]) {
+                  baseMask[nr][nc] = true;
+                  bridgedCount++;
+                }
+              }
+            }
+          };
+
+          let [cr, cc] = bestA;
+          const [tr, tc] = bestB;
+          while (cr !== tr) {
+            cr += cr < tr ? 1 : -1;
+            markThick(cr, cc);
+          }
+          while (cc !== tc) {
+            cc += cc < tc ? 1 : -1;
+            markThick(cr, cc);
+          }
+
+          baseComps = this._findComponents(baseMask, false);
+        }
+      }
+
+      const combinedMask = Array.from({ length: N }, (_, r) =>
+        Array.from({ length: N }, (_, c) => occupied[r][c] || baseMask[r][c])
+      );
+      const finalComps = this._findComponents(combinedMask, false);
+
+      this.lastConnectivity = {
+        activeCount,
+        rawIslands: rawComps4.length,
+        finalIslands: finalComps.length,
+        bridgedCount,
+        hasDiagonalOnly
+      };
+
+      return { baseMask, combinedMask, connectivity: this.lastConnectivity };
     }
 
     renderCanvasUI() {
@@ -285,6 +473,10 @@
 
           const paintCell = () => {
             if (this.grid[r][c] !== this.activeBrush) {
+              if (!this._strokeRecorded) {
+                this._strokeRecorded = true;
+                if (this.onBeforeMutate) this.onBeforeMutate();
+              }
               this.grid[r][c] = this.activeBrush;
               if (this.activeBrush > 0) {
                 cell.style.backgroundColor = hexStr(this.colors[this.activeBrush]);
@@ -301,6 +493,7 @@
           cell.addEventListener('mousedown', (e) => {
             e.preventDefault();
             this.isPainting = true;
+            this._strokeRecorded = false;
             paintCell();
           });
           cell.addEventListener('mouseenter', () => {
@@ -341,23 +534,14 @@
       const totalWidth = MC_CONFIG.GRID_SIZE * voxelSize;
       const offset = -totalWidth / 2 + voxelSize / 2;
 
-      // Якщо увімкнено "Суцільна основа (Бронебійна міцність)" — будуємо підкладку під активними клітинками та їх сусідами
+      const { baseMask, combinedMask } = this.computeBaseAndConnectivity(params.solidBase);
+
+      // Якщо увімкнено "Суцільна підкладка" — будуємо підкладку під контуром та містками між островами
       if (params.solidBase) {
         const baseGeo = new THREE.BoxGeometry(voxelSize, basePlateHeight, voxelSize);
         for (let r = 0; r < MC_CONFIG.GRID_SIZE; r++) {
           for (let c = 0; c < MC_CONFIG.GRID_SIZE; c++) {
-            let hasNeighbor = this.grid[r][c] > 0;
-            if (!hasNeighbor) {
-              for (let dr = -1; dr <= 1; dr++) {
-                for (let dc = -1; dc <= 1; dc++) {
-                  const nr = r + dr, nc = c + dc;
-                  if (nr >= 0 && nr < MC_CONFIG.GRID_SIZE && nc >= 0 && nc < MC_CONFIG.GRID_SIZE && this.grid[nr][nc] > 0) {
-                    hasNeighbor = true;
-                  }
-                }
-              }
-            }
-            if (hasNeighbor && this.grid[r][c] === 0) {
+            if (baseMask[r][c] && this.grid[r][c] === 0) {
               const mesh = new THREE.Mesh(baseGeo, materials[0]);
               mesh.position.set(offset + c * voxelSize, basePlateHeight / 2, offset + r * voxelSize);
               group.add(mesh);
@@ -366,7 +550,7 @@
         }
       }
 
-      // Будуємо основні різнорівневі вокселі
+      // Будуємо основні різнорівневі вокселі та визначаємо фактичні межі зайнятих клітинок
       const levelGeos = {
         1: new THREE.BoxGeometry(voxelSize, levelHeights[1], voxelSize),
         2: new THREE.BoxGeometry(voxelSize, levelHeights[2], voxelSize),
@@ -374,8 +558,24 @@
         4: new THREE.BoxGeometry(voxelSize, levelHeights[4], voxelSize)
       };
 
+      let minR = MC_CONFIG.GRID_SIZE;
+      let maxR = -1;
+      let topRowSumC = 0;
+      let topRowCount = 0;
+
       for (let r = 0; r < MC_CONFIG.GRID_SIZE; r++) {
         for (let c = 0; c < MC_CONFIG.GRID_SIZE; c++) {
+          if (combinedMask[r][c]) {
+            if (r < minR) {
+              minR = r;
+              topRowSumC = c;
+              topRowCount = 1;
+            } else if (r === minR) {
+              topRowSumC += c;
+              topRowCount++;
+            }
+            if (r > maxR) maxR = r;
+          }
           const lvl = this.grid[r][c];
           if (lvl > 0) {
             const h = levelHeights[lvl] || 4.0;
@@ -387,7 +587,15 @@
         }
       }
 
-      // Додаємо вушко для брелока (товсте, надійне для старого принтера)
+      // Якщо полотно порожнє — використовуємо стандартні межі
+      if (maxR < 0) {
+        minR = 0;
+        maxR = MC_CONFIG.GRID_SIZE - 1;
+        topRowSumC = 7.5;
+        topRowCount = 1;
+      }
+
+      // Додаємо вушко для брелока (прив'язується до фактичного верхнього краю фігури)
       if (mountType === 'keychain') {
         const ringOuter = MC_CONFIG.KEYCHAIN_RING_OUTER;
         const ringInner = MC_CONFIG.KEYCHAIN_RING_INNER;
@@ -406,29 +614,33 @@
         });
         extrudeGeo.rotateX(Math.PI / 2);
 
+        const anchorCol = topRowCount > 0 ? topRowSumC / topRowCount : 7.5;
+        const anchorX = offset + anchorCol * voxelSize;
+        const topEdgeZ = offset + minR * voxelSize;
+
         const ringMesh = new THREE.Mesh(extrudeGeo, materials[1]);
-        // Ставимо вушко у верхньому лівому або центральному верхньому краю, де є вокселі
-        ringMesh.position.set(0, ringHeight, offset - voxelSize * 1.1);
+        ringMesh.position.set(anchorX, ringHeight, topEdgeZ - voxelSize * 1.1);
         group.add(ringMesh);
 
         // Перемичка до основної фігури
-        const bridgeGeo = new THREE.BoxGeometry(voxelSize * 3, ringHeight * 0.85, voxelSize * 2.5);
+        const bridgeGeo = new THREE.BoxGeometry(voxelSize * 3, ringHeight * 0.85, voxelSize * 2.6);
         const bridgeMesh = new THREE.Mesh(bridgeGeo, materials[1]);
-        bridgeMesh.position.set(0, (ringHeight * 0.85) / 2, offset + voxelSize * 0.3);
+        bridgeMesh.position.set(anchorX, (ringHeight * 0.85) / 2, topEdgeZ + voxelSize * 0.2);
         group.add(bridgeMesh);
       }
 
-      // Якщо обрано плашку з ім'ям внизу
+      // Якщо обрано плашку з ім'ям внизу (прив'язується до фактичного нижнього краю фігури)
       if (customLabel.length > 0 || mountType === 'stand') {
         const labelText = customLabel.length > 0 ? customLabel : 'МАЙНКРАФТ';
         const charMatrices = window.VoxelFont.textToCharMatrices(labelText, 9);
         const px = Math.max(MC_CONFIG.LABEL_PIXEL_MIN, voxelSize * MC_CONFIG.LABEL_PIXEL_SCALE);
         const textWidth = charMatrices.length * 6 * px;
-        const plateW = Math.max(totalWidth * 0.85, textWidth + 8);
+        const bottomEdgeZ = offset + maxR * voxelSize;
+        const plateW = Math.max(voxelSize * 8, textWidth + 8);
         const plateD = 9 * px;
         const plateH = MC_CONFIG.LABEL_PLATE_HEIGHT;
 
-        const plateZ = -offset + voxelSize * 0.8 + plateD / 2;
+        const plateZ = bottomEdgeZ + voxelSize * 0.8 + plateD / 2;
 
         const plateGeo = new THREE.BoxGeometry(plateW, plateH, plateD);
         const plateMesh = new THREE.Mesh(plateGeo, materials[1]);
