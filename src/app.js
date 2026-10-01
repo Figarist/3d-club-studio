@@ -141,8 +141,6 @@
         btnSnapshotV1: document.getElementById('btn-snapshot-v1'),
         btnCompareV1V2: document.getElementById('btn-compare-v1v2'),
         btnPrintCard: document.getElementById('btn-print-card'),
-        btnMissionV1Compare: document.getElementById('btn-mission-v1-compare'),
-        btnMissionPrintCard: document.getElementById('btn-mission-print-card'),
         compareModal: document.getElementById('compare-modal'),
         btnCloseCompare: document.getElementById('btn-close-compare'),
         btnCloseCompareFooter: document.getElementById('btn-close-compare-footer'),
@@ -279,7 +277,6 @@
         this.compare.setV1(state.v1Snapshot);
         if (dom.btnCompareV1V2) dom.btnCompareV1V2.style.display = 'inline-block';
         if (dom.btnSnapshotV1) dom.btnSnapshotV1.textContent = '📸 V1 збережено ✅';
-        if (dom.btnMissionV1Compare) dom.btnMissionV1Compare.classList.add('highlight');
       }
       if (state.studentPairCode) {
         this.safeStorage.setItem('3d_kuznya_pair_code', state.studentPairCode);
@@ -642,10 +639,6 @@
           dom.btnCompareV1V2.disabled = false;
           dom.btnCompareV1V2.classList.add('has-v1');
           dom.btnCompareV1V2.title = `V1 зафіксовано о ${snap.displayTime}. Натисніть для порівняння!`;
-        }
-        if (dom.btnMissionV1Compare) {
-          dom.btnMissionV1Compare.disabled = false;
-          dom.btnMissionV1Compare.classList.add('highlight');
         }
         if (dom.btnSnapshotV1) {
           dom.btnSnapshotV1.textContent = '📸 V1 збережено ✅';
@@ -1073,13 +1066,6 @@
         dom.missionsModal.addEventListener('click', (e) => {
           if (e.target === dom.missionsModal) this.closeMissionsModal();
         });
-      }
-
-      if (dom.btnMissionV1Compare) {
-        dom.btnMissionV1Compare.addEventListener('click', () => this.openCompareModal());
-      }
-      if (dom.btnMissionPrintCard) {
-        dom.btnMissionPrintCard.addEventListener('click', () => this.openPrintCardModal());
       }
 
       if (btnToggleBody) {
