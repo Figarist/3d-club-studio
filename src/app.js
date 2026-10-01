@@ -202,7 +202,7 @@
       const savedPair = this.safeStorage.getItem('3d_kuznya_pair_code') || '';
       return {
         app: '3d-club-studio',
-        version: '1.5.1',
+        version: '1.5.2',
         savedAt: new Date().toISOString(),
         activeTab: this.activeTab,
         activeMissionId: this.missions.activeMissionId,
@@ -884,23 +884,34 @@
       if (dom.btnPrintCard) dom.btnPrintCard.addEventListener('click', () => this.openPrintCardModal());
 
       const btnSound = document.getElementById('btn-toggle-sound');
+      const btnMusic = document.getElementById('btn-toggle-music');
       if (btnSound) {
         btnSound.addEventListener('click', () => {
           if (window.StudioSound) {
             const on = window.StudioSound.toggleSound();
             btnSound.classList.toggle('muted', !on);
             btnSound.textContent = on ? '🔊 Звук' : '🔇 Звук: ВИМК';
+            btnSound.title = on ? 'Звукові ефекти увімкнено (натисніть, щоб вимкнути)' : 'Звукові ефекти вимкнено (натисніть, щоб увімкнути)';
+            if (!on && btnMusic) {
+              btnMusic.classList.remove('playing');
+              btnMusic.textContent = '🎵 Музика';
+              btnMusic.title = 'Фонова мелодія кузні вимкнена';
+            }
           }
         });
       }
 
-      const btnMusic = document.getElementById('btn-toggle-music');
       if (btnMusic) {
         btnMusic.addEventListener('click', () => {
           if (window.StudioSound) {
             const on = window.StudioSound.toggleMusic();
             btnMusic.classList.toggle('playing', on);
             btnMusic.textContent = on ? '🎵 Мелодія: ГРАЄ' : '🎵 Музика';
+            btnMusic.title = on ? 'Фонова мелодія грає (натисніть для паузи)' : 'Увімкнути фонову мелодію кузні';
+            if (on && btnSound) {
+              btnSound.classList.remove('muted');
+              btnSound.textContent = '🔊 Звук';
+            }
           }
         });
       }
@@ -1137,6 +1148,12 @@
     }
 
     bindCameraControls() {
+      if (this.sceneManager) {
+        this.sceneManager.onUserCameraInteraction = () => {
+          document.querySelectorAll('[data-camera-view]').forEach(b => b.classList.remove('active-cam'));
+        };
+      }
+
       document.querySelectorAll('[data-camera-view]').forEach((btn) => {
         btn.addEventListener('click', () => {
           const preset = btn.getAttribute('data-camera-view');
@@ -1259,6 +1276,11 @@
       if (btnShort) {
         btnShort.addEventListener('click', () => {
           this.recordUndoSnapshot();
+          const firstPreset = document.querySelector('[data-il-preset="short"]');
+          if (firstPreset) {
+            document.querySelectorAll('[data-il-preset]').forEach(b => b.classList.remove('active'));
+            firstPreset.classList.add('active');
+          }
           const dom = this._domCache || {};
           if (dom.ilWord1) dom.ilWord1.value = '3D';
           if (dom.ilWord2) dom.ilWord2.value = '★!';
@@ -1273,6 +1295,8 @@
       document.querySelectorAll('[data-il-preset]').forEach((btn) => {
         btn.addEventListener('click', () => {
           this.recordUndoSnapshot();
+          document.querySelectorAll('[data-il-preset]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
           const dom = this._domCache || {};
           const w1 = btn.getAttribute('data-w1');
           const w2 = btn.getAttribute('data-w2');
@@ -1333,13 +1357,15 @@
         const el = document.getElementById(id);
         if (el) {
           el.addEventListener('mousedown', () => this.recordUndoSnapshot());
-          el.addEventListener('input', () => {
+          const handleUpdate = () => {
             this._playControlFeedback(el);
             this.updateValueLabels();
             this.markModelModified();
             this.rebuildCurrentModel(false);
             this.autosave();
-          });
+          };
+          el.addEventListener('input', handleUpdate);
+          el.addEventListener('change', handleUpdate);
         }
       });
     }
@@ -1376,13 +1402,15 @@
         const el = document.getElementById(id);
         if (el) {
           el.addEventListener('mousedown', () => this.recordUndoSnapshot());
-          el.addEventListener('input', () => {
+          const handleUpdate = () => {
             this._playControlFeedback(el);
             this.updateValueLabels();
             this.markModelModified();
             this.rebuildCurrentModel(false);
             this.autosave();
-          });
+          };
+          el.addEventListener('input', handleUpdate);
+          el.addEventListener('change', handleUpdate);
         }
       });
 
@@ -1405,14 +1433,16 @@
         const el = document.getElementById(id);
         if (el) {
           el.addEventListener('mousedown', () => this.recordUndoSnapshot());
-          el.addEventListener('input', () => {
+          const handleUpdate = () => {
             this._playControlFeedback(el);
             this.updateValueLabels();
             const isArch = id === 'mob-archetype';
             this.markModelModified();
             this.rebuildCurrentModel(isArch, true);
             this.autosave();
-          });
+          };
+          el.addEventListener('input', handleUpdate);
+          el.addEventListener('change', handleUpdate);
         }
       });
     }
