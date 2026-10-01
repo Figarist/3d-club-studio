@@ -15,7 +15,7 @@
       <div class="brand-title">
         <div class="brand-title-row">
           <h1>3D КУЗНЯ ЧУДЕС</h1>
-          <span id="app-version-pill" class="version-pill" title="Версія програми: v1.3.0">v1.3.0</span>
+          <span id="app-version-pill" class="version-pill" title="Версія програми: v1.4.0">v1.4.0</span>
         </div>
         <p>Minecraft &amp; Print-Safe 3D Генератор • Tinkercad / Makers Empire / 3D-Принтер</p>
       </div>
@@ -40,7 +40,7 @@
       </button>
     </nav>
 
-    <!-- ДІЇ: СКАСУВАННЯ, ОДНОКОЛІРНЕ ПРЕВ'Ю, ЗБЕРЕЖЕННЯ ПРОЄКТУ, СИМУЛЯТОР, STL -->
+    <!-- ДІЇ: СКАСУВАННЯ, ОДНОКОЛІРНЕ ПРЕВ'Ю, ЗБЕРЕЖЕННЯ ПРОЄКТУ, V1/V2, ПАСПОРТ, СИМУЛЯТОР, STL -->
     <div class="top-actions">
       <button id="btn-undo" class="btn-action btn-history" title="Скасувати останню дію (Ctrl+Z)">
         ↩️
@@ -58,6 +58,15 @@
         📂 Відкрити
       </button>
       <input id="input-load-project" type="file" accept=".json" style="display:none;" aria-hidden="true" />
+      <button id="btn-snapshot-v1" class="btn-action btn-v1" title="Зафіксувати поточну модель як Версію 1 (Ескіз)">
+        📸 Фіксувати V1
+      </button>
+      <button id="btn-compare-v1v2" class="btn-action btn-v1" title="Відкрити порівняння поступу: Версія 1 (Ескіз) ↔ Версія 2 (Фінал)" style="display:none;">
+        ⚖️ V1 ↔ V2
+      </button>
+      <button id="btn-print-card" class="btn-action btn-card" title="Створити картку для черги 3D-друку (Паспорт деталі для принтера)">
+        📋 Картка для друку
+      </button>
       <button id="btn-toggle-sound" class="btn-action btn-sound" title="Увімкнути/вимкнути веселі звукові ефекти">
         🔊 Звук
       </button>
@@ -102,6 +111,8 @@
             <button id="btn-prev-mission" class="mission-nav-btn" title="Попередня місія">◀</button>
             <button id="btn-next-mission" class="mission-nav-btn" title="Наступна місія">▶</button>
             <button id="btn-toggle-mission-body" class="mission-small-btn" title="Згорнути або розгорнути кроки й чек-лист місії">📋 Чек-лист</button>
+            <button id="btn-mission-v1-compare" class="mission-small-btn" title="Порівняти початковий ескіз V1 з фіналом V2">⚖️ V1↔V2</button>
+            <button id="btn-mission-print-card" class="mission-small-btn" title="Створити картку для черги 3D-друку (Паспорт деталі)">📋 Картка</button>
             <button id="btn-open-missions-inline" class="mission-small-btn highlight" title="Відкрити всі 12 місій гуртка">🗺️ Усі 12</button>
           </div>
         </div>
@@ -169,6 +180,7 @@
             <button class="preset-btn preset-mini-btn" data-mc-preset="game_token">🎲 Жетон Гравця</button>
             <button class="preset-btn preset-mini-btn" data-mc-preset="mini_tag">🏷️ Міні-Табличка</button>
             <button class="preset-btn preset-mini-btn" data-mc-preset="cardboard_stand">🏙️ Паз для Картону</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="slot_calibrator">📏 Калібратор Пазів</button>
             <button class="preset-btn preset-mini-btn" data-mc-preset="shield">🛡️ Щит (Tinkercad)</button>
           </div>
 
@@ -246,6 +258,19 @@
               <option value="keychain" selected>🔑 Міцне вушко для брелока (отвір 6 мм)</option>
               <option value="none">🧱 Чиста фігурка / Плитка (для Tinkercad / жетона)</option>
               <option value="stand">🏆 З іменною табличкою внизу</option>
+            </select>
+          </div>
+
+          <div id="mc-slot-width-group" class="control-row" style="display:none;">
+            <div class="control-label">
+              <span>Ширина паза під картон:</span>
+              <span id="val-mc-slot" class="control-val">2.0 мм (+0.2 допуск)</span>
+            </div>
+            <select id="mc-slot-width" aria-label="Ширина паза під картон">
+              <option value="1.5">1.5 мм (допуск +0.2 = 1.7 мм) — тонкий картон</option>
+              <option value="2.0" selected>2.0 мм (допуск +0.2 = 2.2 мм) — палітурний картон</option>
+              <option value="2.5">2.5 мм (допуск +0.2 = 2.7 мм) — гофрокартон мікро-E</option>
+              <option value="3.0">3.0 мм (допуск +0.2 = 3.2 мм) — щільний гофрокартон-B</option>
             </select>
           </div>
 
@@ -563,8 +588,8 @@
         </div>
 
         <!-- Кутовий бейдж версії програми -->
-        <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • Версія v1.3.0 (12 місій гуртка, міні-шаблони 25–35 мм, чесна діагностика, 1 Пластик)">
-          ⚒️ v1.3.0
+        <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • Версія v1.4.0 (калібратор пазів, V1↔V2 поступ, картки черги друку, профіль Anycubic i3 Mega)">
+          ⚒️ v1.4.0
         </div>
       </div>
     </section>
@@ -597,6 +622,192 @@
 
       <!-- СІТКА 12 КАРТОК МІСІЙ -->
       <div id="missions-grid-container" class="missions-grid"></div>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНЕ ВІКНО: ГАЛЕРЕЯ ІНЖЕНЕРНОГО ПОСТУПУ (ПОРІВНЯННЯ V1 ↔ V2) -->
+  <div id="compare-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="compare-modal-title" style="display:none;">
+    <div class="modal-window compare-window">
+      <div class="modal-header">
+        <div>
+          <h2 id="compare-modal-title">⚖️ Інженерний поступ: Порівняння Версія 1 (Ескіз) ↔ Версія 2 (Фінал)</h2>
+          <p class="modal-subtitle">
+            Порівняй свій початковий задум з оптимізованою моделлю. Чому V2 надійніша для друку на Anycubic i3 Mega?
+          </p>
+        </div>
+        <button id="btn-close-compare" class="modal-close-btn" title="Закрити (Esc)" aria-label="Закрити вікно порівняння">✕</button>
+      </div>
+
+      <!-- ЗВЕДЕНИЙ БАНЕР ПОСТУПУ -->
+      <div id="compare-summary-banner" class="compare-summary-banner"></div>
+
+      <!-- ДВІ КАРТКИ ПОРІВНЯННЯ ПОРУЧ -->
+      <div class="compare-grid">
+        <div class="compare-col v1-col">
+          <div class="compare-card-header">
+            <span class="version-tag v1-tag">Версія 1 (Ескіз)</span>
+            <span id="v1-timestamp" class="compare-time">--:--:--</span>
+          </div>
+          <div class="compare-img-wrap">
+            <img id="v1-preview-img" alt="Прев'ю моделі V1" class="compare-preview-img" />
+          </div>
+          <div id="v1-metrics" class="compare-metrics-list"></div>
+        </div>
+
+        <div class="compare-col v2-col">
+          <div class="compare-card-header">
+            <span class="version-tag v2-tag">Версія 2 (Готово до друку)</span>
+            <span id="v2-timestamp" class="compare-time">Зараз</span>
+          </div>
+          <div class="compare-img-wrap">
+            <img id="v2-preview-img" alt="Прев'ю моделі V2" class="compare-preview-img" />
+          </div>
+          <div id="v2-metrics" class="compare-metrics-list"></div>
+        </div>
+      </div>
+
+      <!-- ІНЖЕНЕРНА РЕФЛЕКСІЯ ДЛЯ 52–60 ХВИЛИН УРОКУ -->
+      <div class="reflection-box">
+        <h4>💡 Інженерна рефлексія пари (хвилини 52–60):</h4>
+        <ul>
+          <li><b>Зв'язність:</b> чи немає деталей, які відпадуть після зняття зі столу принтера? (Острови = 1).</li>
+          <li><b>Силует і тінь:</b> чи достатньо контрастні сходинки висоти, коли колір пластику один?</li>
+          <li><b>Економія часу:</b> на скільки хвилин оптимізовано час у спільній черзі Anycubic i3 Mega?</li>
+        </ul>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-compare-to-passport" class="btn-action btn-card">📋 Створити Паспорт деталі з V2</button>
+        <button id="btn-re-snapshot-v1" class="btn-subtle">📸 Оновити V1 (перезаписати ескіз)</button>
+        <button id="btn-close-compare-footer" class="view-btn">Закрити</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНЕ ВІКНО: ПАСПОРТ ДЕТАЛІ ДЛЯ ЧЕРГИ 3D-ДРУКУ -->
+  <div id="print-card-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="print-card-modal-title" style="display:none;">
+    <div class="modal-window print-card-window">
+      <div class="modal-header no-print">
+        <div>
+          <h2 id="print-card-modal-title">📋 Паспорт деталі для черги 3D-друку</h2>
+          <p class="modal-subtitle">
+            Заповни код пари та перевір відмітки. Картку можна роздрукувати на звичайному принтері або зберегти як PNG!
+          </p>
+        </div>
+        <button id="btn-close-print-card" class="modal-close-btn" title="Закрити (Esc)" aria-label="Закрити паспорт деталі">✕</button>
+      </div>
+
+      <!-- ВЕРХНЯ ПАНЕЛЬ ДІЙ (НЕ ДРУКУЄТЬСЯ НА ПАПЕРІ) -->
+      <div class="print-card-toolbar no-print">
+        <button id="btn-action-print" class="btn-action btn-sim">🖨️ Друкувати картку (Ctrl+P)</button>
+        <button id="btn-action-download-png" class="btn-action btn-project">💾 Зберегти як PNG</button>
+        <button id="btn-action-copy-text" class="btn-action btn-mono">📋 Скопіювати текст</button>
+        <div class="pair-code-inline">
+          <label for="card-pair-input"><b>Код пари / Учні:</b></label>
+          <input id="card-pair-input" type="text" maxlength="32" placeholder="Пара #1 (Максим & Данило)" class="hud-input" style="width:230px;" />
+        </div>
+      </div>
+
+      <!-- ДРУКОВАНА КАРТКА-ПАСПОРТ (ПОТРАПЛЯЄ НА ДРУК Ctrl+P) -->
+      <div id="printable-passport-card" class="passport-card-paper">
+        <div class="passport-header">
+          <div class="passport-logo">
+            <span class="logo-icon">⚒️</span>
+            <div>
+              <div class="passport-studio-name">3D КУЗНЯ ЧУДЕС • ЛАБОРАТОРІЯ 3D-ДИЗАЙНУ</div>
+              <div class="passport-doc-title">ПАСПОРТ ДЕТАЛІ ДЛЯ ЧЕРГИ 3D-ДРУКУ</div>
+            </div>
+          </div>
+          <div class="passport-meta-box">
+            <div><b>Пара / Учні:</b> <span id="p-card-pair">Пара #1</span></div>
+            <div><b>Дата:</b> <span id="p-card-date">01.10.2026</span></div>
+          </div>
+        </div>
+
+        <div class="passport-body">
+          <div class="passport-left-col">
+            <div class="passport-img-box">
+              <img id="p-card-img" alt="3D-модель" class="passport-preview-img" />
+              <div class="passport-stl-name" id="p-card-filename">model.stl</div>
+            </div>
+            <div class="passport-mission-info">
+              <div><b>Місія:</b> <span id="p-card-mission">#1 Паспорт Героя</span></div>
+              <div class="passport-version-row">
+                <b>Версія:</b>
+                <label><input type="radio" name="p-card-ver" value="V1" id="p-ver-v1" /> V1 (Ескіз)</label>
+                <label><input type="radio" name="p-card-ver" value="V2" id="p-ver-v2" checked /> V2 (Фінал)</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="passport-mid-col">
+            <div class="passport-section-title">📐 Інженерні характеристики</div>
+            <table class="passport-specs-table">
+              <tr>
+                <td>Габарити (X × Y × Z):</td>
+                <td><strong id="p-card-dims">-- × -- × -- мм</strong></td>
+              </tr>
+              <tr>
+                <td>Зв'язність деталей:</td>
+                <td><span id="p-card-conn" class="badge-conn">✅ 1 суцільна деталь</span></td>
+              </tr>
+              <tr>
+                <td>Суцільна підкладка:</td>
+                <td><span id="p-card-base">Так (2.0 мм + містки)</span></td>
+              </tr>
+              <tr>
+                <td>Особливий параметр:</td>
+                <td><span id="p-card-custom-param">Воксель 2.0 мм</span></td>
+              </tr>
+              <tr>
+                <td>Тест «🪨 1 Пластик»:</td>
+                <td><span id="p-card-mono">Перевірено (контраст OK)</span></td>
+              </tr>
+            </table>
+
+            <div class="passport-section-title" style="margin-top: 8px;">✅ Чек-лист самоперевірки пари</div>
+            <div class="passport-checklist" id="p-card-checklist">
+              <label><input type="checkbox" checked /> 1. Усі частини з'єднані в 1 деталь (0 розривів)</label>
+              <label><input type="checkbox" checked /> 2. Силует читається в одному кольорі («🪨 1 Пластик»)</label>
+              <label><input type="checkbox" checked /> 3. Габарити вкладаються у норму місії (≤35 мм)</label>
+            </div>
+            <div class="passport-signatures">
+              <div>Дизайнер: _________________</div>
+              <div>Перевіряльник: _________________</div>
+            </div>
+          </div>
+
+          <div class="passport-right-col">
+            <div class="passport-section-title">🖨️ Службові поля викладача</div>
+            <div class="teacher-fields-box">
+              <div class="t-field">
+                <span class="t-label">Слайсер (хв/грам):</span>
+                <div class="t-line">______ хв / ______ г PLA</div>
+              </div>
+              <div class="t-field">
+                <span class="t-label">Профіль слайсера:</span>
+                <div class="t-line">[ ] 0.20 мм (швидк) [ ] 0.16 мм (рельєф)</div>
+              </div>
+              <div class="t-field">
+                <span class="t-label">Дата й час запуску:</span>
+                <div class="t-line">____.____.202_ о ____:____</div>
+              </div>
+              <div class="t-field">
+                <span class="t-label">Результат перевірки:</span>
+                <div class="t-line">[ ] У черзі [ ] Друк OK [ ] Брак</div>
+              </div>
+              <div class="t-field" style="margin-top: 10px;">
+                <span class="t-label">Підпис викладача:</span>
+                <div class="t-line">__________________________</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="passport-cut-line no-print-visible">
+          <span>✂️ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ✂️</span>
+        </div>
+      </div>
     </div>
   </div>
 

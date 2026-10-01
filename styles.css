@@ -513,7 +513,9 @@ select:focus {
 /* ДОДАТКОВІ КНОПКИ ШАПКИ (ІСТОРІЯ, ПРОЄКТ, 1 ПЛАСТИК) */
 .btn-history,
 .btn-project,
-.btn-mono {
+.btn-mono,
+.btn-v1,
+.btn-card {
   background: var(--bg-card);
   color: var(--text-main);
   border-color: var(--border-color);
@@ -523,9 +525,42 @@ select:focus {
 
 .btn-history:hover:not(:disabled),
 .btn-project:hover,
-.btn-mono:hover {
+.btn-mono:hover,
+.btn-v1:hover,
+.btn-card:hover {
   border-color: var(--cyan);
   background: var(--bg-card-hover);
+}
+
+.btn-v1 {
+  background: rgba(168, 85, 247, 0.15);
+  border-color: rgba(168, 85, 247, 0.55);
+  color: #e9d5ff;
+}
+
+.btn-v1:hover {
+  background: #9333ea;
+  color: #ffffff;
+  border-color: #f3e8ff;
+}
+
+.btn-v1.active {
+  background: linear-gradient(135deg, #a855f7, #7e22ce);
+  border-color: #f3e8ff;
+  color: #ffffff;
+}
+
+.btn-card {
+  background: rgba(234, 179, 8, 0.15);
+  border-color: rgba(234, 179, 8, 0.55);
+  color: #fef08a;
+  font-weight: 700;
+}
+
+.btn-card:hover {
+  background: linear-gradient(135deg, #eab308, #ca8a04);
+  color: #1e1b4b;
+  border-color: #fef9c3;
 }
 
 .btn-history:disabled {
@@ -1354,6 +1389,600 @@ select:focus {
   transform: scale(1.04);
   background: linear-gradient(135deg, #34d399, #10b981);
 }
+
+/* ==========================================================================
+   УНІВЕРСАЛЬНІ МОДАЛЬНІ ВІКНА (V1↔V2 ПОРІВНЯННЯ ТА ПАСПОРТ ДЕТАЛІ)
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 9, 20, 0.85);
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+.modal-window {
+  background: #0f172a;
+  border: 1.5px solid var(--border-color);
+  border-radius: 16px;
+  width: 100%;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 14px 20px;
+  background: linear-gradient(90deg, #17253b 0%, #0f172a 100%);
+  border-bottom: 1.5px solid var(--border-color);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.modal-header h2 {
+  font-size: 17.5px;
+  font-weight: 800;
+  color: #fde047;
+}
+
+.modal-subtitle {
+  font-size: 12px;
+  color: #cbd5e1;
+  margin-top: 3px;
+}
+
+.modal-close-btn {
+  background: #1e293b;
+  color: #f8fafc;
+  border: 1.5px solid var(--border-color);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.modal-close-btn:hover {
+  border-color: var(--danger);
+  background: #7f1d1d;
+}
+
+.modal-footer {
+  padding: 12px 20px;
+  background: #0b1320;
+  border-top: 1.5px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   ГАЛЕРЕЯ ІНЖЕНЕРНОГО ПОСТУПУ (V1 ↔ V2)
+   ========================================================================== */
+.compare-window {
+  max-width: 960px;
+}
+
+.compare-summary-banner {
+  padding: 10px 18px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(56, 189, 248, 0.12));
+  border-bottom: 1px solid rgba(16, 185, 129, 0.35);
+  font-size: 13px;
+  font-weight: 700;
+  color: #a7f3d0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+}
+
+.compare-summary-banner .diff-tag {
+  background: rgba(15, 23, 42, 0.7);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #e0f2fe;
+}
+
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+@media (max-width: 720px) {
+  .compare-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.compare-col {
+  background: #1e293b;
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.v1-col {
+  border-color: rgba(168, 85, 247, 0.5);
+  background: linear-gradient(180deg, rgba(88, 28, 135, 0.12) 0%, #1e293b 100%);
+}
+
+.v2-col {
+  border-color: rgba(16, 185, 129, 0.6);
+  background: linear-gradient(180deg, rgba(6, 78, 59, 0.14) 0%, #1e293b 100%);
+}
+
+.compare-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.version-tag {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.v1-tag {
+  background: rgba(168, 85, 247, 0.25);
+  border: 1px solid #a855f7;
+  color: #d8b4fe;
+}
+
+.v2-tag {
+  background: rgba(16, 185, 129, 0.25);
+  border: 1px solid #10b981;
+  color: #6ee7b7;
+}
+
+.compare-time {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.compare-img-wrap {
+  width: 100%;
+  height: 180px;
+  background: #0b1320;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.compare-preview-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.compare-metrics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: #cbd5e1;
+}
+
+.metric-item,
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 8px;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 6px;
+  align-items: center;
+}
+
+.metric-item b,
+.metric-row b {
+  color: #f8fafc;
+}
+
+.metric-good {
+  color: #34d399 !important;
+}
+
+.metric-bad {
+  color: #f87171 !important;
+}
+
+.compare-summary-banner.banner-good {
+  background: rgba(16, 185, 129, 0.15);
+  border-bottom: 1.5px solid #10b981;
+  color: #a7f3d0;
+}
+
+.compare-summary-banner.banner-success {
+  background: rgba(14, 165, 233, 0.18);
+  border-bottom: 1.5px solid #38bdf8;
+  color: #e0f2fe;
+}
+
+.compare-summary-banner.banner-warn {
+  background: rgba(245, 158, 11, 0.15);
+  border-bottom: 1.5px solid #f59e0b;
+  color: #fde68a;
+}
+
+.reflection-box {
+  margin: 0 20px 14px 20px;
+  padding: 12px 16px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1.5px solid rgba(245, 158, 11, 0.4);
+  border-radius: 10px;
+  font-size: 12px;
+  color: #fde68a;
+  line-height: 1.45;
+}
+
+.reflection-box h4 {
+  font-size: 13px;
+  color: #fbbf24;
+  margin-bottom: 6px;
+}
+
+.reflection-box ul {
+  padding-left: 18px;
+  margin: 0;
+}
+
+/* ==========================================================================
+   ПАСПОРТ ДЕТАЛІ ДЛЯ ЧЕРГИ 3D-ДРУКУ
+   ========================================================================== */
+.print-card-window {
+  max-width: 920px;
+}
+
+.print-card-toolbar {
+  padding: 10px 20px;
+  background: #0b1320;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pair-code-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #cbd5e1;
+  margin-left: auto;
+}
+
+/* ПАПЕРОВА КАРТКА ПАСПОРТА */
+.passport-card-paper {
+  background: #ffffff;
+  color: #0f172a;
+  padding: 16px 20px;
+  margin: 16px 20px;
+  border: 2px dashed #0284c7;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-y: auto;
+}
+
+.passport-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #0f172a;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.passport-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.passport-logo .logo-icon {
+  font-size: 26px;
+}
+
+.passport-studio-name {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #475569;
+}
+
+.passport-doc-title {
+  font-size: 15px;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.2px;
+}
+
+.passport-meta-box {
+  text-align: right;
+  font-size: 12px;
+  color: #1e293b;
+  line-height: 1.35;
+}
+
+.passport-meta-box span {
+  font-weight: 800;
+  color: #0369a1;
+}
+
+.passport-body {
+  display: grid;
+  grid-template-columns: 200px 1fr 220px;
+  gap: 14px;
+}
+
+@media (max-width: 760px) {
+  .passport-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.passport-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.passport-img-box {
+  width: 100%;
+  height: 140px;
+  background: #f1f5f9;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.passport-preview-img {
+  max-width: 90%;
+  max-height: 105px;
+  object-fit: contain;
+}
+
+.passport-stl-name {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
+  font-size: 9.5px;
+  text-align: center;
+  padding: 2px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: monospace;
+}
+
+.passport-mission-info {
+  font-size: 11.5px;
+  color: #334155;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.passport-version-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.passport-mid-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.passport-section-title {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #0f172a;
+  border-bottom: 1.5px solid #94a3b8;
+  padding-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.passport-specs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11.5px;
+}
+
+.passport-specs-table td {
+  padding: 3px 4px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.passport-specs-table td:first-child {
+  color: #475569;
+  width: 55%;
+}
+
+.badge-conn {
+  color: #047857;
+  font-weight: 800;
+}
+
+.passport-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11px;
+  color: #1e293b;
+}
+
+.passport-checklist label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.passport-signatures {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: #475569;
+  margin-top: 6px;
+  padding-top: 4px;
+  border-top: 1px dashed #cbd5e1;
+}
+
+.passport-right-col {
+  background: #f8fafc;
+  border: 1.5px solid #94a3b8;
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.teacher-fields-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.t-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.t-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.t-line {
+  font-size: 11px;
+  color: #0f172a;
+  border-bottom: 1px dotted #64748b;
+  padding-bottom: 2px;
+}
+
+.passport-cut-line {
+  text-align: center;
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 12px;
+  letter-spacing: 2px;
+}
+
+/* ==========================================================================
+   СТИЛІ ДРУКУ (PRINT MEDIA) ДЛЯ ПАСПОРТА ДЕТАЛІ
+   ========================================================================== */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .topbar,
+  .view-mode-bar,
+  .workspace,
+  .viewport-area,
+  .sidebar,
+  .no-print,
+  #missions-modal,
+  #compare-modal {
+    display: none !important;
+  }
+
+  #print-card-modal {
+    position: static !important;
+    background: none !important;
+    backdrop-filter: none !important;
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print-card-window {
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .passport-card-paper {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+    box-shadow: none !important;
+    margin: 0 auto !important;
+    padding: 14px 18px !important;
+    page-break-inside: avoid !important;
+    max-width: 180mm !important;
+  }
+
+  .passport-header {
+    border-bottom: 2px solid #000000 !important;
+  }
+
+  .passport-img-box {
+    border: 1px solid #000000 !important;
+    background: #ffffff !important;
+  }
+
+  .passport-stl-name {
+    background: #000000 !important;
+    color: #ffffff !important;
+  }
+
+  .passport-right-col {
+    border: 1.5px solid #000000 !important;
+    background: #ffffff !important;
+  }
+
+  .no-print-visible {
+    display: block !important;
+  }
+}
+
 
 
 
