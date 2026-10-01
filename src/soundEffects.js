@@ -541,7 +541,8 @@
         switch (themeKey) {
           case 'sword':
           case 'knight':
-          case 'dual_axes': {
+          case 'dual_axes':
+          case 'hero_badge': {
             // Дзвінкий металевий «ШІНГ!» виймання меча + героїчний акорд
             this._noise({ filterType: 'bandpass', freq: 2400, endFreq: 5800, q: 6.0, duration: 0.18, gain: 0.14 });
             this._tone({ type: 'sawtooth', freq: 587.33, endFreq: 1174.66, duration: 0.16, gain: 0.09 });
@@ -554,7 +555,10 @@
           case 'pickaxe':
           case 'golem':
           case 'hammer':
-          case 'shield': {
+          case 'shield':
+          case 'fossil_shell':
+          case 'mini_tag':
+          case 'cardboard_stand': {
             // Ковальський удар молота по ковадлу «ДЗЕНЬ-БУМ!»
             this._tone({ type: 'triangle', freq: 130, endFreq: 55, duration: 0.2, gain: 0.24 });
             this._tone({ type: 'square', freq: 840, endFreq: 810, duration: 0.28, gain: 0.08 });
@@ -563,7 +567,8 @@
             break;
           }
 
-          case 'creeper': {
+          case 'creeper':
+          case 'creature_track': {
             // Фірмове шипіння Кріпера «Тссссс...» + кумедний 8-бітний стрибок
             this._noise({ filterType: 'bandpass', freq: 3200, endFreq: 1600, q: 1.8, duration: 0.28, gain: 0.16 });
             [330, 311, 293, 261, 392, 523].forEach((f, i) => {
@@ -591,7 +596,9 @@
 
           case 'heart':
           case 'totem':
-          case 'crown': {
+          case 'crown':
+          case 'city_coin':
+          case 'game_token': {
             // Дзвінкий 1-UP / XP Level-Up орб із Minecraft
             const xpNotes = [523.25, 659.25, 783.99, 987.77, 1046.50, 1318.51];
             xpNotes.forEach((f, i) => {
