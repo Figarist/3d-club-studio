@@ -504,43 +504,6 @@ button {
   z-index: 10;
 }
 
-/* --- ЗГОРНУТА ПЛАШКА МІСІЇ --- */
-.mission-minimized-bar {
-  background: #0b1322;
-  border: 1px solid rgba(245, 158, 11, 0.28);
-  border-radius: var(--radius-md);
-  padding: 6px 10px;
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  align-items: center;
-}
-
-.mission-min-btn {
-  background: transparent;
-  border: none;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: var(--accent-gold);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  cursor: pointer;
-  padding: 2px 4px;
-  border-radius: var(--radius-xs);
-  transition: background var(--transition-fast);
-}
-
-.mission-min-btn:hover {
-  background: rgba(245, 158, 11, 0.12);
-  color: #fff;
-}
-
-.mission-min-btn .min-btn-action {
-  color: var(--text-muted);
-  font-size: 11px;
-}
-
 /* --- КОМПАКТНА КАРТКА МІСІЇ --- */
 .mission-compact-card {
   background: #0b1322;
@@ -831,10 +794,12 @@ button {
   padding: 10px;
 }
 
+#mc-pixel-grid,
+.pixel-grid,
 .pixel-grid-container {
-  display: grid;
-  grid-template-columns: repeat(16, 1fr);
-  grid-template-rows: repeat(16, 1fr);
+  display: grid !important;
+  grid-template-columns: repeat(16, 1fr) !important;
+  grid-template-rows: repeat(16, 1fr) !important;
   gap: 2px;
   width: 100%;
   max-width: 320px;
@@ -843,6 +808,7 @@ button {
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   padding: 3px;
+  box-sizing: border-box;
   touch-action: none;
 }
 
@@ -859,6 +825,9 @@ button {
   cursor: crosshair;
   transition: transform 60ms ease, background-color 100ms ease;
   position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  aspect-ratio: 1 / 1;
 }
 
 .pixel-cell:hover {
