@@ -15,7 +15,7 @@
       <div class="brand-title">
         <div class="brand-title-row">
           <h1>3D КУЗНЯ ЧУДЕС</h1>
-          <span id="app-version-pill" class="version-pill" title="Версія програми: v1.4.0">v1.4.0</span>
+          <span id="app-version-pill" class="version-pill" title="Версія програми: v1.5.0">v1.5.0</span>
         </div>
         <p>Minecraft &amp; Print-Safe 3D Генератор • Tinkercad / Makers Empire / 3D-Принтер</p>
       </div>
@@ -122,6 +122,14 @@
     <!-- ЛІВА ПАНЕЛЬ НАЛАШТУВАНЬ -->
     <aside class="sidebar" id="app-sidebar">
 
+      <!-- ПЛАШКА ЗГОРНУТОЇ МІСІЇ (якщо картку закрито) -->
+      <div id="mission-minimized-bar" class="mission-minimized-bar" style="display:none;">
+        <button id="btn-show-active-mission" class="mission-min-btn" title="Показати завдання поточної місії">
+          <span>🗺️ Активна місія #<b id="min-mission-id">1</b>: <span id="min-mission-title">Паспорт</span></span>
+          <span class="min-btn-action">Розгорнути ▾</span>
+        </button>
+      </div>
+
       <!-- КОМПАКТНА КАРТКА ПОТОЧНОЇ МІСІЇ НАД РЕДАКТОРОМ -->
       <div id="active-mission-card" class="mission-compact-card">
         <div class="mission-compact-top">
@@ -129,10 +137,9 @@
           <div class="mission-compact-actions">
             <button id="btn-prev-mission" class="mission-nav-btn" title="Попередня місія">◀</button>
             <button id="btn-next-mission" class="mission-nav-btn" title="Наступна місія">▶</button>
-            <button id="btn-toggle-mission-body" class="mission-small-btn" title="Згорнути або розгорнути кроки й чек-лист місії">📋 Чек-лист</button>
-            <button id="btn-mission-v1-compare" class="mission-small-btn" title="Порівняти початковий ескіз V1 з фіналом V2">⚖️ V1↔V2</button>
-            <button id="btn-mission-print-card" class="mission-small-btn" title="Створити картку для черги 3D-друку (Паспорт деталі)">📋 Картка</button>
             <button id="btn-open-missions-inline" class="mission-small-btn highlight" title="Відкрити всі 12 місій гуртка">🗺️ Усі 12</button>
+            <button id="btn-toggle-mission-body" class="mission-small-btn" title="Згорнути або розгорнути опис місії">🔼 Згорнути</button>
+            <button id="btn-close-active-mission" class="mission-nav-btn mission-close-btn" title="Сховати панель місії" aria-label="Сховати панель місії">✕</button>
           </div>
         </div>
 
@@ -585,6 +592,7 @@
           <button class="cam-btn" data-cam-view="side90" data-camera-view="side90" title="Ракурс збоку (90°)">🔄 90°</button>
           <button class="cam-btn" data-cam-view="top" data-camera-view="top" title="Ракурс зверху">🔝 Зверху</button>
           <button class="cam-btn active-cam" data-cam-view="iso" data-camera-view="iso" title="Ізометричний 3D ракурс">🧊 Ізометрія</button>
+          <button id="btn-toggle-ortho" class="cam-btn btn-ortho-toggle" title="Перемкнути між Ортографічною (без перспективних спотворень) та Перспективною проєкцією (Клавіша O)">📐 Орто</button>
           <button id="btn-hud-mono" class="cam-btn mono-hud-btn" title="Як виглядатиме одним пластиком без кольору">🪨 1 Пластик</button>
           <input id="mono-color-picker" type="color" value="#cfd6df" title="Колір пластику для одноколірного прев'ю" aria-label="Колір пластику для одноколірного прев'ю" class="mono-color-input" />
         </div>
@@ -607,8 +615,8 @@
         </div>
 
         <!-- Кутовий бейдж версії програми -->
-        <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • Версія v1.4.0 (калібратор пазів, V1↔V2 поступ, картки черги друку, профіль Anycubic i3 Mega)">
-          ⚒️ v1.4.0
+        <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • Версія v1.5.0 (ортографічний вигляд, оновлений інтерфейс і закриття місій, калібратор пазів, V1↔V2 поступ, картки черги друку, профіль Anycubic i3 Mega)">
+          ⚒️ v1.5.0
         </div>
       </div>
     </section>
@@ -616,27 +624,27 @@
   </main>
 
   <!-- МОДАЛЬНЕ ВІКНО: КАТАЛОГ «🗺️ МІСІЇ ГУРТКА (12)» -->
-  <div id="missions-modal" class="missions-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="missions-modal-title" style="display:none;">
-    <div class="missions-modal-window">
-      <div class="missions-modal-header">
+  <div id="missions-modal" class="modal-backdrop missions-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="missions-modal-title" style="display:none;">
+    <div class="modal-window missions-modal-window">
+      <div class="modal-header missions-modal-header">
         <div>
           <h2 id="missions-modal-title">🗺️ Місії гуртка «3D Кузня Чудес» (12 проєктів для 2–6 класів)</h2>
-          <p class="missions-modal-subtitle">
+          <p class="modal-subtitle missions-modal-subtitle">
             Обери місію, прочитай легенду-загадку та натисни <b>«🚀 Почати місію»</b> — студія сама увімкне потрібний генератор, стартовий міні-шаблон (25–35 мм) і рекомендовані параметри!
           </p>
         </div>
-        <button id="btn-close-missions" class="missions-close-btn" title="Закрити каталог місій (Esc)" aria-label="Закрити каталог місій">✕</button>
+        <button id="btn-close-missions" class="modal-close-btn missions-close-btn" title="Закрити каталог місій (Esc)" aria-label="Закрити каталог місій">✕</button>
       </div>
 
       <!-- ФІЛЬТР ЗА КАТЕГОРІЯМИ (4 рельєфи, 2 фактури, 2 настільні ігри, 2 корисні дрібниці, 1 картонний мегаполіс, 1 оптичний експеримент) -->
       <div class="missions-filter-bar" role="tablist" aria-label="Категорії місій">
-        <button class="mission-filter-btn active" data-mission-filter="all">🌟 Усі місії (12)</button>
-        <button class="mission-filter-btn" data-mission-filter="relief">🛡️ Рельєфи (4)</button>
-        <button class="mission-filter-btn" data-mission-filter="texture">🐾 Фактури і сліди (2)</button>
-        <button class="mission-filter-btn" data-mission-filter="boardgame">🎲 Настільні ігри (2)</button>
-        <button class="mission-filter-btn" data-mission-filter="useful">🏷️ Корисні дрібниці (2)</button>
-        <button class="mission-filter-btn" data-mission-filter="cardboard">🏙️ Картонний мегаполіс (1)</button>
-        <button class="mission-filter-btn" data-mission-filter="optical">🔮 Оптичний експеримент (1)</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip active" data-mission-filter="all">🌟 Усі місії (12)</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="relief">🛡️ Рельєфи (4)</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="texture">🐾 Фактури і сліди (2)</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="boardgame">🎲 Настільні ігри (2)</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="useful">🏷️ Корисні дрібниці (2)</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="cardboard">🏙️ Картонний мегаполіс (1)</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="optical">🔮 Оптичний експеримент (1)</button>
       </div>
 
       <!-- СІТКА 12 КАРТОК МІСІЙ -->

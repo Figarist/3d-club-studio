@@ -368,6 +368,7 @@
       this.missionFilter = 'all';
       this.missionChecks = { connected: false, mono: false, size: false };
       this.bodyCollapsed = false;
+      this.cardVisible = options.initialCardVisible !== undefined ? !!options.initialCardVisible : true;
       this.onMissionChange = options.onMissionChange || null;
       this.onChecklistChange = options.onChecklistChange || null;
     }
@@ -382,6 +383,7 @@
       if (found) {
         this.activeMissionId = found.id;
         this.missionChecks = { connected: false, mono: false, size: false };
+        this.cardVisible = true;
         if (typeof this.onMissionChange === 'function') {
           this.onMissionChange(found);
         }
@@ -405,6 +407,21 @@
       this.missionFilter = cat || 'all';
     }
 
+    setCardVisibility(visible) {
+      this.cardVisible = !!visible;
+      return this.cardVisible;
+    }
+
+    toggleCardVisibility() {
+      this.cardVisible = !this.cardVisible;
+      return this.cardVisible;
+    }
+
+    setBodyCollapse(collapsed) {
+      this.bodyCollapsed = !!collapsed;
+      return this.bodyCollapsed;
+    }
+
     toggleBodyCollapse() {
       this.bodyCollapsed = !this.bodyCollapsed;
       return this.bodyCollapsed;
@@ -422,7 +439,9 @@
     getState() {
       return {
         activeMissionId: this.activeMissionId,
-        missionChecks: Object.assign({}, this.missionChecks)
+        missionChecks: Object.assign({}, this.missionChecks),
+        cardVisible: this.cardVisible,
+        bodyCollapsed: this.bodyCollapsed
       };
     }
 
@@ -430,6 +449,12 @@
       if (!state) return;
       if (state.activeMissionId) {
         this.activeMissionId = parseInt(state.activeMissionId, 10) || 1;
+      }
+      if (typeof state.cardVisible === 'boolean') {
+        this.cardVisible = state.cardVisible;
+      }
+      if (typeof state.bodyCollapsed === 'boolean') {
+        this.bodyCollapsed = state.bodyCollapsed;
       }
       if (state.missionChecks && typeof state.missionChecks === 'object') {
         this.missionChecks = {
@@ -493,6 +518,29 @@
       }
       if (dom.activeMissionBody) {
         dom.activeMissionBody.classList.toggle('collapsed', this.bodyCollapsed);
+      }
+
+      const card = dom.activeMissionCard || document.getElementById('active-mission-card');
+      const minBar = dom.missionMinimizedBar || document.getElementById('mission-minimized-bar');
+      const btnToggle = dom.btnToggleMissionBody || document.getElementById('btn-toggle-mission-body');
+      const minId = dom.minMissionId || document.getElementById('min-mission-id');
+      const minTitle = dom.minMissionTitle || document.getElementById('min-mission-title');
+
+      if (card) {
+        card.style.display = this.cardVisible ? 'flex' : 'none';
+      }
+      if (minBar) {
+        minBar.style.display = this.cardVisible ? 'none' : 'flex';
+      }
+      if (btnToggle) {
+        btnToggle.innerHTML = this.bodyCollapsed ? '🔽 Розгорнути' : '🔼 Згорнути';
+        btnToggle.title = this.bodyCollapsed ? 'Розгорнути опис місії' : 'Згорнути опис місії';
+      }
+      if (minId) {
+        minId.textContent = m.id;
+      }
+      if (minTitle) {
+        minTitle.textContent = m.title;
       }
     }
 
