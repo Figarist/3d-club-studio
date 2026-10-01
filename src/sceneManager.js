@@ -78,6 +78,8 @@
 
       const w = this.container.clientWidth || 800;
       const h = this.container.clientHeight || 600;
+      this.cachedWidth = w;
+      this.cachedHeight = h;
 
       this.scene = new THREE.Scene();
       this.scene.background = new THREE.Color(0x0b1320);
@@ -342,8 +344,8 @@
     // Оновлення меж ортографічної камери відповідно до поточної відстані камери та пропорцій екрана
     updateOrthoProjection(w, h) {
       if (!this.orthoCamera) return;
-      const containerW = w || (this.container ? this.container.clientWidth : 800);
-      const containerH = h || (this.container ? this.container.clientHeight : 600);
+      const containerW = w || this.cachedWidth || (this.container ? this.container.clientWidth : 800);
+      const containerH = h || this.cachedHeight || (this.container ? this.container.clientHeight : 600);
       const aspect = containerW / Math.max(1, containerH);
 
       // Масштаб ортографічної камери ідеально узгоджений із PerspectiveCamera FOV 42° на відстані spherical.radius
@@ -364,8 +366,14 @@
       this.onResize();
       if (this.isOrthographic) {
         this.camera = this.orthoCamera;
+        if (Math.abs(this.targetSpherical.phi - Math.PI / 2.25) < 0.06) {
+          this.targetSpherical.phi = Math.PI / 2 - 0.001;
+        }
       } else {
         this.camera = this.perspCamera;
+        if (Math.abs(this.targetSpherical.phi - (Math.PI / 2 - 0.001)) < 0.03) {
+          this.targetSpherical.phi = Math.PI / 2.25;
+        }
       }
       if (window.StudioSound) window.StudioSound.playCameraSwoosh(this.isOrthographic ? 'ortho' : 'iso');
       return this.isOrthographic;
@@ -735,6 +743,8 @@
       if (!this.container || !this.renderer) return;
       const w = this.container.clientWidth;
       const h = this.container.clientHeight;
+      this.cachedWidth = w;
+      this.cachedHeight = h;
       if (this.perspCamera) {
         this.perspCamera.aspect = w / h;
         this.perspCamera.updateProjectionMatrix();
