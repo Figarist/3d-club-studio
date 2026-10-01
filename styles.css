@@ -631,19 +631,51 @@ button {
 
 .mission-compact-title-row {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mission-compact-title-wrap {
+  display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .mission-compact-title {
   font-size: var(--text-base);
   font-weight: 700;
   color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .mission-compact-meta {
   font-size: var(--text-xs);
   color: var(--text-muted);
+}
+
+.btn-mission-apply {
+  background: var(--accent-craft);
+  color: #022c22;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: var(--radius-xs);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-mission-apply:hover {
+  background: #34d399;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .mission-compact-body {
@@ -659,10 +691,11 @@ button {
   display: none;
 }
 
-.mission-riddle-quote {
-  font-size: var(--text-sm);
+.mission-riddle-quote,
+.mission-compact-card .mission-riddle-box {
+  font-size: var(--text-xs);
   color: var(--accent-gold);
-  background: rgba(245, 158, 11, 0.06);
+  background: rgba(245, 158, 11, 0.07);
   border-left: 3px solid var(--accent-forge);
   padding: 6px 10px;
   border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
@@ -670,13 +703,15 @@ button {
   line-height: 1.4;
 }
 
-.mission-grades-box {
+.mission-grades-box,
+.mission-compact-card .mission-grades-row {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.mission-grade-tag {
+.mission-grade-tag,
+.mission-compact-card .mission-grade-item {
   display: flex;
   align-items: baseline;
   gap: 6px;
@@ -695,7 +730,8 @@ button {
 .tag-23 { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
 .tag-46 { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
 
-.mission-steps-scroll {
+.mission-steps-scroll,
+.mission-steps-mini {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -714,17 +750,26 @@ button {
   color: var(--text-main);
 }
 
-.mission-checklist-inline {
+.mission-checklist-inline,
+.mission-checklist-box {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
   background: rgba(0, 0, 0, 0.2);
   padding: 6px 8px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
 }
 
-.chk-label {
+.mission-checklist-title {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+
+.chk-label,
+.mission-check-row {
   display: flex;
   align-items: center;
   gap: 7px;
@@ -732,10 +777,12 @@ button {
   color: var(--text-secondary);
   cursor: pointer;
 }
-.chk-label input[type="checkbox"] {
+.chk-label input[type="checkbox"],
+.mission-check-row input[type="checkbox"] {
   accent-color: var(--accent-craft);
   width: 14px;
   height: 14px;
+  cursor: pointer;
 }
 
 /* --- СЕКЦІЇ ГЕНЕРАТОРІВ (PANEL SECTIONS) --- */
@@ -1469,6 +1516,12 @@ select:focus, input[type="text"]:focus {
   justify-content: space-between;
   gap: 10px;
   transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.mission-card-inner {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .mission-card:hover {
