@@ -312,24 +312,24 @@
       generatorLabel: '⛏️ Майнкрафт-Кузня',
       targetTab: 'minecraft',
       riddle: '«Друкувати цілий будинок на 3D-принтері — це 5 годин, а вирізати з картону — 5 хвилин! Але картонні стіни падають. Спроєктуй маленьку 3D-підставку з пазом, яка триматиме високу картонну вежу або героя!»',
-      grade23: 'Розглянь шаблон «Паз для Картону», де дві високі стінки (Шар 4) утворюють доріжку-щілину посередині (Шар 1), і прикрась боки підставки контрфорсами (Шар 2–3).',
-      grade46: 'Виміряй товщину картону лінійкою, налаштуй воксель (2.0–2.2 мм) та висоту сходинки (1.6 мм), щоб між стінками Шару 4 утворився глибокий паз для фіксації картону.',
+      grade23: 'Розглянь шаблон «Паз для Картону» або протестуй картон на «Калібраторі пазів». Налаштуй ширину паза (1.5–3.0 мм) та прикрась боки підставки контрфорсами (Шар 2–3).',
+      grade46: 'Протестуй картон на «Калібраторі пазів гуртка», обери точну ширину паза (1.5, 2.0, 2.5 або 3.0 мм з авто-допуском +0.2 мм та фаскою) і створи підставку до 32×32 мм.',
       steps: {
         riddle: 'Як поєднати швидке макетування з картону та точність 3D-друку в одному спільному мегаполісі?',
-        design: 'Залиш посередині рівний паз Шару 1 шириною 1–2 клітинки, а по боках збудуй високі стінки Шару 4.',
+        design: 'Обери ширину паза під свій картон (за зразком калібратора), перевір наявність фаски на вході та зміцни бічні підпори Шарами 2–3.',
         mono: 'Увімкни «🪨 1 Пластик» і поверни камеру збоку («🔄 Збоку 90°»), щоб побачити глибину канавки для картону!',
         improve: 'Зроби широкі бічні сходинки (Шар 2 і 3), щоб підставка не перекидалася під вагою картонної декорації.',
         result: 'Виріж із картону силует будівлі чи персонажа і презентуй макет своєї споруди!'
       },
       checklist: [
-        'Чи з\'єднані обидві стінки тримача спільною підошвою?',
-        'Чи видно наскрізну доріжку-паз при огляді збоку в 1 кольорі?',
+        'Чи підібрано точну ширину паза під картон за калібратором?',
+        'Чи з\'єднані обидва борти тримача спільною підошвою та фаскою?',
         'Чи вкладається підставка у габарит до 32×32 мм?'
       ],
       config: {
         tab: 'minecraft',
         mcPreset: 'cardboard_stand',
-        controls: { mcVoxelSize: '2.0', mcHeightStep: '1.6', mcSolidBase: true, mcMountType: 'none', mcCustomLabel: '' }
+        controls: { mcVoxelSize: '2.0', mcHeightStep: '1.6', mcSolidBase: true, mcMountType: 'none', mcSlotWidth: '2.0', mcCustomLabel: '' }
       }
     },
 
@@ -381,6 +381,7 @@
       this.redoStack = [];
       this.maxHistory = 35;
       this._isRestoring = false;
+      this.v1Snapshot = null;
 
       this.mcGen = new window.MinecraftForgeGenerator();
       this.illusionGen = new window.DualIllusionGenerator();
@@ -436,6 +437,9 @@
         mcHeightStep: document.getElementById('mc-height-step'),
         mcSolidBase: document.getElementById('mc-solid-base'),
         mcMountType: document.getElementById('mc-mount-type'),
+        mcSlotWidth: document.getElementById('mc-slot-width'),
+        mcSlotWidthGroup: document.getElementById('mc-slot-width-group'),
+        valMcSlot: document.getElementById('val-mc-slot'),
         mcCustomLabel: document.getElementById('mc-custom-label'),
         valMcVoxel: document.getElementById('val-mc-voxel'),
         valMcStep: document.getElementById('val-mc-step'),
@@ -470,7 +474,43 @@
         mobName: document.getElementById('mob-name'),
         mobTinkercadBlank: document.getElementById('mob-tinkercad-blank'),
         valMobHead: document.getElementById('val-mob-head'),
-        valMobBulk: document.getElementById('val-mob-bulk')
+        valMobBulk: document.getElementById('val-mob-bulk'),
+        btnSnapshotV1: document.getElementById('btn-snapshot-v1'),
+        btnCompareV1V2: document.getElementById('btn-compare-v1v2'),
+        btnPrintCard: document.getElementById('btn-print-card'),
+        btnMissionV1Compare: document.getElementById('btn-mission-v1-compare'),
+        btnMissionPrintCard: document.getElementById('btn-mission-print-card'),
+        compareModal: document.getElementById('compare-modal'),
+        btnCloseCompare: document.getElementById('btn-close-compare'),
+        btnCloseCompareFooter: document.getElementById('btn-close-compare-footer'),
+        btnReSnapshotV1: document.getElementById('btn-re-snapshot-v1'),
+        btnCompareToPassport: document.getElementById('btn-compare-to-passport'),
+        compareSummaryBanner: document.getElementById('compare-summary-banner'),
+        v1PreviewImg: document.getElementById('v1-preview-img'),
+        v2PreviewImg: document.getElementById('v2-preview-img'),
+        v1Timestamp: document.getElementById('v1-timestamp'),
+        v2Timestamp: document.getElementById('v2-timestamp'),
+        v1Metrics: document.getElementById('v1-metrics'),
+        v2Metrics: document.getElementById('v2-metrics'),
+        printCardModal: document.getElementById('print-card-modal'),
+        btnClosePrintCard: document.getElementById('btn-close-print-card'),
+        btnActionPrint: document.getElementById('btn-action-print'),
+        btnActionDownloadPng: document.getElementById('btn-action-download-png'),
+        btnActionCopyText: document.getElementById('btn-action-copy-text'),
+        cardPairInput: document.getElementById('card-pair-input'),
+        pCardPair: document.getElementById('p-card-pair'),
+        pCardDate: document.getElementById('p-card-date'),
+        pCardImg: document.getElementById('p-card-img'),
+        pCardFilename: document.getElementById('p-card-filename'),
+        pCardMission: document.getElementById('p-card-mission'),
+        pVerV1: document.getElementById('p-ver-v1'),
+        pVerV2: document.getElementById('p-ver-v2'),
+        pCardDims: document.getElementById('p-card-dims'),
+        pCardConn: document.getElementById('p-card-conn'),
+        pCardBase: document.getElementById('p-card-base'),
+        pCardCustomParam: document.getElementById('p-card-custom-param'),
+        pCardMono: document.getElementById('p-card-mono'),
+        pCardChecklist: document.getElementById('p-card-checklist')
       };
 
       this.bindTabs();
@@ -501,10 +541,12 @@
       const dom = this._domCache || {};
       return {
         app: '3d-club-studio',
-        version: '1.3.0',
+        version: '1.4.0',
         savedAt: new Date().toISOString(),
         activeTab: this.activeTab,
         activeMissionId: this.activeMissionId,
+        v1Snapshot: this.v1Snapshot ? this.v1Snapshot : null,
+        studentPairCode: dom.cardPairInput?.value || localStorage.getItem('3d_kuznya_pair_code') || '',
         missionChecks: Object.assign({}, this.missionChecks),
         monochrome: this.sceneManager ? this.sceneManager.isMonochrome : false,
         monoColor: dom.monoColorPicker?.value || '#cfd6df',
@@ -516,6 +558,7 @@
           mcHeightStep: dom.mcHeightStep?.value,
           mcSolidBase: dom.mcSolidBase?.checked,
           mcMountType: dom.mcMountType?.value,
+          mcSlotWidth: dom.mcSlotWidth?.value || '2.0',
           mcCustomLabel: dom.mcCustomLabel?.value,
           ilWord1: dom.ilWord1?.value,
           ilWord2: dom.ilWord2?.value,
@@ -552,6 +595,16 @@
       if (state.activeMissionId) {
         this.activeMissionId = parseInt(state.activeMissionId, 10) || 1;
       }
+      if (state.v1Snapshot) {
+        this.v1Snapshot = state.v1Snapshot;
+        if (dom.btnCompareV1V2) dom.btnCompareV1V2.style.display = 'inline-block';
+        if (dom.btnSnapshotV1) dom.btnSnapshotV1.textContent = '📸 V1 збережено';
+        if (dom.btnMissionV1Compare) dom.btnMissionV1Compare.classList.add('highlight');
+      }
+      if (state.studentPairCode) {
+        localStorage.setItem('3d_kuznya_pair_code', state.studentPairCode);
+        if (dom.cardPairInput) dom.cardPairInput.value = state.studentPairCode;
+      }
       if (state.missionChecks && typeof state.missionChecks === 'object') {
         this.missionChecks = {
           connected: !!state.missionChecks.connected,
@@ -572,6 +625,7 @@
       setVal(dom.mcHeightStep, c.mcHeightStep);
       setChk(dom.mcSolidBase, c.mcSolidBase);
       setVal(dom.mcMountType, c.mcMountType);
+      setVal(dom.mcSlotWidth, c.mcSlotWidth || '2.0');
       setVal(dom.mcCustomLabel, c.mcCustomLabel);
 
       setVal(dom.ilWord1, c.ilWord1);
@@ -1083,6 +1137,78 @@
           this.sceneManager.setCameraView(v);
         });
       });
+
+      // Кнопки V1 Snapshot, V1 ↔ V2 Compare та Картки для черги друку
+      if (dom.btnSnapshotV1) {
+        dom.btnSnapshotV1.addEventListener('click', () => this.captureV1Snapshot());
+      }
+      if (dom.btnCompareV1V2) {
+        dom.btnCompareV1V2.addEventListener('click', () => this.openCompareModal());
+      }
+      if (dom.btnPrintCard) {
+        dom.btnPrintCard.addEventListener('click', () => this.openPrintCardModal());
+      }
+
+      // Керування модальним вікном порівняння V1 ↔ V2
+      if (dom.btnCloseCompare) {
+        dom.btnCloseCompare.addEventListener('click', () => this.closeCompareModal());
+      }
+      if (dom.btnCloseCompareFooter) {
+        dom.btnCloseCompareFooter.addEventListener('click', () => this.closeCompareModal());
+      }
+      if (dom.btnReSnapshotV1) {
+        dom.btnReSnapshotV1.addEventListener('click', () => {
+          this.captureV1Snapshot();
+          this.openCompareModal();
+        });
+      }
+      if (dom.btnCompareToPassport) {
+        dom.btnCompareToPassport.addEventListener('click', () => {
+          this.closeCompareModal();
+          this.openPrintCardModal('V2');
+        });
+      }
+      if (dom.compareModal) {
+        dom.compareModal.addEventListener('click', (e) => {
+          if (e.target === dom.compareModal) this.closeCompareModal();
+        });
+      }
+
+      // Керування модальним вікном Паспорта черги друку
+      if (dom.btnClosePrintCard) {
+        dom.btnClosePrintCard.addEventListener('click', () => this.closePrintCardModal());
+      }
+      if (dom.printCardModal) {
+        dom.printCardModal.addEventListener('click', (e) => {
+          if (e.target === dom.printCardModal) this.closePrintCardModal();
+        });
+      }
+      if (dom.btnActionPrint) {
+        dom.btnActionPrint.addEventListener('click', () => window.print());
+      }
+      if (dom.btnActionDownloadPng) {
+        dom.btnActionDownloadPng.addEventListener('click', () => this.downloadPassportPng());
+      }
+      if (dom.btnActionCopyText) {
+        dom.btnActionCopyText.addEventListener('click', () => this.copyPassportText());
+      }
+      if (dom.cardPairInput) {
+        dom.cardPairInput.addEventListener('input', (e) => {
+          const val = e.target.value.trim();
+          localStorage.setItem('3d_kuznya_pair_code', val);
+          this.updatePrintCardContent(dom.pVerV1?.checked ? 'V1' : 'V2');
+        });
+      }
+      if (dom.pVerV1) {
+        dom.pVerV1.addEventListener('change', () => {
+          if (dom.pVerV1.checked) this.updatePrintCardContent('V1');
+        });
+      }
+      if (dom.pVerV2) {
+        dom.pVerV2.addEventListener('change', () => {
+          if (dom.pVerV2.checked) this.updatePrintCardContent('V2');
+        });
+      }
     }
 
     getSuggestedFilename() {
@@ -1137,10 +1263,19 @@
       }
 
       window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && dom.missionsModal && dom.missionsModal.style.display !== 'none') {
-          this.closeMissionsModal();
+        if (e.key === 'Escape') {
+          if (dom.missionsModal && dom.missionsModal.style.display !== 'none') this.closeMissionsModal();
+          if (dom.compareModal && dom.compareModal.style.display !== 'none') this.closeCompareModal();
+          if (dom.printCardModal && dom.printCardModal.style.display !== 'none') this.closePrintCardModal();
         }
       });
+
+      if (dom.btnMissionV1Compare) {
+        dom.btnMissionV1Compare.addEventListener('click', () => this.openCompareModal());
+      }
+      if (dom.btnMissionPrintCard) {
+        dom.btnMissionPrintCard.addEventListener('click', () => this.openPrintCardModal());
+      }
 
       if (btnToggleBody) {
         btnToggleBody.addEventListener('click', () => {
@@ -1225,6 +1360,481 @@
       if (!dom.missionsModal) return;
       dom.missionsModal.style.display = 'none';
       if (window.StudioSound) window.StudioSound.playPop(360);
+    }
+
+    // -------------------------------------------------------------------------
+    // 0.1 ГАЛЕРЕЯ ІНЖЕНЕРНОГО ПОСТУПУ (V1 ↔ V2) ТА ПАСПОРТ ЧЕРГИ ДРУКУ
+    // -------------------------------------------------------------------------
+    captureV1Snapshot(silent = false) {
+      const dom = this._domCache || {};
+      if (this.sceneManager) {
+        this.sceneManager.renderer.render(this.sceneManager.scene, this.sceneManager.camera);
+      }
+      const thumbUrl = this.sceneManager?.renderer?.domElement?.toDataURL('image/png') || '';
+      const d = this.sceneManager?.dimensions || { x: 0, y: 0, z: 0 };
+      const conn = this.mcGen?.lastConnectivity || { finalIslands: 1, rawIslands: 1, activeCount: 0 };
+      const mission = this.getActiveMission();
+      const date = new Date();
+
+      this.v1Snapshot = {
+        capturedAt: date.toISOString(),
+        displayTime: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        thumbnail: thumbUrl,
+        activeTab: this.activeTab,
+        missionId: this.activeMissionId,
+        missionTitle: mission ? mission.title : '',
+        dimensions: { x: d.x, y: d.y, z: d.z },
+        islands: conn.finalIslands || 1,
+        rawIslands: conn.rawIslands || 1,
+        activeCount: conn.activeCount || 0,
+        solidBase: !!dom.mcSolidBase?.checked,
+        estimatedMinutes: dom.slicerTimeInput?.value?.trim() || (d.z > 0 ? Math.ceil(d.x * d.y * d.z / 180) + ' хв' : '~15 хв')
+      };
+
+      if (dom.btnCompareV1V2) {
+        dom.btnCompareV1V2.style.display = 'inline-block';
+        dom.btnCompareV1V2.disabled = false;
+        dom.btnCompareV1V2.classList.add('has-v1');
+        dom.btnCompareV1V2.title = `V1 зафіксовано о ${this.v1Snapshot.displayTime}. Натисніть для порівняння!`;
+      }
+      if (dom.btnMissionV1Compare) {
+        dom.btnMissionV1Compare.disabled = false;
+        dom.btnMissionV1Compare.classList.add('highlight');
+      }
+      if (dom.btnSnapshotV1) {
+        dom.btnSnapshotV1.textContent = '📸 V1 збережено ✅';
+        setTimeout(() => {
+          if (dom.btnSnapshotV1) dom.btnSnapshotV1.textContent = '📸 Оновити V1';
+        }, 2200);
+      }
+
+      this.autosave();
+
+      if (!silent && window.StudioSound) {
+        window.StudioSound.playPop(620);
+      }
+    }
+
+    openCompareModal() {
+      const dom = this._domCache || {};
+      if (!dom.compareModal) return;
+
+      if (!this.v1Snapshot) {
+        this.captureV1Snapshot(true);
+      }
+
+      const v1 = this.v1Snapshot;
+      if (this.sceneManager) {
+        this.sceneManager.renderer.render(this.sceneManager.scene, this.sceneManager.camera);
+      }
+      const v2Thumb = this.sceneManager?.renderer?.domElement?.toDataURL('image/png') || '';
+      const d2 = this.sceneManager?.dimensions || { x: 0, y: 0, z: 0 };
+      const conn2 = this.mcGen?.lastConnectivity || { finalIslands: 1, rawIslands: 1, activeCount: 0 };
+      const d1 = v1.dimensions || { x: 0, y: 0, z: 0 };
+      const now = new Date();
+      const v2Time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      if (dom.v1PreviewImg) dom.v1PreviewImg.src = v1.thumbnail;
+      if (dom.v1Timestamp) dom.v1Timestamp.textContent = `Зафіксовано: ${v1.displayTime}`;
+      if (dom.v1Metrics) {
+        dom.v1Metrics.innerHTML = `
+          <div class="metric-row"><span>📐 Габарити:</span><b>${d1.x} × ${d1.y} × ${d1.z} мм</b></div>
+          <div class="metric-row"><span>🧩 Островів:</span><b class="${v1.islands > 1 ? 'metric-bad' : 'metric-good'}">${v1.islands} ${v1.islands > 1 ? '🚨 (розірвано)' : '✅ (1 суцільна)'}</b></div>
+          <div class="metric-row"><span>🪨 Підкладка:</span><b>${v1.solidBase ? 'Увімкнено' : 'Вимкнено'}</b></div>
+          <div class="metric-row"><span>⏱️ Орієнтовний час:</span><b>${v1.estimatedMinutes}</b></div>
+        `;
+      }
+
+      if (dom.v2PreviewImg) dom.v2PreviewImg.src = v2Thumb;
+      if (dom.v2Timestamp) dom.v2Timestamp.textContent = `Поточний стан: ${v2Time}`;
+      if (dom.v2Metrics) {
+        const v2Islands = conn2.finalIslands || 1;
+        dom.v2Metrics.innerHTML = `
+          <div class="metric-row"><span>📐 Габарити:</span><b>${d2.x} × ${d2.y} × ${d2.z} мм</b></div>
+          <div class="metric-row"><span>🧩 Островів:</span><b class="${v2Islands > 1 ? 'metric-bad' : 'metric-good'}">${v2Islands} ${v2Islands > 1 ? '🚨 (розірвано)' : '✅ (1 суцільна)'}</b></div>
+          <div class="metric-row"><span>🪨 Підкладка:</span><b>${dom.mcSolidBase?.checked ? 'Увімкнено' : 'Вимкнено'}</b></div>
+          <div class="metric-row"><span>⏱️ Орієнтовний час:</span><b>${dom.slicerTimeInput?.value?.trim() || (d2.z > 0 ? Math.ceil(d2.x * d2.y * d2.z / 180) + ' хв' : '~15 хв')}</b></div>
+        `;
+      }
+
+      if (dom.compareSummaryBanner) {
+        const v1Islands = v1.islands || 1;
+        const v2Islands = conn2.finalIslands || 1;
+        let badgeClass = 'banner-good';
+        let text = '';
+
+        if (v1Islands > 1 && v2Islands === 1) {
+          text = `🎉 <b>Інженерний поступ:</b> У V1 було ${v1Islands} розірваних островів, а у V2 модель об'єднана в <b>1 суцільну міцну деталь</b>!`;
+          badgeClass = 'banner-success';
+        } else if (v2Islands === 1) {
+          text = `✅ <b>Готово до друку:</b> Виріб суцільний (1 деталь), габарити в межах норми (${d2.x}×${d2.y} мм).`;
+          badgeClass = 'banner-good';
+        } else {
+          text = `⚠️ <b>Зверніть увагу:</b> У V2 залишилося ${v2Islands} розірваних острівців. Увімкніть «Суцільна підкладка» або домалюйте містки перед відправкою до черги друку.`;
+          badgeClass = 'banner-warn';
+        }
+        dom.compareSummaryBanner.className = `compare-summary-banner ${badgeClass}`;
+        dom.compareSummaryBanner.innerHTML = text;
+      }
+
+      dom.compareModal.style.display = 'flex';
+      if (window.StudioSound) window.StudioSound.playPop(520);
+    }
+
+    closeCompareModal() {
+      const dom = this._domCache || {};
+      if (dom.compareModal) dom.compareModal.style.display = 'none';
+      if (window.StudioSound) window.StudioSound.playPop(340);
+    }
+
+    updatePrintCardContent(chosenVer = 'V2') {
+      const dom = this._domCache || {};
+      const isV1 = chosenVer === 'V1' && this.v1Snapshot;
+      const snap = isV1 ? this.v1Snapshot : null;
+
+      const pairCode = dom.cardPairInput?.value?.trim() || localStorage.getItem('3d_kuznya_pair_code') || 'Пара #___';
+      if (dom.pCardPair) dom.pCardPair.textContent = pairCode;
+
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+        ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      if (dom.pCardDate) dom.pCardDate.textContent = isV1 && snap.displayTime ? `V1 (${snap.displayTime})` : dateStr;
+
+      // Зображення попереднього перегляду
+      if (dom.pCardImg) {
+        if (isV1 && snap.thumbnail) {
+          dom.pCardImg.src = snap.thumbnail;
+        } else {
+          if (this.sceneManager) {
+            this.sceneManager.renderer.render(this.sceneManager.scene, this.sceneManager.camera);
+            dom.pCardImg.src = this.sceneManager.renderer.domElement.toDataURL('image/png');
+          }
+        }
+      }
+
+      // Назва файлу моделі
+      const fname = this.getSuggestedFilename();
+      const verSuffix = isV1 ? '_V1_draft.stl' : '_V2_final.stl';
+      const displayFname = fname.replace(/\.stl$/i, verSuffix);
+      if (dom.pCardFilename) dom.pCardFilename.textContent = displayFname;
+
+      // Назва місії
+      const mission = this.getActiveMission();
+      if (dom.pCardMission) {
+        dom.pCardMission.textContent = mission ? `Місія #${mission.id}: ${mission.title}` : 'Вільне моделювання';
+      }
+
+      // Габарити
+      const d = isV1 ? snap.dimensions : (this.sceneManager?.dimensions || { x: 0, y: 0, z: 0 });
+      if (dom.pCardDims) {
+        dom.pCardDims.textContent = `${d.x} × ${d.y} × ${d.z} мм`;
+      }
+
+      // Зв'язність
+      const conn = isV1 ? { finalIslands: snap.islands } : (this.mcGen?.lastConnectivity || { finalIslands: 1 });
+      if (dom.pCardConn) {
+        if (conn.finalIslands === 1) {
+          dom.pCardConn.textContent = '✅ 1 суцільна деталь (готово)';
+          dom.pCardConn.className = 'status-good';
+        } else {
+          dom.pCardConn.textContent = `🚨 ${conn.finalIslands} розірваних острівців`;
+          dom.pCardConn.className = 'status-bad';
+        }
+      }
+
+      // Суцільна підкладка
+      const baseOn = isV1 ? snap.solidBase : !!dom.mcSolidBase?.checked;
+      if (dom.pCardBase) {
+        dom.pCardBase.textContent = baseOn ? 'Увімкнено (1.0 мм шар)' : 'Без підкладки';
+      }
+
+      // Параметризовані налаштування (паз картону або крок висоти)
+      if (dom.pCardCustomParam) {
+        if (this.activeTab === 'minecraft') {
+          const slot = dom.mcSlotWidth?.value || '2.0';
+          const isStand = this.mcGen?.currentPresetKey === 'cardboard_stand' || this.mcGen?.currentPresetKey === 'slot_calibrator';
+          if (isStand) {
+            dom.pCardCustomParam.textContent = `Паз картону: ${slot} мм (+0.2 мм допуск)`;
+          } else {
+            const vox = dom.mcVoxelSize?.value || '2.0';
+            dom.pCardCustomParam.textContent = `Воксель: ${vox} мм, сходинка: ${dom.mcHeightStep?.value || '1.2'} мм`;
+          }
+        } else if (this.activeTab === 'illusion') {
+          dom.pCardCustomParam.textContent = `Слова: "${dom.ilWord1?.value || ''}" ↔ "${dom.ilWord2?.value || ''}"`;
+        } else if (this.activeTab === 'physics') {
+          dom.pCardCustomParam.textContent = `Підрежим: ${dom.phSubmode?.value || 'механіка'}`;
+        } else {
+          dom.pCardCustomParam.textContent = `Архетип: ${dom.mobArchetype?.value || 'моб'}`;
+        }
+      }
+
+      // Перевірка монохрому
+      if (dom.pCardMono) {
+        dom.pCardMono.textContent = this.missionChecks.mono ? '✅ Перевірено в "🪨 1 Пластик"' : '⏳ Очікує візуальної перевірки';
+      }
+
+      // Чек-лист місії
+      if (dom.pCardChecklist && mission && mission.checklist) {
+        dom.pCardChecklist.innerHTML = mission.checklist.map((item, idx) => {
+          const isChecked = idx === 0 ? this.missionChecks.connected : idx === 1 ? this.missionChecks.mono : this.missionChecks.size;
+          return `<li class="${isChecked ? 'chk-done' : 'chk-pending'}">${isChecked ? '☑️' : '⬜'} ${item}</li>`;
+        }).join('');
+      }
+    }
+
+    openPrintCardModal(version = 'V2') {
+      const dom = this._domCache || {};
+      if (!dom.printCardModal) return;
+
+      const savedPair = localStorage.getItem('3d_kuznya_pair_code') || '';
+      if (dom.cardPairInput) {
+        if (!dom.cardPairInput.value && savedPair) {
+          dom.cardPairInput.value = savedPair;
+        }
+      }
+
+      const chosenVer = (version === 'V1' && this.v1Snapshot) ? 'V1' : 'V2';
+      if (dom.pVerV1) dom.pVerV1.checked = (chosenVer === 'V1');
+      if (dom.pVerV2) dom.pVerV2.checked = (chosenVer === 'V2');
+
+      this.updatePrintCardContent(chosenVer);
+      dom.printCardModal.style.display = 'flex';
+      if (window.StudioSound) window.StudioSound.playPop(520);
+    }
+
+    closePrintCardModal() {
+      const dom = this._domCache || {};
+      if (dom.printCardModal) dom.printCardModal.style.display = 'none';
+      if (window.StudioSound) window.StudioSound.playPop(340);
+    }
+
+    downloadPassportPng() {
+      const dom = this._domCache || {};
+      const isV1 = dom.pVerV1?.checked && this.v1Snapshot;
+      const snap = isV1 ? this.v1Snapshot : null;
+      const pairCode = dom.cardPairInput?.value?.trim() || localStorage.getItem('3d_kuznya_pair_code') || 'Пара #___';
+      const mission = this.getActiveMission();
+      const d = isV1 ? snap.dimensions : (this.sceneManager?.dimensions || { x: 0, y: 0, z: 0 });
+      const conn = isV1 ? { finalIslands: snap.islands } : (this.mcGen?.lastConnectivity || { finalIslands: 1 });
+      const verLabel = isV1 ? 'V1 (Ескіз)' : 'V2 (Фінал)';
+      const filename = this.getSuggestedFilename().replace(/\.stl$/i, isV1 ? '_V1.stl' : '_V2.stl');
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 800;
+      canvas.height = 1100;
+      const ctx = canvas.getContext('2d');
+
+      // Біле тло
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Рамка паспорта
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(16, 16, 768, 1068);
+
+      // Верхній темний банер кузні
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(20, 20, 760, 80);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 24px system-ui, sans-serif';
+      ctx.fillText('3D КУЗНЯ ЧУДЕС • ПАСПОРТ ДЕТАЛІ ДЛЯ ЧЕРГИ', 40, 56);
+      ctx.font = '14px system-ui, sans-serif';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText('Інженерний бланк перевірки якості перед 3D-друком на Anycubic i3 Mega', 40, 82);
+
+      // Рядок пари та дати
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(24, 110, 752, 54);
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(24, 110, 752, 54);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 18px system-ui, sans-serif';
+      ctx.fillText(`👤 Пара: ${pairCode}`, 40, 144);
+
+      ctx.fillStyle = isV1 ? '#d97706' : '#16a34a';
+      ctx.font = 'bold 16px system-ui, sans-serif';
+      ctx.fillText(`🏷️ Версія: ${verLabel}`, 400, 144);
+
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('uk-UA') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      ctx.fillStyle = '#64748b';
+      ctx.font = '14px system-ui, sans-serif';
+      ctx.fillText(`📅 ${dateStr}`, 600, 144);
+
+      const renderRestOfCard = (imgElement) => {
+        // Поле 3D прев'ю
+        ctx.fillStyle = '#f1f5f9';
+        ctx.fillRect(40, 180, 320, 260);
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(40, 180, 320, 260);
+
+        if (imgElement) {
+          try {
+            ctx.drawImage(imgElement, 40, 180, 320, 260);
+          } catch (_) {}
+        } else {
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '16px system-ui, sans-serif';
+          ctx.fillText('3D Модель', 150, 310);
+        }
+
+        // Блок технічних характеристик
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.strokeRect(380, 180, 380, 260);
+        ctx.fillStyle = '#0284c7';
+        ctx.font = 'bold 16px system-ui, sans-serif';
+        ctx.fillText('📐 ТЕХНІЧНІ ХАРАКТЕРИСТИКИ', 400, 210);
+
+        ctx.fillStyle = '#334155';
+        ctx.font = '14px system-ui, sans-serif';
+        ctx.fillText(`📁 Файл: ${filename.slice(0, 32)}`, 400, 240);
+        ctx.fillText(`🗺️ Місія: #${mission ? mission.id : 0} ${mission ? mission.title.slice(0, 26) : 'Вільна'}`, 400, 270);
+        ctx.fillText(`📏 Габарити: ${d.x} × ${d.y} × ${d.z} мм`, 400, 300);
+        ctx.fillText(`🧩 Зв'язність: ${conn.finalIslands === 1 ? '✅ 1 суцільна деталь' : '🚨 ' + conn.finalIslands + ' окремих частин'}`, 400, 330);
+        ctx.fillText(`🪨 Підкладка: ${dom.mcSolidBase?.checked ? 'Увімкнено (1.0 мм)' : 'Без підкладки'}`, 400, 360);
+
+        let customParamText = '';
+        if (this.activeTab === 'minecraft') {
+          const isStand = this.mcGen?.currentPresetKey === 'cardboard_stand' || this.mcGen?.currentPresetKey === 'slot_calibrator';
+          customParamText = isStand ? `Паз картону: ${dom.mcSlotWidth?.value || '2.0'} мм (+0.2 мм)` : `Воксель: ${dom.mcVoxelSize?.value || '2.0'} мм`;
+        } else if (this.activeTab === 'illusion') {
+          customParamText = `Слова: "${dom.ilWord1?.value || ''}" / "${dom.ilWord2?.value || ''}"`;
+        } else {
+          customParamText = `Режим: ${this.activeTab}`;
+        }
+        ctx.fillText(`⚙️ Параметр: ${customParamText}`, 400, 390);
+        ctx.fillText(`👁️ Монохром: ${this.missionChecks.mono ? '✅ Перевірено' : '⏳ Не перевірено'}`, 400, 420);
+
+        // Блок чек-листа
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(40, 460, 720, 150);
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.strokeRect(40, 460, 720, 150);
+
+        ctx.fillStyle = '#0284c7';
+        ctx.font = 'bold 16px system-ui, sans-serif';
+        ctx.fillText('✅ ЧЕК-ЛИСТ САМОПЕРЕВІРКИ (ПАРА ДИЗАЙНЕР + ПЕРЕВІРЯЛЬНИК)', 60, 490);
+
+        const chk1 = this.missionChecks.connected ? '[X] Зв\'язність: усі частини з\'єднані в одну міцну деталь' : '[ ] Зв\'язність: потребує з\'єднання або підкладки';
+        const chk2 = this.missionChecks.mono ? '[X] Монохром: перевірено в режимі «1 Пластик», рельєф читається' : '[ ] Монохром: огляд в 1 кольорі ще не пройдено';
+        const chk3 = this.missionChecks.size ? '[X] Габарити: розмір вкладається у норму столу та час уроку' : '[ ] Габарити: перевірити розмір зі слайсером';
+
+        ctx.font = '14px system-ui, sans-serif';
+        ctx.fillStyle = this.missionChecks.connected ? '#16a34a' : '#64748b';
+        ctx.fillText(chk1, 60, 525);
+        ctx.fillStyle = this.missionChecks.mono ? '#16a34a' : '#64748b';
+        ctx.fillText(chk2, 60, 555);
+        ctx.fillStyle = this.missionChecks.size ? '#16a34a' : '#64748b';
+        ctx.fillText(chk3, 60, 585);
+
+        // Блок контролю викладача для черги друку
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#0284c7';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(40, 630, 720, 380);
+
+        ctx.fillStyle = '#0284c7';
+        ctx.font = 'bold 18px system-ui, sans-serif';
+        ctx.fillText('📋 КОНТРОЛЬ ВИКЛАДАЧА ТА ВІДМІТКА СЛАЙСЕРА (ЧЕРГА ДРУКУ)', 60, 665);
+
+        ctx.fillStyle = '#1e293b';
+        ctx.font = '15px system-ui, sans-serif';
+        ctx.fillText('1. Розрахунок у слайсері (Cura / PrusaSlicer / OrcaSlicer):', 60, 705);
+        ctx.fillText('   • Час друку: __________________ хв', 60, 735);
+        ctx.fillText('   • Витрата філаменту: __________ грам (PLA)', 400, 735);
+        ctx.fillText('   • Висота шару:  [  ] 0.20 мм (швидкий)   [  ] 0.16 мм (рельєф)', 60, 765);
+
+        ctx.fillText('2. Черга та запуск на принтері Anycubic i3 Mega:', 60, 810);
+        ctx.fillText('   • Номер у черзі друку уроку: № ______', 60, 840);
+        ctx.fillText('   • Точний час запуску: _______________', 400, 840);
+
+        ctx.fillText('3. Інженерний вердикт викладача:', 60, 885);
+        ctx.fillText('[  ] ДОПУЩЕНО ДО ДРУКУ (деталь надійна, стіл калібровано)', 80, 920);
+        ctx.fillText('[  ] ВІДХИЛЕНО НА ДООПРАЦЮВАННЯ (острови / габарит / товщина)', 80, 950);
+
+        ctx.fillText('Підпис викладача / чергового інженера: ________________________', 60, 990);
+
+        // Підвал
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '12px system-ui, sans-serif';
+        ctx.fillText('«3D Кузня Чудес v1.4.0» • Шкільний гурток 3D-моделювання та друку • Anycubic i3 Mega', 160, 1045);
+
+        canvas.toBlob((blob) => {
+          if (!blob) return;
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          const cleanPair = pairCode.replace(/[^a-zA-Z0-9а-яА-ЯіїєґІЇЄҐ_-]/g, '_');
+          a.download = `passport_${cleanPair}_${filename.replace(/\.stl$/i, '')}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          if (window.StudioSound) window.StudioSound.playExportSuccess();
+        }, 'image/png');
+      };
+
+      const thumbSrc = isV1 ? snap.thumbnail : (dom.pCardImg?.src || '');
+      if (thumbSrc) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => renderRestOfCard(img);
+        img.onerror = () => renderRestOfCard(null);
+        img.src = thumbSrc;
+      } else {
+        renderRestOfCard(null);
+      }
+    }
+
+    copyPassportText() {
+      const dom = this._domCache || {};
+      const isV1 = dom.pVerV1?.checked && this.v1Snapshot;
+      const verLabel = isV1 ? 'V1 (Ескіз)' : 'V2 (Фінал)';
+      const pairCode = dom.cardPairInput?.value?.trim() || localStorage.getItem('3d_kuznya_pair_code') || 'Пара #___';
+      const fname = this.getSuggestedFilename().replace(/\.stl$/i, isV1 ? '_V1.stl' : '_V2.stl');
+      const mission = this.getActiveMission();
+      const d = isV1 ? this.v1Snapshot.dimensions : (this.sceneManager?.dimensions || { x: 0, y: 0, z: 0 });
+      const conn = isV1 ? { finalIslands: this.v1Snapshot.islands } : (this.mcGen?.lastConnectivity || { finalIslands: 1 });
+
+      const text = [
+        `📋 ПАСПОРТ ДЕТАЛІ ДО ЧЕРГИ ДРУКУ («3D КУЗНЯ ЧУДЕС»)`,
+        `----------------------------------------------------`,
+        `👤 Пара / Учень: ${pairCode}`,
+        `🏷️ Версія: ${verLabel} | Дата: ${new Date().toLocaleString('uk-UA')}`,
+        `📁 Файл моделі: ${fname}`,
+        `🗺️ Місія: #${mission ? mission.id : 0} ${mission ? mission.title : 'Вільне моделювання'}`,
+        `📐 Габарити: ${d.x} × ${d.y} × ${d.z} мм`,
+        `🧩 Зв'язність деталей: ${conn.finalIslands === 1 ? '1 суцільна деталь (ОК)' : conn.finalIslands + ' окремих островів (ПОТРІБНА ПІДКЛАДКА)'}`,
+        `🪨 Суцільна підкладка: ${dom.mcSolidBase?.checked ? 'Увімкнено (1.0 мм)' : 'Вимкнено'}`,
+        `----------------------------------------------------`,
+        `✅ Самоперевірка учнів:`,
+        `- Зв'язність форми: ${this.missionChecks.connected ? '[X] Так' : '[ ] Ні'}`,
+        `- Огляд в "1 пластику": ${this.missionChecks.mono ? '[X] Так' : '[ ] Ні'}`,
+        `- Контроль габаритів: ${this.missionChecks.size ? '[X] Так' : '[ ] Ні'}`,
+        `----------------------------------------------------`,
+        `📝 ПОЛЯ ДЛЯ ВИКЛАДАЧА (СЛАЙСЕР ТА ЧЕРГА):`,
+        `[ ] Слайсер: ____ хв / ____ грам PLA`,
+        `[ ] Дата й час запуску на Anycubic i3 Mega: ____________`,
+        `[ ] Статус: [ ] ДОПУЩЕНО ДО ДРУКУ  [ ] ПОТРЕБУЄ ДООПРАЦЮВАННЯ`,
+        `[ ] Підпис викладача: ____________________`
+      ].join('\n');
+
+      navigator.clipboard.writeText(text).then(() => {
+        if (dom.btnActionCopyText) {
+          const orig = dom.btnActionCopyText.textContent;
+          dom.btnActionCopyText.textContent = '✅ Скопійовано!';
+          setTimeout(() => { if (dom.btnActionCopyText) dom.btnActionCopyText.textContent = orig; }, 2000);
+        }
+        if (window.StudioSound) window.StudioSound.playPop(600);
+      }).catch(() => {
+        alert('Будь ласка, скопіюйте текст вручну:\n\n' + text);
+      });
     }
 
     updateActiveMissionUI() {
@@ -1401,6 +2011,7 @@
             if (rp.heightStep && dom.mcHeightStep) dom.mcHeightStep.value = rp.heightStep;
             if (typeof rp.solidBase === 'boolean' && dom.mcSolidBase) dom.mcSolidBase.checked = rp.solidBase;
             if (rp.mountType && dom.mcMountType) dom.mcMountType.value = rp.mountType;
+            if (rp.slotWidth && dom.mcSlotWidth) dom.mcSlotWidth.value = rp.slotWidth;
             this.updateValueLabels();
           }
 
@@ -1450,19 +2061,21 @@
         });
       }
 
-      const ids = ['mc-voxel-size', 'mc-height-step', 'mc-solid-base', 'mc-mount-type', 'mc-custom-label'];
+      const ids = ['mc-voxel-size', 'mc-height-step', 'mc-solid-base', 'mc-mount-type', 'mc-slot-width', 'mc-custom-label'];
       ids.forEach((id) => {
         const el = document.getElementById(id);
         if (el) {
           el.addEventListener('focus', () => this.recordUndoSnapshot());
           el.addEventListener('mousedown', () => this.recordUndoSnapshot());
-          el.addEventListener('input', () => {
+          const handleUpdate = () => {
             this._playControlFeedback(el);
             this.updateValueLabels();
             this.markModelModified();
             this.rebuildCurrentModel(false);
             this.autosave();
-          });
+          };
+          el.addEventListener('input', handleUpdate);
+          el.addEventListener('change', handleUpdate);
         }
       });
     }
@@ -1657,6 +2270,16 @@
           lbl.textContent = inp.value + suffix;
         }
       }
+
+      if (dom.mcSlotWidth && dom.valMcSlot) {
+        dom.valMcSlot.textContent = dom.mcSlotWidth.value + ' мм';
+      }
+      if (dom.mcSlotWidthGroup) {
+        const isStandOrCalib = this.mcGen?.currentPresetKey === 'cardboard_stand' ||
+                              this.mcGen?.currentPresetKey === 'slot_calibrator' ||
+                              dom.mcMountType?.value === 'cardboard_stand';
+        dom.mcSlotWidthGroup.style.display = isStandOrCalib ? 'flex' : 'none';
+      }
     }
 
     // Випадкова генерація ("ВАУ-Мутація") залежно від відкритої вкладки
@@ -1723,7 +2346,8 @@
           heightStep: dom.mcHeightStep?.value,
           solidBase: dom.mcSolidBase?.checked,
           mountType: dom.mcMountType?.value,
-          customLabel: dom.mcCustomLabel?.value
+          customLabel: dom.mcCustomLabel?.value,
+          slotWidth: dom.mcSlotWidth?.value || '2.0'
         });
         this.updateMinecraftConnectivityUI();
       } else if (this.activeTab === 'illusion') {
