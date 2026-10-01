@@ -15,14 +15,17 @@
       <div class="brand-title">
         <div class="brand-title-row">
           <h1>3D КУЗНЯ ЧУДЕС</h1>
-          <span id="app-version-pill" class="version-pill" title="Версія програми: v1.2.0">v1.2.0</span>
+          <span id="app-version-pill" class="version-pill" title="Версія програми: v1.3.0">v1.3.0</span>
         </div>
         <p>Minecraft &amp; Print-Safe 3D Генератор • Tinkercad / Makers Empire / 3D-Принтер</p>
       </div>
     </div>
 
-    <!-- ПЕРЕМИКАЧ 4 ГЕНЕРАТОРІВ -->
+    <!-- ПЕРЕМИКАЧ МІСІЙ ТА 4 ГЕНЕРАТОРІВ -->
     <nav class="gen-tabs">
+      <button id="btn-open-missions" class="gen-tab-btn btn-missions-tab" title="Відкрити каталог із 12 навчальних місій гуртка (2–6 класи)">
+        🗺️ Місії гуртка (12)
+      </button>
       <button class="gen-tab-btn active" data-tab="minecraft">
         ⛏️ Майнкрафт-Кузня
       </button>
@@ -91,6 +94,61 @@
     <!-- ЛІВА ПАНЕЛЬ НАЛАШТУВАНЬ -->
     <aside class="sidebar" id="app-sidebar">
 
+      <!-- КОМПАКТНА КАРТКА ПОТОЧНОЇ МІСІЇ НАД РЕДАКТОРОМ -->
+      <div id="active-mission-card" class="mission-compact-card">
+        <div class="mission-compact-top">
+          <span id="active-mission-badge" class="mission-cat-pill">🗺️ Місія #1 • Рельєфи</span>
+          <div class="mission-compact-actions">
+            <button id="btn-prev-mission" class="mission-nav-btn" title="Попередня місія">◀</button>
+            <button id="btn-next-mission" class="mission-nav-btn" title="Наступна місія">▶</button>
+            <button id="btn-toggle-mission-body" class="mission-small-btn" title="Згорнути або розгорнути кроки й чек-лист місії">📋 Чек-лист</button>
+            <button id="btn-open-missions-inline" class="mission-small-btn highlight" title="Відкрити всі 12 місій гуртка">🗺️ Усі 12</button>
+          </div>
+        </div>
+
+        <div class="mission-compact-title-row">
+          <div class="mission-compact-title-wrap">
+            <strong id="active-mission-title" class="mission-compact-title">⚡ Паспорт таємного дослідника</strong>
+            <span id="active-mission-meta" class="mission-compact-meta">🎯 Габарит: до 35×35 мм • ⛏️ Майнкрафт-Кузня</span>
+          </div>
+          <button id="btn-start-active-mission" class="btn-mission-apply" title="Увімкнути потрібну вкладку, стартовий міні-шаблон та рекомендовані параметри цієї місії">
+            🚀 Почати місію
+          </button>
+        </div>
+
+        <div id="active-mission-body" class="mission-compact-body">
+          <div id="active-mission-riddle" class="mission-riddle-box"></div>
+          <div class="mission-grades-row">
+            <div class="mission-grade-item">
+              <span class="grade-tag grade-23">👶 2–3 класи:</span>
+              <span id="active-mission-g23"></span>
+            </div>
+            <div class="mission-grade-item">
+              <span class="grade-tag grade-46">🧑 4–6 класи:</span>
+              <span id="active-mission-g46"></span>
+            </div>
+          </div>
+
+          <div id="active-mission-steps" class="mission-steps-mini"></div>
+
+          <div class="mission-checklist-box">
+            <div class="mission-checklist-title">✅ Чек-лист самоперевірки (Дизайнер + Перевіряльник):</div>
+            <label class="mission-check-row">
+              <input type="checkbox" id="chk-mission-connected" data-mission-check="connected" />
+              <span>Чи з'єднані всі частини в одну суцільну деталь?</span>
+            </label>
+            <label class="mission-check-row">
+              <input type="checkbox" id="chk-mission-mono" data-mission-check="mono" />
+              <span>Чи впізнається силует в 1 кольорі (кнопка «🪨 1 Пластик»)?</span>
+            </label>
+            <label class="mission-check-row">
+              <input type="checkbox" id="chk-mission-size" data-mission-check="size" />
+              <span>Чи вкладається модель у цільовий габарит місії?</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
       <!-- ===================================================================
            ВКЛАДКА 1: МАЙНКРАФТ-КУЗНЯ (ВОКСЕЛЬНИЙ 3D-РЕЛЬЄФ)
            =================================================================== -->
@@ -101,7 +159,21 @@
 
         <div class="card">
           <div class="card-header">
-            <span>📦 Готові Артефакти (Шаблони)</span>
+            <span>🌟 Малі рельєфні шаблони місій (25–35 мм)</span>
+          </div>
+          <div class="preset-grid">
+            <button class="preset-btn preset-mini-btn" data-mc-preset="hero_badge">⚡ Паспорт Героя</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="creature_track">🐾 Слід Істоти</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="fossil_shell">🐚 Скам'янілість</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="city_coin">🪙 Монета Міста</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="game_token">🎲 Жетон Гравця</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="mini_tag">🏷️ Міні-Табличка</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="cardboard_stand">🏙️ Паз для Картону</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="shield">🛡️ Щит (Tinkercad)</button>
+          </div>
+
+          <div class="card-header" style="margin-top: 6px;">
+            <span>📦 Класичні Артефакти Minecraft</span>
           </div>
           <div class="preset-grid">
             <button class="preset-btn active" data-mc-preset="sword">⚔️ Алмазний Меч</button>
@@ -109,7 +181,6 @@
             <button class="preset-btn" data-mc-preset="creeper">💚 Кріпер-Трофей</button>
             <button class="preset-btn" data-mc-preset="tnt">🧨 Динаміт TNT</button>
             <button class="preset-btn" data-mc-preset="heart">❤️ Серце Життя</button>
-            <button class="preset-btn" data-mc-preset="shield">🛡️ Щит (Tinkercad)</button>
             <button class="preset-btn" data-mc-preset="totem">🏆 Тотем Безсмертя</button>
             <button class="preset-btn" data-mc-preset="dragon">🐉 Дракон Енду</button>
           </div>
@@ -145,7 +216,7 @@
         <div class="card">
           <div class="card-header">
             <span>⚙️ Налаштування друку та габаритів</span>
-            <button id="btn-mc-mini-preset" class="btn-subtle" title="Встановити воксель 2.2 мм для швидкого міні-значка до 35 мм">🎯 Міні-значок (~35 мм)</button>
+            <button id="btn-mc-mini-preset" class="btn-subtle" title="Встановити воксель 2.0 мм для швидкого міні-значка 28–32 мм">🎯 Міні-значок (~30 мм)</button>
           </div>
 
           <div class="control-row">
@@ -153,7 +224,7 @@
               <span>Розмір 1 кубика (вокселя):</span>
               <span id="val-mc-voxel" class="control-val">3.5 мм</span>
             </div>
-            <input id="mc-voxel-size" type="range" min="2.0" max="5.0" step="0.1" value="3.5" aria-label="Розмір 1 кубика (вокселя), мм" />
+            <input id="mc-voxel-size" type="range" min="1.8" max="5.0" step="0.1" value="3.5" aria-label="Розмір 1 кубика (вокселя), мм" />
           </div>
 
           <div class="control-row">
@@ -173,7 +244,7 @@
             <div class="control-label"><span>Тип кріплення / підставки:</span></div>
             <select id="mc-mount-type" aria-label="Тип кріплення або підставки">
               <option value="keychain" selected>🔑 Міцне вушко для брелока (отвір 6 мм)</option>
-              <option value="none">🧱 Чиста фігурка (для Tinkercad / значка)</option>
+              <option value="none">🧱 Чиста фігурка / Плитка (для Tinkercad / жетона)</option>
               <option value="stand">🏆 З іменною табличкою внизу</option>
             </select>
           </div>
@@ -190,19 +261,19 @@
            =================================================================== -->
       <section id="panel-illusion" class="panel-section">
         <div class="printer-safe-tip">
-          🔮 <b>Оптичний силует 0° / 90°:</b> Для 1-годинного заняття обирайте короткі знаки (1–3 символи), щоб модель швидко друкувалася і гарантовано вміщувалася у безпечне поле 190×190 мм!
+          🔮 <b>Оптичний силует 0° / 90°:</b> Для 1-годинного заняття обирайте короткі знаки (1–2 символи, ~28–32 мм), щоб модель швидко друкувалася і легко перевірялася!
         </div>
 
         <div class="card">
           <div class="card-header">
             <span>⚡ Швидкі Шаблони Ілюзій</span>
-            <button id="btn-il-short-mode" class="btn-subtle" title="Короткий знак із 2 символів (~30 мм) для швидкого друку">⚡ Короткий знак (1–2 літери)</button>
+            <button id="btn-il-short-mode" class="btn-subtle" title="Короткий знак із 2 символів (~28 мм) для швидкого друку">⚡ Короткий знак (1–2 літери)</button>
           </div>
           <div class="preset-grid">
-            <button class="preset-btn" data-il-preset="short" data-w1="3D" data-w2="★!">⚡ 3D ↔ ★! (Короткий)</button>
-            <button class="preset-btn" data-il-preset="1" data-w1="МАКСИМ" data-w2="★BOSS★">👦 МАКСИМ ↔ BOSS</button>
-            <button class="preset-btn" data-il-preset="2" data-w1="МАЙН!" data-w2="КРАФТ">⛏️ МАЙН! ↔ КРАФТ</button>
-            <button class="preset-btn" data-il-preset="4" data-w1="СОФІЯ" data-w2="★PRO★">👧 СОФІЯ ↔ ★PRO★</button>
+            <button class="preset-btn preset-mini-btn" data-il-preset="short" data-w1="3D" data-w2="★!" data-voxel="2.2">⚡ 3D ↔ ★! (~28 мм)</button>
+            <button class="preset-btn preset-mini-btn" data-il-preset="cipher" data-w1="ОК" data-w2="⚔👑" data-voxel="2.2">🔮 ОК ↔ ⚔👑 (~28 мм)</button>
+            <button class="preset-btn" data-il-preset="1" data-w1="МАКСИМ" data-w2="★BOSS★" data-voxel="2.6">👦 МАКСИМ ↔ BOSS</button>
+            <button class="preset-btn" data-il-preset="2" data-w1="МАЙН!" data-w2="КРАФТ" data-voxel="2.6">⛏️ МАЙН! ↔ КРАФТ</button>
           </div>
         </div>
 
@@ -492,13 +563,42 @@
         </div>
 
         <!-- Кутовий бейдж версії програми -->
-        <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • Версія v1.2.0 (Чесна діагностика, авто-містки, одноколірне прев'ю, збереження .json)">
-          ⚒️ v1.2.0
+        <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • Версія v1.3.0 (12 місій гуртка, міні-шаблони 25–35 мм, чесна діагностика, 1 Пластик)">
+          ⚒️ v1.3.0
         </div>
       </div>
     </section>
 
   </main>
+
+  <!-- МОДАЛЬНЕ ВІКНО: КАТАЛОГ «🗺️ МІСІЇ ГУРТКА (12)» -->
+  <div id="missions-modal" class="missions-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="missions-modal-title" style="display:none;">
+    <div class="missions-modal-window">
+      <div class="missions-modal-header">
+        <div>
+          <h2 id="missions-modal-title">🗺️ Місії гуртка «3D Кузня Чудес» (12 проєктів для 2–6 класів)</h2>
+          <p class="missions-modal-subtitle">
+            Обери місію, прочитай легенду-загадку та натисни <b>«🚀 Почати місію»</b> — студія сама увімкне потрібний генератор, стартовий міні-шаблон (25–35 мм) і рекомендовані параметри!
+          </p>
+        </div>
+        <button id="btn-close-missions" class="missions-close-btn" title="Закрити каталог місій (Esc)" aria-label="Закрити каталог місій">✕</button>
+      </div>
+
+      <!-- ФІЛЬТР ЗА КАТЕГОРІЯМИ (4 рельєфи, 2 фактури, 2 настільні ігри, 2 корисні дрібниці, 1 картонний мегаполіс, 1 оптичний експеримент) -->
+      <div class="missions-filter-bar" role="tablist" aria-label="Категорії місій">
+        <button class="mission-filter-btn active" data-mission-filter="all">🌟 Усі місії (12)</button>
+        <button class="mission-filter-btn" data-mission-filter="relief">🛡️ Рельєфи (4)</button>
+        <button class="mission-filter-btn" data-mission-filter="texture">🐾 Фактури і сліди (2)</button>
+        <button class="mission-filter-btn" data-mission-filter="boardgame">🎲 Настільні ігри (2)</button>
+        <button class="mission-filter-btn" data-mission-filter="useful">🏷️ Корисні дрібниці (2)</button>
+        <button class="mission-filter-btn" data-mission-filter="cardboard">🏙️ Картонний мегаполіс (1)</button>
+        <button class="mission-filter-btn" data-mission-filter="optical">🔮 Оптичний експеримент (1)</button>
+      </div>
+
+      <!-- СІТКА 12 КАРТОК МІСІЙ -->
+      <div id="missions-grid-container" class="missions-grid"></div>
+    </div>
+  </div>
 
   <!-- ПІДКЛЮЧЕННЯ СКРИПТІВ (Працює 100% офлайн без інтернету та серверів!) -->
   <script src="lib/three.min.js"></script>
