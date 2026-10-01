@@ -6,6 +6,9 @@
       this.container = null;
       this.scene = null;
       this.camera = null;
+      this.perspCamera = null;
+      this.orthoCamera = null;
+      this.isOrthographic = false;
       this.renderer = null;
       this.modelGroup = null;     // Головна група 3D-моделі (експортується в .STL)
       this.effectsGroup = null;   // Допоміжні візуальні ефекти (снаряди, лазер сопла, маркер центру мас)
@@ -80,7 +83,10 @@
       this.scene.background = new THREE.Color(0x0b1320);
       this.scene.fog = new THREE.FogExp2(0x0b1320, 0.0018);
 
-      this.camera = new THREE.PerspectiveCamera(42, w / h, 1, 1500);
+      this.perspCamera = new THREE.PerspectiveCamera(42, w / h, 1, 1500);
+      this.orthoCamera = new THREE.OrthographicCamera(-w / 2, w / 2, h / 2, -h / 2, 1, 1500);
+      this.camera = this.perspCamera;
+      this.updateOrthoProjection(w, h);
 
       this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
       this.renderer.setSize(w, h);
@@ -333,20 +339,56 @@
       }
     }
 
+    // Оновлення меж ортографічної камери відповідно до поточної відстані камери та пропорцій екрана
+    updateOrthoProjection(w, h) {
+      if (!this.orthoCamera) return;
+      const containerW = w || (this.container ? this.container.clientWidth : 800);
+      const containerH = h || (this.container ? this.container.clientHeight : 600);
+      const aspect = containerW / Math.max(1, containerH);
+
+      // Масштаб ортографічної камери ідеально узгоджений із PerspectiveCamera FOV 42° на відстані spherical.radius
+      const halfH = this.spherical.radius * Math.tan(THREE.MathUtils.degToRad(21));
+      const halfW = halfH * aspect;
+
+      this.orthoCamera.left = -halfW;
+      this.orthoCamera.right = halfW;
+      this.orthoCamera.top = halfH;
+      this.orthoCamera.bottom = -halfH;
+      this.orthoCamera.near = 1;
+      this.orthoCamera.far = 1500;
+      this.orthoCamera.updateProjectionMatrix();
+    }
+
+    setProjectionMode(isOrtho) {
+      this.isOrthographic = !!isOrtho;
+      this.onResize();
+      if (this.isOrthographic) {
+        this.camera = this.orthoCamera;
+      } else {
+        this.camera = this.perspCamera;
+      }
+      if (window.StudioSound) window.StudioSound.playCameraSwoosh(this.isOrthographic ? 'ortho' : 'iso');
+      return this.isOrthographic;
+    }
+
+    toggleProjection() {
+      return this.setProjectionMode(!this.isOrthographic);
+    }
+
     // Плавний поворот камери в заданий ракурс (наприклад, для оптичної ілюзії 0° та 90°)
     setCameraView(preset) {
       if (window.StudioSound) window.StudioSound.playCameraSwoosh(preset);
       if (preset === 'front') {
         this.targetSpherical.theta = 0;
-        this.targetSpherical.phi = Math.PI / 2.25;
+        this.targetSpherical.phi = this.isOrthographic ? (Math.PI / 2 - 0.001) : (Math.PI / 2.25);
         this.targetSpherical.radius = 135;
       } else if (preset === 'side90') {
         this.targetSpherical.theta = Math.PI / 2;
-        this.targetSpherical.phi = Math.PI / 2.25;
+        this.targetSpherical.phi = this.isOrthographic ? (Math.PI / 2 - 0.001) : (Math.PI / 2.25);
         this.targetSpherical.radius = 135;
       } else if (preset === 'top') {
         this.targetSpherical.theta = 0;
-        this.targetSpherical.phi = 0.15;
+        this.targetSpherical.phi = 0.001;
         this.targetSpherical.radius = 150;
       } else {
         // Ізометрія за замовчуванням
@@ -690,11 +732,14 @@
     }
 
     onResize() {
-      if (!this.container || !this.renderer || !this.camera) return;
+      if (!this.container || !this.renderer) return;
       const w = this.container.clientWidth;
       const h = this.container.clientHeight;
-      this.camera.aspect = w / h;
-      this.camera.updateProjectionMatrix();
+      if (this.perspCamera) {
+        this.perspCamera.aspect = w / h;
+        this.perspCamera.updateProjectionMatrix();
+      }
+      this.updateOrthoProjection(w, h);
       this.renderer.setSize(w, h);
     }
 
@@ -710,10 +755,20 @@
 
       const r = this.spherical.radius;
       const sinPhi = Math.sin(this.spherical.phi);
-      this.camera.position.x = this.spherical.target.x + r * sinPhi * Math.sin(this.spherical.theta);
-      this.camera.position.y = this.spherical.target.y + r * Math.cos(this.spherical.phi);
-      this.camera.position.z = this.spherical.target.z + r * sinPhi * Math.cos(this.spherical.theta);
-      this.camera.lookAt(this.spherical.target);
+      const camX = this.spherical.target.x + r * sinPhi * Math.sin(this.spherical.theta);
+      const camY = this.spherical.target.y + r * Math.cos(this.spherical.phi);
+      const camZ = this.spherical.target.z + r * sinPhi * Math.cos(this.spherical.theta);
+
+      if (this.isOrthographic && this.orthoCamera) {
+        this.updateOrthoProjection();
+        this.orthoCamera.position.set(camX, camY, camZ);
+        this.orthoCamera.lookAt(this.spherical.target);
+        this.camera = this.orthoCamera;
+      } else if (this.perspCamera) {
+        this.perspCamera.position.set(camX, camY, camZ);
+        this.perspCamera.lookAt(this.spherical.target);
+        this.camera = this.perspCamera;
+      }
 
       // Анімація появи блоків
       if (this.popAnimBlocks.length > 0) {

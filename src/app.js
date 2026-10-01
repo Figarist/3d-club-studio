@@ -67,6 +67,13 @@
         // Модалка місій
         missionsModal: document.getElementById('missions-modal'),
         missionsGrid: document.getElementById('missions-grid-container'),
+        activeMissionCard: document.getElementById('active-mission-card'),
+        missionMinimizedBar: document.getElementById('mission-minimized-bar'),
+        btnCloseActiveMission: document.getElementById('btn-close-active-mission'),
+        btnShowActiveMission: document.getElementById('btn-show-active-mission'),
+        btnToggleMissionBody: document.getElementById('btn-toggle-mission-body'),
+        minMissionId: document.getElementById('min-mission-id'),
+        minMissionTitle: document.getElementById('min-mission-title'),
         activeMissionBadge: document.getElementById('active-mission-badge'),
         activeMissionTitle: document.getElementById('active-mission-title'),
         activeMissionMeta: document.getElementById('active-mission-meta'),
@@ -78,6 +85,7 @@
         chkMissionConnected: document.getElementById('chk-mission-connected'),
         chkMissionMono: document.getElementById('chk-mission-mono'),
         chkMissionSize: document.getElementById('chk-mission-size'),
+        btnToggleOrtho: document.getElementById('btn-toggle-ortho'),
 
         // Контроли Майнкрафт
         mcVoxelSize: document.getElementById('mc-voxel-size'),
@@ -200,10 +208,13 @@
       const savedPair = this.safeStorage.getItem('3d_kuznya_pair_code') || '';
       return {
         app: '3d-club-studio',
-        version: '1.4.0',
+        version: '1.5.0',
         savedAt: new Date().toISOString(),
         activeTab: this.activeTab,
         activeMissionId: this.missions.activeMissionId,
+        activeMissionVisible: this.missions ? this.missions.cardVisible : true,
+        activeMissionCollapsed: this.missions ? this.missions.bodyCollapsed : false,
+        isOrthographic: this.sceneManager ? this.sceneManager.isOrthographic : false,
         v1Snapshot: this.compare.getV1(),
         studentPairCode: dom.cardPairInput?.value || savedPair,
         missionChecks: Object.assign({}, this.missions.missionChecks),
@@ -253,6 +264,16 @@
 
       if (state.activeMissionId) {
         this.missions.activeMissionId = parseInt(state.activeMissionId, 10) || 1;
+      }
+      if (typeof state.activeMissionVisible === 'boolean') {
+        this.missions.setCardVisibility(state.activeMissionVisible);
+      }
+      if (typeof state.activeMissionCollapsed === 'boolean') {
+        this.missions.setBodyCollapse(state.activeMissionCollapsed);
+      }
+      if (typeof state.isOrthographic === 'boolean' && this.sceneManager) {
+        this.sceneManager.setProjectionMode(state.isOrthographic);
+        this.updateOrthoButtonUI(state.isOrthographic);
       }
       if (state.v1Snapshot) {
         this.compare.setV1(state.v1Snapshot);
@@ -564,8 +585,17 @@
 
       if (tabName === 'illusion') {
         this.sceneManager.setCameraView('front');
+        if (this.missions && this.missions.getActiveMission()?.targetTab !== 'illusion') {
+          this.missions.setMission(12);
+        }
       } else {
         this.sceneManager.setCameraView('iso');
+        if (this.missions && this.missions.getActiveMission()?.targetTab === 'illusion') {
+          this.missions.setMission(1);
+        }
+      }
+      if (this.missions) {
+        this.missions.updateActiveMissionUI(this._domCache);
       }
 
       if (!skipRebuild) {
@@ -741,6 +771,8 @@
       if (!dom.missionsModal) return;
       this.missions.renderMissionsModal(this._domCache, (id) => this.startMission(id));
       dom.missionsModal.style.display = 'flex';
+      const btnTop = document.getElementById('btn-open-missions');
+      if (btnTop) btnTop.classList.add('active');
       if (window.StudioSound) window.StudioSound.playPop(540);
     }
 
@@ -748,7 +780,18 @@
       const dom = this._domCache || {};
       if (!dom.missionsModal) return;
       dom.missionsModal.style.display = 'none';
+      const btnTop = document.getElementById('btn-open-missions');
+      if (btnTop) btnTop.classList.remove('active');
       if (window.StudioSound) window.StudioSound.playPop(360);
+    }
+
+    toggleMissionsModal() {
+      const dom = this._domCache || {};
+      if (dom.missionsModal && dom.missionsModal.style.display === 'flex') {
+        this.closeMissionsModal();
+      } else {
+        this.openMissionsModal();
+      }
     }
 
     // -------------------------------------------------------------------------
@@ -781,7 +824,7 @@
       if (dom.btnRedo) dom.btnRedo.addEventListener('click', () => this.redo());
       if (dom.btnMcUndo) dom.btnMcUndo.addEventListener('click', () => this.undo());
 
-      // Гарячі клавіші (Undo, Redo, Save, Escape)
+      // Гарячі клавіші (Undo, Redo, Save, Escape, Ортографія)
       window.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
           e.preventDefault();
@@ -797,6 +840,15 @@
           if (dom.missionsModal && dom.missionsModal.style.display !== 'none') this.closeMissionsModal();
           if (dom.compareModal && dom.compareModal.style.display !== 'none') this.closeCompareModal();
           if (dom.printCardModal && dom.printCardModal.style.display !== 'none') this.closePrintCardModal();
+        } else if (!e.ctrlKey && !e.metaKey && !e.altKey && (e.key.toLowerCase() === 'o' || e.key === '5')) {
+          if (!['input', 'textarea'].includes(document.activeElement?.tagName?.toLowerCase())) {
+            e.preventDefault();
+            if (this.sceneManager) {
+              const isOrtho = this.sceneManager.toggleProjection();
+              this.updateOrthoButtonUI(isOrtho);
+              this.autosave();
+            }
+          }
         }
       });
 
@@ -989,13 +1041,33 @@
       const btnOpenInline = document.getElementById('btn-open-missions-inline');
       const btnCloseModal = document.getElementById('btn-close-missions');
       const btnToggleBody = document.getElementById('btn-toggle-mission-body');
+      const btnCloseCard = document.getElementById('btn-close-active-mission');
+      const btnShowCard = document.getElementById('btn-show-active-mission');
       const btnPrev = document.getElementById('btn-prev-mission');
       const btnNext = document.getElementById('btn-next-mission');
       const btnStartActive = document.getElementById('btn-start-active-mission');
 
-      if (btnOpenTop) btnOpenTop.addEventListener('click', () => this.openMissionsModal());
+      if (btnOpenTop) btnOpenTop.addEventListener('click', () => this.toggleMissionsModal());
       if (btnOpenInline) btnOpenInline.addEventListener('click', () => this.openMissionsModal());
       if (btnCloseModal) btnCloseModal.addEventListener('click', () => this.closeMissionsModal());
+
+      if (btnCloseCard) {
+        btnCloseCard.addEventListener('click', () => {
+          this.missions.setCardVisibility(false);
+          this.missions.updateActiveMissionUI(this._domCache);
+          if (window.StudioSound) window.StudioSound.playPop(340);
+          this.autosave();
+        });
+      }
+
+      if (btnShowCard) {
+        btnShowCard.addEventListener('click', () => {
+          this.missions.setCardVisibility(true);
+          this.missions.updateActiveMissionUI(this._domCache);
+          if (window.StudioSound) window.StudioSound.playPop(520);
+          this.autosave();
+        });
+      }
 
       if (dom.missionsModal) {
         dom.missionsModal.addEventListener('click', (e) => {
@@ -1013,11 +1085,9 @@
       if (btnToggleBody) {
         btnToggleBody.addEventListener('click', () => {
           const col = this.missions.toggleBodyCollapse();
-          if (dom.activeMissionBody) {
-            dom.activeMissionBody.classList.toggle('collapsed', col);
-          }
-          btnToggleBody.textContent = col ? '📋 Розгорнути' : '📋 Чек-лист';
+          this.missions.updateActiveMissionUI(this._domCache);
           if (window.StudioSound) window.StudioSound.playPop(col ? 360 : 520);
+          this.autosave();
         });
       }
 
@@ -1100,9 +1170,32 @@
           const preset = btn.getAttribute('data-camera-view');
           if (this.sceneManager && preset) {
             this.sceneManager.setCameraView(preset);
+            document.querySelectorAll('[data-camera-view]').forEach(b => b.classList.remove('active-cam'));
+            btn.classList.add('active-cam');
           }
         });
       });
+
+      const btnToggleOrtho = document.getElementById('btn-toggle-ortho');
+      if (btnToggleOrtho) {
+        btnToggleOrtho.addEventListener('click', () => {
+          if (this.sceneManager) {
+            const isOrtho = this.sceneManager.toggleProjection();
+            this.updateOrthoButtonUI(isOrtho);
+            this.autosave();
+          }
+        });
+      }
+    }
+
+    updateOrthoButtonUI(isOrtho) {
+      const btn = this._domCache?.btnToggleOrtho || document.getElementById('btn-toggle-ortho');
+      if (!btn) return;
+      btn.classList.toggle('active-cam', !!isOrtho);
+      btn.textContent = isOrtho ? '📐 Орто: Вкл' : '📐 Орто';
+      btn.title = isOrtho
+        ? 'Ортографічна проєкція активна (паралельні лінії без спотворень). Натисніть для переходу на Перспективу (Клавіша O)'
+        : 'Перспективна проєкція. Натисніть для переходу на Ортографічну проєкцію (Клавіша O)';
     }
 
     bindMinecraftControls() {
