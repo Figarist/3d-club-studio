@@ -331,7 +331,7 @@
     cardboard_stand: {
       name: '🏙️ Паз для Картону',
       isMiniPreset: true,
-      recommendedParams: { voxelSize: '2.0', heightStep: '1.6', solidBase: true, mountType: 'none' },
+      recommendedParams: { voxelSize: '2.0', heightStep: '1.6', solidBase: true, mountType: 'none', slotWidth: '2.0' },
       colors: { 1: 0x1f2937, 2: 0x475569, 3: 0x38bdf8, 4: 0xf59e0b },
       grid: [
         '................',
@@ -348,6 +348,30 @@
         '.22333333333322.',
         '..222222222222..',
         '................',
+        '................',
+        '................'
+      ]
+    },
+    slot_calibrator: {
+      name: '📏 Калібратор Пазів',
+      isMiniPreset: true,
+      recommendedParams: { voxelSize: '2.0', heightStep: '1.4', solidBase: true, mountType: 'none', slotWidth: '2.0' },
+      colors: { 1: 0x334155, 2: 0x0284c7, 3: 0x38bdf8, 4: 0xf59e0b },
+      grid: [
+        '................',
+        '.22222222222222.',
+        '.23333333333332.',
+        '.24444444444442.',
+        '.24444444444442.',
+        '.24.44..444...2.',
+        '.24.44..444...2.',
+        '.24.44..444...2.',
+        '.24.44..444...2.',
+        '.24.44..444...2.',
+        '.24.44..444...2.',
+        '.24444444444442.',
+        '.23333333333332.',
+        '.22222222222222.',
         '................',
         '................'
       ]
@@ -673,6 +697,97 @@
       }
     }
 
+    // Спеціальний калібратор пазів гуртка (34 × 24 × 8 мм з 4 пазами під картон: 1.5, 2.0, 2.5, 3.0 мм + допуск +0.2 мм та фасками)
+    buildSlotCalibrator(params, materials) {
+      const group = new THREE.Group();
+      // 1. Нижня монолітна основа: 34 мм (X) × 24 мм (Z) × 2.0 мм (Y)
+      const baseGeo = new THREE.BoxGeometry(34.0, 2.0, 24.0);
+      const baseMesh = new THREE.Mesh(baseGeo, materials[1]);
+      baseMesh.position.set(0, 1.0, 0);
+      group.add(baseMesh);
+
+      // 2. Задній хребет (упор для картону та місце для цифр): 34 мм × 6 мм × 7 мм (Y від 2.0 до 8.0, Z від -12.0 до -5.0)
+      const spineGeo = new THREE.BoxGeometry(34.0, 6.0, 7.0);
+      const spineMesh = new THREE.Mesh(spineGeo, materials[2]);
+      spineMesh.position.set(0, 5.0, -8.5);
+      group.add(spineMesh);
+
+      // 3. 5 зубців гребінця, що обмежують 4 калібровані пази (Z від -5.0 до +12.0 мм, довжина 17 мм, висота 6 мм)
+      // Пази (номінал 1.5, 2.0, 2.5, 3.0 мм з інженерним допуском посадки +0.2 мм):
+      // Слот 1: 1.7 мм, Слот 2: 2.2 мм, Слот 3: 2.7 мм, Слот 4: 3.2 мм (разом 9.8 мм)
+      // Зубці: 4.8, 4.8, 4.9, 4.8, 4.9 мм (разом 24.2 мм, сумарна ширина = 34.0 мм)
+      const toothWidths = [4.8, 4.8, 4.9, 4.8, 4.9];
+      const slotWidths = [1.7, 2.2, 2.7, 3.2];
+      const toothLenZ = 17.0;
+      const toothH = 6.0;
+      const toothY = 5.0; // Y від 2.0 до 8.0
+      const toothZ = 3.5; // центр по Z
+
+      let currentX = -17.0;
+      const slotCentersX = [];
+
+      for (let i = 0; i < 5; i++) {
+        const tw = toothWidths[i];
+        const toothCenterX = currentX + tw / 2;
+        const toothGeo = new THREE.BoxGeometry(tw, toothH, toothLenZ);
+        const toothMesh = new THREE.Mesh(toothGeo, materials[3]);
+        toothMesh.position.set(toothCenterX, toothY, toothZ);
+        group.add(toothMesh);
+
+        currentX += tw;
+        if (i < 4) {
+          const sw = slotWidths[i];
+          const slotCenterX = currentX + sw / 2;
+          slotCentersX.push(slotCenterX);
+
+          // Скоси/фаски (45°, 0.85 мм) на вході кожного паза для легкого вставляння без розшарування картону
+          const chamferGeo = new THREE.BoxGeometry(0.85, 0.85, toothLenZ);
+          const leftChamfer = new THREE.Mesh(chamferGeo, materials[4]);
+          leftChamfer.position.set(currentX, 8.0, toothZ);
+          leftChamfer.rotation.z = Math.PI / 4;
+          group.add(leftChamfer);
+
+          const rightChamfer = new THREE.Mesh(chamferGeo, materials[4]);
+          rightChamfer.position.set(currentX + sw, 8.0, toothZ);
+          rightChamfer.rotation.z = -Math.PI / 4;
+          group.add(rightChamfer);
+
+          currentX += sw;
+        }
+      }
+
+      // 4. Об'ємні воксельні цифри номіналу товщини картону на хребті: '1.5', '2.0', '2.5', '3.0'
+      const labels = ['1.5', '2.0', '2.5', '3.0'];
+      const px = 0.7; // мм
+      const textH = 1.0; // мм
+      const lGeo = new THREE.BoxGeometry(px, textH, px);
+
+      labels.forEach((lbl, sIdx) => {
+        const chars = window.VoxelFont.textToCharMatrices(lbl, 4);
+        const charW = chars.length * 6 * px;
+        const startX = slotCentersX[sIdx] - charW / 2 + px / 2;
+        const startZ = -8.5 - (7 * px) / 2 + px / 2;
+
+        chars.forEach((cItem, cIdx) => {
+          for (let r = 0; r < 7; r++) {
+            for (let c = 0; c < 5; c++) {
+              if (cItem.matrix[r][c] === 1) {
+                const mesh = new THREE.Mesh(lGeo, materials[4]);
+                mesh.position.set(
+                  startX + (cIdx * 6 + c) * px,
+                  8.0 + textH / 2,
+                  startZ + r * px
+                );
+                group.add(mesh);
+              }
+            }
+          }
+        });
+      });
+
+      return group;
+    }
+
     // Генерація 3D-геометрії у реальних міліметрах
     build3D(params) {
       const group = new THREE.Group();
@@ -699,8 +814,29 @@
         4: new THREE.MeshStandardMaterial({ color: this.colors[4], roughness: 0.25, metalness: 0.3 })
       };
 
+      // Якщо обрано «Калібратор пазів гуртка» — створюємо прецизійний тестовий гребінець
+      if (this.currentPresetKey === 'slot_calibrator') {
+        return this.buildSlotCalibrator(params, materials);
+      }
+
+      const isCardboardStand = this.currentPresetKey === 'cardboard_stand';
+      const nominalSlot = parseFloat(params.slotWidth) || 2.0;
+      const actualSlotWidth = nominalSlot + 0.2; // +0.2 мм інженерний допуск посадки
+
       const totalWidth = MC_CONFIG.GRID_SIZE * voxelSize;
       const offset = -totalWidth / 2 + voxelSize / 2;
+
+      // Обчислення положення рядка по Z (для пазової підставки рядки 0..5 та 8..15 точно розсуваються на ширину паза)
+      const getRowZ = (r) => {
+        if (!isCardboardStand) return offset + r * voxelSize;
+        if (r <= 5) {
+          return -actualSlotWidth / 2 - voxelSize / 2 - (5 - r) * voxelSize;
+        } else if (r >= 8) {
+          return actualSlotWidth / 2 + voxelSize / 2 + (r - 8) * voxelSize;
+        } else {
+          return (r === 6 ? -1 : 1) * (actualSlotWidth / 4);
+        }
+      };
 
       const { baseMask, combinedMask } = this.computeBaseAndConnectivity(params.solidBase);
 
@@ -711,7 +847,7 @@
           for (let c = 0; c < MC_CONFIG.GRID_SIZE; c++) {
             if (baseMask[r][c] && this.grid[r][c] === 0) {
               const mesh = new THREE.Mesh(baseGeo, materials[0]);
-              mesh.position.set(offset + c * voxelSize, basePlateHeight / 2, offset + r * voxelSize);
+              mesh.position.set(offset + c * voxelSize, basePlateHeight / 2, getRowZ(r));
               group.add(mesh);
             }
           }
@@ -749,10 +885,35 @@
             const h = levelHeights[lvl] || 4.0;
             const geo = levelGeos[lvl];
             const mesh = new THREE.Mesh(geo, materials[lvl]);
-            mesh.position.set(offset + c * voxelSize, h / 2, offset + r * voxelSize);
+            mesh.position.set(offset + c * voxelSize, h / 2, getRowZ(r));
             group.add(mesh);
           }
         }
+      }
+
+      // Для пазової підставки: монолітне дно та скошені фаски (45°) на верхніх краях входу
+      if (isCardboardStand) {
+        const floorH = Math.max(2.0, basePlateHeight + 1.2);
+        const slotLenX = 14 * voxelSize;
+        const floorGeo = new THREE.BoxGeometry(slotLenX, floorH, actualSlotWidth);
+        const floorMesh = new THREE.Mesh(floorGeo, materials[1]);
+        floorMesh.position.set(0, floorH / 2, 0);
+        group.add(floorMesh);
+
+        // Фаски (скіс 45°, 0.9 мм) на внутрішніх верхніх гранях входу в паз
+        const chamferSize = 0.9;
+        const chamferGeo = new THREE.BoxGeometry(slotLenX, chamferSize, chamferSize);
+        const wallTopY = levelHeights[4];
+
+        const chamferBack = new THREE.Mesh(chamferGeo, materials[4]);
+        chamferBack.position.set(0, wallTopY - chamferSize * 0.35, -actualSlotWidth / 2);
+        chamferBack.rotation.x = Math.PI / 4;
+        group.add(chamferBack);
+
+        const chamferFront = new THREE.Mesh(chamferGeo, materials[4]);
+        chamferFront.position.set(0, wallTopY - chamferSize * 0.35, actualSlotWidth / 2);
+        chamferFront.rotation.x = -Math.PI / 4;
+        group.add(chamferFront);
       }
 
       // Якщо полотно порожнє — використовуємо стандартні межі
@@ -784,7 +945,7 @@
 
         const anchorCol = topRowCount > 0 ? topRowSumC / topRowCount : 7.5;
         const anchorX = offset + anchorCol * voxelSize;
-        const topEdgeZ = offset + minR * voxelSize;
+        const topEdgeZ = getRowZ(minR);
 
         const ringMesh = new THREE.Mesh(extrudeGeo, materials[1]);
         ringMesh.position.set(anchorX, ringHeight, topEdgeZ - voxelSize * 1.1);
@@ -803,7 +964,7 @@
         const charMatrices = window.VoxelFont.textToCharMatrices(labelText, 9);
         const px = Math.max(MC_CONFIG.LABEL_PIXEL_MIN, voxelSize * MC_CONFIG.LABEL_PIXEL_SCALE);
         const textWidth = charMatrices.length * 6 * px;
-        const bottomEdgeZ = offset + maxR * voxelSize;
+        const bottomEdgeZ = getRowZ(maxR);
         const plateW = Math.max(voxelSize * 8, textWidth + 8);
         const plateD = 9 * px;
         const plateH = MC_CONFIG.LABEL_PLATE_HEIGHT;
