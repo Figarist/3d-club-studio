@@ -136,41 +136,61 @@
     setupPrintBed() {
       const bedGroup = new THREE.Group();
 
-      // Стіл 3D-принтера 200x200 мм (1 одиниця = 1 мм)
-      const bedGeo = new THREE.BoxGeometry(200, 2, 200);
+      // Матова скляна основа Anycubic Ultrabase 200x200 мм (1 одиниця = 1 мм)
+      const bedGeo = new THREE.BoxGeometry(200, 2.4, 200);
       const bedMat = new THREE.MeshStandardMaterial({
-        color: 0x111c2d,
-        roughness: 0.8,
-        metalness: 0.2
+        color: 0x0c121e,
+        roughness: 0.88,
+        metalness: 0.08
       });
       const bedMesh = new THREE.Mesh(bedGeo, bedMat);
-      bedMesh.position.y = -1.05;
+      bedMesh.position.y = -1.21;
       bedMesh.receiveShadow = true;
       bedGroup.add(bedMesh);
 
-      // Сітка 200x200 мм (крок 10 мм)
-      const grid = new THREE.GridHelper(200, 20, 0x10b981, 0x1e3a5f);
+      // Основна сітка 200x200 мм (крок 10 мм)
+      const grid = new THREE.GridHelper(200, 20, 0x334155, 0x1e293b);
       grid.position.y = 0.02;
       bedGroup.add(grid);
 
-      // Дрібна сітка в центрі 100x100 мм (крок 5 мм)
-      const fineGrid = new THREE.GridHelper(100, 20, 0x059669, 0x17253b);
-      fineGrid.position.y = 0.01;
+      // Центральна точна сітка 100x100 мм (крок 5 мм)
+      const fineGrid = new THREE.GridHelper(100, 20, 0x24334a, 0x141f31);
+      fineGrid.position.y = 0.025;
       bedGroup.add(fineGrid);
 
-      // Неонова рамка по краю столу
-      const borderGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(202, 2.2, 202));
-      const borderMat = new THREE.LineBasicMaterial({ color: 0x10b981 });
+      // Безпечна зона друку 190x190 мм (контур із приємним акцентом)
+      const safeGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(190, 0.2, 190));
+      const safeMat = new THREE.LineBasicMaterial({ color: 0x0284c7, transparent: true, opacity: 0.45 });
+      const safeLine = new THREE.LineSegments(safeGeo, safeMat);
+      safeLine.position.y = 0.03;
+      bedGroup.add(safeLine);
+
+      // Зовнішній мікро-кант столу 200x200 мм
+      const borderGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(200.4, 2.45, 200.4));
+      const borderMat = new THREE.LineBasicMaterial({ color: 0x475569 });
       const borderLine = new THREE.LineSegments(borderGeo, borderMat);
-      borderLine.position.y = -1.0;
+      borderLine.position.y = -1.2;
       bedGroup.add(borderLine);
 
-      // Позначка "ПЕРЕД (FRONT)" на передній грані столу (Z = +100)
-      const frontIndicatorGeo = new THREE.BoxGeometry(60, 1.5, 3);
-      const frontIndicatorMat = new THREE.MeshBasicMaterial({ color: 0x10b981 });
-      const frontIndicator = new THREE.Mesh(frontIndicatorGeo, frontIndicatorMat);
-      frontIndicator.position.set(0, 0.2, 100);
-      bedGroup.add(frontIndicator);
+      // Гравірування центру столу (перехрестя ⊕)
+      const crossMat = new THREE.LineBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.75 });
+      const crossGeoX = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-8, 0.035, 0), new THREE.Vector3(8, 0.035, 0)]);
+      const crossGeoZ = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0.035, -8), new THREE.Vector3(0, 0.035, 8)]);
+      bedGroup.add(new THREE.Line(crossGeoX, crossMat));
+      bedGroup.add(new THREE.Line(crossGeoZ, crossMat));
+
+      // Передній індикатор орієнтації "ПЕРЕД (FRONT) • ANYCUBIC 200×200"
+      const frontBarGeo = new THREE.BoxGeometry(72, 1.4, 2.4);
+      const frontBarMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 });
+      const frontBar = new THREE.Mesh(frontBarGeo, frontBarMat);
+      frontBar.position.set(0, 0.1, 100);
+      bedGroup.add(frontBar);
+
+      const frontLipGeo = new THREE.BoxGeometry(32, 0.8, 1.0);
+      const frontLipMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+      const frontLip = new THREE.Mesh(frontLipGeo, frontLipMat);
+      frontLip.position.set(0, 0.45, 100.8);
+      bedGroup.add(frontLip);
 
       this.scene.add(bedGroup);
     }
@@ -336,39 +356,67 @@
       }
     }
 
-    // Рекурсивне звільнення GPU-ресурсів (геометрії та матеріалів) для запобігання витоку WebGL-пам'яті
-    _disposeRecursive(obj) {
+    finishPopAnimation() {
+      if (this.popAnimBlocks && this.popAnimBlocks.length > 0) {
+        this.popAnimBlocks.forEach((item) => {
+          if (item && item.mesh) {
+            item.mesh.position.y = item.targetY;
+            item.mesh.scale.copy(item.targetScale);
+          }
+        });
+        this.popAnimBlocks = [];
+      }
+    }
+
+    // Рекурсивне звільнення GPU-ресурсів (геометрії, текстур та матеріалів) для запобігання витоку WebGL-пам'яті
+    _disposeRecursive(obj, disposedGeoms = new Set(), disposedMats = new Set()) {
+      if (!obj) return;
       if (obj.children) {
         for (let i = obj.children.length - 1; i >= 0; i--) {
-          this._disposeRecursive(obj.children[i]);
+          this._disposeRecursive(obj.children[i], disposedGeoms, disposedMats);
         }
       }
-      if (obj.geometry) obj.geometry.dispose();
-      const matToDispose = (obj.userData && obj.userData._origMaterial) || obj.material;
-      if (matToDispose && matToDispose !== this.monochromeMaterial) {
-        if (Array.isArray(matToDispose)) {
-          matToDispose.forEach(m => {
-            if (m && m !== this.monochromeMaterial) m.dispose();
-          });
-        } else {
-          matToDispose.dispose();
-        }
+      if (obj.geometry && !disposedGeoms.has(obj.geometry)) {
+        disposedGeoms.add(obj.geometry);
+        obj.geometry.dispose();
       }
+      const candidateMats = [];
+      if (obj.userData && obj.userData._origMaterial) candidateMats.push(obj.userData._origMaterial);
+      if (obj.material) candidateMats.push(obj.material);
+
+      candidateMats.forEach((mat) => {
+        if (!mat || mat === this.monochromeMaterial) return;
+        const list = Array.isArray(mat) ? mat : [mat];
+        list.forEach((m) => {
+          if (m && !disposedMats.has(m) && m !== this.monochromeMaterial) {
+            disposedMats.add(m);
+            if (m.map) m.map.dispose();
+            if (m.roughnessMap) m.roughnessMap.dispose();
+            if (m.metalnessMap) m.metalnessMap.dispose();
+            if (m.normalMap) m.normalMap.dispose();
+            if (m.alphaMap) m.alphaMap.dispose();
+            m.dispose();
+          }
+        });
+      });
     }
 
     clearModel() {
       this.stopSlicerSimulation();
       this.physicsUpdateFn = null;
-      this.popAnimBlocks = [];
+      this.finishPopAnimation();
+
+      const disposedGeoms = new Set();
+      const disposedMats = new Set();
 
       while (this.modelGroup.children.length > 0) {
         const obj = this.modelGroup.children[0];
-        this._disposeRecursive(obj);
+        this._disposeRecursive(obj, disposedGeoms, disposedMats);
         this.modelGroup.remove(obj);
       }
       while (this.effectsGroup.children.length > 0) {
         const obj = this.effectsGroup.children[0];
-        this._disposeRecursive(obj);
+        this._disposeRecursive(obj, disposedGeoms, disposedMats);
         this.effectsGroup.remove(obj);
       }
     }
@@ -472,18 +520,33 @@
       if (!dimEl) return;
       const d = this.dimensions;
       const sizeCategory = !d.fitsBed
-        ? '🚨 ЗА МЕЖАМИ СТОЛУ (>200 мм)'
+        ? '🚨 За межами столу (>200 мм)'
         : !d.safeBed
           ? '⚠️ Впритул до краю (>190 мм)'
           : d.isMini
-            ? '🌟 Міні-формат'
-            : '📐 Габарит';
+            ? '🌟 Міні-формат (≤35 мм)'
+            : '📐 У межах норми (Anycubic)';
+
+      const plaGrams = Math.round(d.volumeCm3 * 1.24 * 10) / 10;
       const timeText = slicerNote
         ? `⏱️ Слайсер: ${slicerNote}`
-        : `⏱️ Час: перевір у слайсері (чернетка за габаритом ~${d.roughMinutes} хв, ~${d.volumeCm3} см³)`;
-      dimEl.textContent = `${sizeCategory}: ${d.x} × ${d.y} × ${d.z} мм | ${timeText}`;
-      dimEl.classList.toggle('badge-warn', !d.safeBed);
+        : `⏱️ Слайсер: ~${d.roughMinutes} хв (PLA ~${plaGrams} г)`;
+
+      dimEl.innerHTML = `
+        <div class="hud-dim-header">
+          <span class="hud-status-chip ${!d.fitsBed ? 'chip-danger' : !d.safeBed ? 'chip-warn' : 'chip-ok'}">${sizeCategory}</span>
+          <span class="hud-flat-chip">Дно Z = 0.00 мм ✅</span>
+        </div>
+        <div class="hud-dim-primary num-tabular">
+          <b>${d.x} × ${d.y} × ${d.z}</b> <span class="hud-dim-unit">мм</span>
+        </div>
+        <div class="hud-dim-meta num-tabular">
+          ${timeText}
+        </div>
+      `;
+      dimEl.classList.toggle('badge-warn', !d.safeBed && d.fitsBed);
       dimEl.classList.toggle('badge-danger', !d.fitsBed);
+      dimEl.classList.toggle('badge-good', d.safeBed);
     }
 
     // Запуск лазерної симуляції пошарового 3D-друку
@@ -514,6 +577,7 @@
     // Експорт поточної моделі у бінарний .STL файл (100% сумісний з Tinkercad, Makers Empire, Cura, PrusaSlicer)
     exportBinarySTL(filename = '3d_model_for_printer.stl') {
       this.stopSlicerSimulation();
+      this.finishPopAnimation();
       this.modelGroup.updateMatrixWorld(true);
 
       const triangles = [];
