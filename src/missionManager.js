@@ -377,13 +377,15 @@
       return this.missions.find((m) => m.id === this.activeMissionId) || this.missions[0];
     }
 
-    setMission(id) {
+    setMission(id, forceShow = false) {
       const parsedId = parseInt(id, 10);
       const found = this.missions.find((m) => m.id === parsedId);
       if (found) {
         this.activeMissionId = found.id;
         this.missionChecks = { connected: false, mono: false, size: false };
-        this.cardVisible = true;
+        if (forceShow) {
+          this.cardVisible = true;
+        }
         if (typeof this.onMissionChange === 'function') {
           this.onMissionChange(found);
         }
@@ -394,13 +396,13 @@
     nextMission() {
       const idx = this.missions.findIndex((m) => m.id === this.activeMissionId);
       const nextIdx = (idx + 1) % this.missions.length;
-      return this.setMission(this.missions[nextIdx].id);
+      return this.setMission(this.missions[nextIdx].id, true);
     }
 
     prevMission() {
       const idx = this.missions.findIndex((m) => m.id === this.activeMissionId);
       const prevIdx = (idx - 1 + this.missions.length) % this.missions.length;
-      return this.setMission(this.missions[prevIdx].id);
+      return this.setMission(this.missions[prevIdx].id, true);
     }
 
     setFilter(cat) {
@@ -521,26 +523,14 @@
       }
 
       const card = dom.activeMissionCard || document.getElementById('active-mission-card');
-      const minBar = dom.missionMinimizedBar || document.getElementById('mission-minimized-bar');
       const btnToggle = dom.btnToggleMissionBody || document.getElementById('btn-toggle-mission-body');
-      const minId = dom.minMissionId || document.getElementById('min-mission-id');
-      const minTitle = dom.minMissionTitle || document.getElementById('min-mission-title');
 
       if (card) {
         card.style.display = this.cardVisible ? 'flex' : 'none';
       }
-      if (minBar) {
-        minBar.style.display = this.cardVisible ? 'none' : 'flex';
-      }
       if (btnToggle) {
         btnToggle.innerHTML = this.bodyCollapsed ? '🔽 Розгорнути' : '🔼 Згорнути';
         btnToggle.title = this.bodyCollapsed ? 'Розгорнути опис місії' : 'Згорнути опис місії';
-      }
-      if (minId) {
-        minId.textContent = m.id;
-      }
-      if (minTitle) {
-        minTitle.textContent = m.title;
       }
     }
 

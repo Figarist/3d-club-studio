@@ -68,12 +68,8 @@
         missionsModal: document.getElementById('missions-modal'),
         missionsGrid: document.getElementById('missions-grid-container'),
         activeMissionCard: document.getElementById('active-mission-card'),
-        missionMinimizedBar: document.getElementById('mission-minimized-bar'),
         btnCloseActiveMission: document.getElementById('btn-close-active-mission'),
-        btnShowActiveMission: document.getElementById('btn-show-active-mission'),
         btnToggleMissionBody: document.getElementById('btn-toggle-mission-body'),
-        minMissionId: document.getElementById('min-mission-id'),
-        minMissionTitle: document.getElementById('min-mission-title'),
         activeMissionBadge: document.getElementById('active-mission-badge'),
         activeMissionTitle: document.getElementById('active-mission-title'),
         activeMissionMeta: document.getElementById('active-mission-meta'),
@@ -206,7 +202,7 @@
       const savedPair = this.safeStorage.getItem('3d_kuznya_pair_code') || '';
       return {
         app: '3d-club-studio',
-        version: '1.5.0',
+        version: '1.5.1',
         savedAt: new Date().toISOString(),
         activeTab: this.activeTab,
         activeMissionId: this.missions.activeMissionId,
@@ -583,12 +579,12 @@
       if (tabName === 'illusion') {
         this.sceneManager.setCameraView('front');
         if (this.missions && this.missions.getActiveMission()?.targetTab !== 'illusion') {
-          this.missions.setMission(12);
+          this.missions.setMission(12, false);
         }
       } else {
         this.sceneManager.setCameraView('iso');
         if (this.missions && this.missions.getActiveMission()?.targetTab === 'illusion') {
-          this.missions.setMission(1);
+          this.missions.setMission(1, false);
         }
       }
       if (this.missions) {
@@ -710,7 +706,7 @@
     }
 
     startMission(missionId) {
-      const m = this.missions.setMission(missionId);
+      const m = this.missions.setMission(missionId, true);
       if (!m) return;
 
       this.recordUndoSnapshot();
@@ -1035,7 +1031,6 @@
       const btnCloseModal = document.getElementById('btn-close-missions');
       const btnToggleBody = document.getElementById('btn-toggle-mission-body');
       const btnCloseCard = document.getElementById('btn-close-active-mission');
-      const btnShowCard = document.getElementById('btn-show-active-mission');
       const btnPrev = document.getElementById('btn-prev-mission');
       const btnNext = document.getElementById('btn-next-mission');
       const btnStartActive = document.getElementById('btn-start-active-mission');
@@ -1049,15 +1044,6 @@
           this.missions.setCardVisibility(false);
           this.missions.updateActiveMissionUI(this._domCache);
           if (window.StudioSound) window.StudioSound.playPop(340);
-          this.autosave();
-        });
-      }
-
-      if (btnShowCard) {
-        btnShowCard.addEventListener('click', () => {
-          this.missions.setCardVisibility(true);
-          this.missions.updateActiveMissionUI(this._domCache);
-          if (window.StudioSound) window.StudioSound.playPop(520);
           this.autosave();
         });
       }
