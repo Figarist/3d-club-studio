@@ -70,7 +70,9 @@
         isMini: false
       };
       this.onDimensionsUpdated = null;
+      this.onUserCameraInteraction = null;
     }
+
 
     init() {
       this.container = document.getElementById(this.containerId);
@@ -258,6 +260,10 @@
         this.prevMouse.x = e.clientX;
         this.prevMouse.y = e.clientY;
 
+        if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+          if (this.onUserCameraInteraction) this.onUserCameraInteraction();
+        }
+
         if (this.isRightDrag) {
           // Панорамування
           const panSpeed = 0.18;
@@ -276,6 +282,7 @@
       dom.addEventListener('wheel', (e) => {
         e.preventDefault();
         this.targetSpherical.radius = Math.max(45, Math.min(340, this.targetSpherical.radius + e.deltaY * 0.12));
+        if (this.onUserCameraInteraction) this.onUserCameraInteraction();
       }, { passive: false });
 
       // Сенсорне керування для планшетів та вузьких екранів
@@ -302,12 +309,14 @@
           this.prevMouse.y = e.touches[0].clientY;
           this.targetSpherical.theta -= dx * 0.0085;
           this.targetSpherical.phi = Math.max(0.12, Math.min(Math.PI / 2 - 0.02, this.targetSpherical.phi - dy * 0.0085));
+          if (this.onUserCameraInteraction) this.onUserCameraInteraction();
         } else if (e.touches.length === 2) {
           const dx = e.touches[0].clientX - e.touches[1].clientX;
           const dy = e.touches[0].clientY - e.touches[1].clientY;
           const dist = Math.hypot(dx, dy);
           if (prevTouchDist > 0) {
             this.targetSpherical.radius = Math.max(45, Math.min(340, this.targetSpherical.radius - (dist - prevTouchDist) * 0.45));
+            if (this.onUserCameraInteraction) this.onUserCameraInteraction();
           }
           prevTouchDist = dist;
         }
@@ -383,28 +392,41 @@
       return this.setProjectionMode(!this.isOrthographic);
     }
 
-    // Плавний поворот камери в заданий ракурс (наприклад, для оптичної ілюзії 0° та 90°)
+    // Плавний поворот камери в заданий ракурс (наприклад, для оптичної ілюзії 0° та 90°, або скидання в ізометрію)
     setCameraView(preset) {
       if (window.StudioSound) window.StudioSound.playCameraSwoosh(preset);
+
+      // Скидаємо зміщення панорамування рівно в центр столу
+      this.targetSpherical.target.set(0, 18, 0);
+
+      const twoPi = Math.PI * 2;
+      const getShortestTheta = (target) => {
+        let current = this.spherical.theta;
+        let diff = (target - (current % twoPi));
+        diff = ((diff + Math.PI) % twoPi) - Math.PI;
+        return current + diff;
+      };
+
       if (preset === 'front') {
-        this.targetSpherical.theta = 0;
+        this.targetSpherical.theta = getShortestTheta(0);
         this.targetSpherical.phi = this.isOrthographic ? (Math.PI / 2 - 0.001) : (Math.PI / 2.25);
         this.targetSpherical.radius = 135;
       } else if (preset === 'side90') {
-        this.targetSpherical.theta = Math.PI / 2;
+        this.targetSpherical.theta = getShortestTheta(Math.PI / 2);
         this.targetSpherical.phi = this.isOrthographic ? (Math.PI / 2 - 0.001) : (Math.PI / 2.25);
         this.targetSpherical.radius = 135;
       } else if (preset === 'top') {
-        this.targetSpherical.theta = 0;
+        this.targetSpherical.theta = getShortestTheta(0);
         this.targetSpherical.phi = 0.001;
         this.targetSpherical.radius = 150;
       } else {
-        // Ізометрія за замовчуванням
-        this.targetSpherical.theta = Math.PI / 4;
-        this.targetSpherical.phi = Math.PI / 3.1;
+        // Ізометрія за замовчуванням: 45° збоку, канонічний нахил 54.74° (аксонометрія) для Орто та 60° для Перспективи
+        this.targetSpherical.theta = getShortestTheta(Math.PI / 4);
+        this.targetSpherical.phi = this.isOrthographic ? Math.atan(Math.SQRT2) : (Math.PI / 3.0);
         this.targetSpherical.radius = 145;
       }
     }
+
 
     finishPopAnimation() {
       if (this.popAnimBlocks && this.popAnimBlocks.length > 0) {

@@ -141,7 +141,7 @@ button {
    ========================================================================== */
 
 .topbar {
-  height: 54px;
+  min-height: 54px;
   background-color: #0b1320;
   border-bottom: 1px solid var(--border-default);
   box-shadow: var(--shadow-sm);
@@ -150,9 +150,12 @@ button {
   justify-content: space-between;
   padding: 0 16px;
   z-index: 30;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
+
 
 .brand {
   display: flex;
@@ -199,11 +202,14 @@ button {
   text-transform: uppercase;
 }
 
+.brand-subtitle,
 .brand-title p {
   font-size: 11px;
   color: var(--text-muted);
   line-height: 1.2;
+  white-space: nowrap;
 }
+
 
 .version-pill {
   background: rgba(245, 158, 11, 0.12);
@@ -362,16 +368,38 @@ button {
 .btn-card:hover {
   background: rgba(2, 132, 199, 0.22);
   border-color: #38bdf8;
+.btn-project {
+  color: var(--text-main);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.btn-project:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-sky);
+  color: #fff;
+}
+
+.btn-sound {
+  color: var(--text-main);
 }
 
 .btn-sound.muted {
-  opacity: 0.6;
+  opacity: 0.65;
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.btn-music {
+  color: var(--text-secondary);
 }
 
 .btn-music.playing {
-  background: rgba(16, 185, 129, 0.14);
-  border-color: rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(16, 185, 129, 0.45);
   color: #6ee7b7;
+  font-weight: 700;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.25);
 }
 
 .btn-random {
@@ -406,6 +434,19 @@ button {
   background: #34d399;
   color: #022c22;
 }
+
+.illusion-highlight {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  color: #6ee7b7 !important;
+  font-weight: 700;
+}
+
+.illusion-highlight:hover {
+  background: rgba(16, 185, 129, 0.28) !important;
+  color: #fff !important;
+}
+
 
 /* ==========================================================================
    СМУГА РЕЖИМІВ ПЕРЕГЛЯДУ (ДЛЯ НОУТБУКІВ, ПРОЄКТОРІВ ТА МОБІЛЬНИХ)
@@ -759,6 +800,7 @@ button {
   display: flex;
 }
 
+.card,
 .panel-card {
   background: var(--bg-card);
   border: 1px solid var(--border-default);
@@ -770,6 +812,7 @@ button {
   box-shadow: var(--shadow-sm);
 }
 
+.card-header,
 .panel-card-title {
   font-size: var(--text-base);
   font-weight: 700;
@@ -777,7 +820,30 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
 }
+
+.card-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.printer-safe-tip {
+  background: rgba(2, 132, 199, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: var(--text-xs);
+  color: #bae6fd;
+  line-height: 1.45;
+  box-shadow: var(--shadow-sm);
+}
+
+.printer-safe-tip b {
+  color: #fff;
+}
+
 
 /* ==========================================================================
    ПІКСЕЛЬ-РЕДАКТОР 16×16 (МАЙНКРАФТ-КУЗНЯ)
@@ -845,27 +911,31 @@ button {
 }
 
 /* Палітра пензлів 1..4 та Гумка */
+.brush-bar,
 .brush-palette {
   display: flex;
   gap: 6px;
   width: 100%;
-  justify-content: center;
+  justify-content: space-between;
 }
 
 .brush-btn {
   flex: 1;
+  min-width: 0;
   background: #0b1322;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   padding: 6px 4px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 3px;
+  justify-content: center;
+  gap: 4px;
   font-size: var(--text-xs);
   color: var(--text-secondary);
   font-weight: 600;
   transition: all var(--transition-fast);
+  white-space: nowrap;
 }
 
 .brush-btn:hover {
@@ -900,13 +970,48 @@ button {
   color: var(--text-muted);
 }
 
-/* Пресети Майнкрафт */
+/* Індикатор зв'язності деталей */
+.connectivity-pill {
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #86efac;
+  transition: all var(--transition-fast);
+}
+
+.connectivity-pill.warn {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fde047;
+}
+
+.connectivity-pill.danger {
+  background: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.connectivity-pill.bridged {
+  background: rgba(2, 132, 199, 0.14);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #7dd3fc;
+}
+
+/* Пресети Майнкрафт та Ілюзій */
+.preset-grid,
 .presets-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 6px;
 }
 
+.preset-btn,
 .preset-chip-btn {
   background: #0b1322;
   border: 1px solid var(--border-subtle);
@@ -920,20 +1025,78 @@ button {
   align-items: center;
   gap: 6px;
   transition: all var(--transition-fast);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+.preset-btn:hover,
 .preset-chip-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-default);
+  color: var(--text-main);
+  transform: translateY(-1px);
+}
+
+.preset-btn.active,
+.preset-chip-btn.active {
+  background: var(--bg-card-elevated);
+  border-color: var(--accent-forge);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.25);
+}
+
+.preset-mini-btn {
+  border-left: 2px solid var(--accent-gold);
+}
+
+/* Панель символів та дрібні кнопки */
+.sym-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.sym-btn {
+  background: #0b1322;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sym-btn:hover {
   background: var(--bg-card-hover);
   border-color: var(--border-default);
   color: var(--text-main);
 }
 
-.preset-chip-btn.active {
-  background: var(--bg-card-elevated);
-  border-color: var(--accent-craft);
-  color: #fff;
-  font-weight: 700;
+.btn-subtle {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--accent-gold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
 }
+
+.btn-subtle:hover {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: var(--accent-forge);
+  color: #fff;
+}
+
 
 /* ==========================================================================
    КОНТРОЛИ ТА ВВЕДЕННЯ (SLIDERS, INPUTS, SELECTS)
@@ -954,6 +1117,7 @@ button {
   font-weight: 600;
 }
 
+.control-val,
 .control-val-badge {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -963,6 +1127,7 @@ button {
   border-radius: var(--radius-xs);
   border: 1px solid rgba(56, 189, 248, 0.2);
 }
+
 
 input[type="range"] {
   width: 100%;
@@ -1126,6 +1291,21 @@ select:focus, input[type="text"]:focus {
   gap: 6px;
   min-width: 260px;
 }
+
+.verification-badge.status-generated {
+  border-color: rgba(56, 189, 248, 0.3);
+}
+.verification-badge.status-sliced {
+  border-color: rgba(245, 158, 11, 0.4);
+}
+.verification-badge.status-printed {
+  border-color: rgba(34, 197, 94, 0.45);
+}
+
+.slicer-note-row {
+  width: 100%;
+}
+
 
 .verification-row {
   display: flex;
@@ -1851,6 +2031,14 @@ select:focus, input[type="text"]:focus {
   gap: 10px;
 }
 
+.passport-mid-col,
+.passport-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+
 .passport-img-box {
   background: #f8fafc;
   border: 1px solid #cbd5e1;
@@ -1995,46 +2183,89 @@ select:focus, input[type="text"]:focus {
   }
 }
 
-/* 2. Типовий ноутбук учня/вчителя: 1366 × 768 */
-@media (max-width: 1400px) {
-  .topbar {
-    padding: 0 12px;
-  }
-  .sidebar {
-    width: 400px;
-    min-width: 360px;
+/* 2. Великі лептопи та планшети у ландшафті: < 1550px */
+@media (max-width: 1550px) {
+  .brand-subtitle {
+    display: none;
   }
   .gen-tab-btn {
-    padding: 5px 9px;
+    padding: 6px 9px;
     font-size: var(--text-xs);
   }
   .btn-action {
-    padding: 4px 8px;
+    padding: 5px 8px;
     font-size: var(--text-xs);
   }
 }
 
-/* 3. Планшет / Інтерактивна дошка: 1024 × 768 */
-@media (max-width: 1100px) {
+/* 3. Типовий ноутбук учня/вчителя: 1366 × 768 */
+@media (max-width: 1366px) {
+  .topbar {
+    padding: 0 10px;
+    gap: 8px;
+    height: 50px;
+  }
+  .brand-title h1 {
+    font-size: 13.5px;
+  }
+  .sidebar {
+    width: 380px;
+    min-width: 330px;
+  }
+  .gen-tab-btn {
+    padding: 5px 8px;
+    font-size: 11.5px;
+    gap: 4px;
+  }
+  .top-action-group {
+    padding: 2px 3px;
+    gap: 2px;
+  }
+  .btn-action {
+    padding: 4px 7px;
+    font-size: 11.5px;
+    gap: 4px;
+  }
+  .top-actions {
+    gap: 4px;
+    overflow-x: auto;
+  }
+}
+
+/* 4. Планшет / Інтерактивна дошка / Вузьке вікно: <= 1120px */
+@media (max-width: 1120px) {
   .topbar {
     height: auto;
+    min-height: 50px;
     flex-wrap: wrap;
-    padding: 8px 12px;
+    padding: 6px 10px;
     gap: 8px;
+  }
+  .brand {
+    flex-shrink: 0;
+  }
+  .top-actions {
+    flex-shrink: 1;
+    overflow-x: auto;
+    max-width: 100%;
+    order: 2;
   }
   .gen-tabs {
     order: 3;
     width: 100%;
     overflow-x: auto;
     justify-content: flex-start;
+    padding: 3px;
   }
   .sidebar {
-    width: 380px;
+    width: 360px;
+    min-width: 320px;
   }
   .passport-body {
     grid-template-columns: 1fr;
   }
 }
+
 
 /* 4. Мобільний огляд: 390 × 844 */
 @media (max-width: 768px) {

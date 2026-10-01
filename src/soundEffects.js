@@ -105,11 +105,11 @@
           this.compressor.attack.setValueAtTime(0.005, this.ctx.currentTime);
           this.lowpass = this.ctx.createBiquadFilter();
           this.lowpass.type = 'lowpass';
-          this.lowpass.frequency.setValueAtTime(3200, this.ctx.currentTime);
+          this.lowpass.frequency.setValueAtTime(7000, this.ctx.currentTime);
           this.lowpass.Q.setValueAtTime(0.7, this.ctx.currentTime);
 
           this.masterGain = this.ctx.createGain();
-          this.masterGain.gain.setValueAtTime(0.42, this.ctx.currentTime);
+          this.masterGain.gain.setValueAtTime(0.70, this.ctx.currentTime);
 
           this.masterGain.connect(this.lowpass);
           this.lowpass.connect(this.compressor);
@@ -217,12 +217,17 @@
       this.enabled = !this.enabled;
       if (this.enabled) {
         this.playPop(520);
-        this._tone({ type: 'sine', freq: 784, endFreq: 1046.5, startTime: 0.06, duration: 0.12, gain: 0.14 });
+        this._tone({ type: 'sine', freq: 784, endFreq: 1046.5, startTime: 0.06, duration: 0.12, gain: 0.18 });
       } else if (this.musicEnabled) {
         this.stopMusic();
       }
       return this.enabled;
     }
+
+    toggleSound() {
+      return this.toggle();
+    }
+
 
     // =========================================================================
     // ФОНОВА ЧІПТЮН-МУЗИКА СТУДІЇ («КУЗНЯ ПРИГОД»)
