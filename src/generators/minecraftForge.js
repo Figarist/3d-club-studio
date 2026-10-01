@@ -653,13 +653,20 @@
       for (let r = 0; r < MC_CONFIG.GRID_SIZE; r++) {
         for (let c = 0; c < MC_CONFIG.GRID_SIZE; c++) {
           const cell = document.createElement('div');
-          cell.className = 'pixel-cell';
+          let classNames = 'pixel-cell';
+          if (r === 7) classNames += ' axis-x';
+          if (c === 7) classNames += ' axis-y';
+          cell.className = classNames;
+          cell.dataset.r = r;
+          cell.dataset.c = c;
+          cell.title = `Клітинка [${r + 1}, ${c + 1}] • Шар ${this.grid[r][c] || '0'}`;
+
           const val = this.grid[r][c];
           if (val > 0) {
             cell.style.backgroundColor = hexStr(this.colors[val] || 0x38bdf8);
             cell.textContent = val;
           } else {
-            cell.style.backgroundColor = '#0f172a';
+            cell.style.backgroundColor = '#0b1322';
             cell.textContent = '';
           }
 
@@ -670,17 +677,20 @@
                 if (this.onBeforeMutate) this.onBeforeMutate();
               }
               this.grid[r][c] = this.activeBrush;
+              cell.title = `Клітинка [${r + 1}, ${c + 1}] • Шар ${this.activeBrush || '0'}`;
               if (this.activeBrush > 0) {
                 cell.style.backgroundColor = hexStr(this.colors[this.activeBrush]);
                 cell.textContent = this.activeBrush;
               } else {
-                cell.style.backgroundColor = '#0f172a';
+                cell.style.backgroundColor = '#0b1322';
                 cell.textContent = '';
               }
               if (window.StudioSound) window.StudioSound.playPaintNote(r, c, this.activeBrush);
               if (window.StudioApp) window.StudioApp.rebuildCurrentModel(false);
             }
           };
+
+          cell._paintSelf = paintCell;
 
           cell.addEventListener('mousedown', (e) => {
             e.preventDefault();
@@ -694,6 +704,35 @@
 
           container.appendChild(cell);
         }
+      }
+
+      // Підтримка плавного малювання пальцем на сенсорних дошках та планшетах
+      if (!container._touchBound) {
+        container._touchBound = true;
+        const handleTouchPaint = (e) => {
+          if (!e.touches || e.touches.length === 0) return;
+          const touch = e.touches[0];
+          const el = document.elementFromPoint(touch.clientX, touch.clientY);
+          if (el && el._paintSelf) {
+            el._paintSelf();
+          }
+        };
+
+        container.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          this.isPainting = true;
+          this._strokeRecorded = false;
+          handleTouchPaint(e);
+        }, { passive: false });
+
+        container.addEventListener('touchmove', (e) => {
+          e.preventDefault();
+          if (this.isPainting) handleTouchPaint(e);
+        }, { passive: false });
+
+        container.addEventListener('touchend', () => {
+          this.isPainting = false;
+        });
       }
     }
 
