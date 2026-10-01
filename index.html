@@ -40,48 +40,67 @@
       </button>
     </nav>
 
-    <!-- ДІЇ: СКАСУВАННЯ, ОДНОКОЛІРНЕ ПРЕВ'Ю, ЗБЕРЕЖЕННЯ ПРОЄКТУ, V1/V2, ПАСПОРТ, СИМУЛЯТОР, STL -->
+    <!-- ДІЇ: ГРУПОВАНІ ЗА ПРИЗНАЧЕННЯМ -->
     <div class="top-actions">
-      <button id="btn-undo" class="btn-action btn-history" title="Скасувати останню дію (Ctrl+Z)">
-        ↩️
-      </button>
-      <button id="btn-redo" class="btn-action btn-history" title="Повернути скасовану дію (Ctrl+Y)">
-        ↪️
-      </button>
-      <button id="btn-toggle-mono" class="btn-action btn-mono" title="Перемкнути: кольори прев'ю чи реальний вигляд одним пластиком">
-        🪨 1 Пластик
-      </button>
-      <button id="btn-save-project" class="btn-action btn-project" title="Зберегти редагований проєкт у файл .json (щоб продовжити наступного разу)">
-        📥 Зберегти
-      </button>
-      <button id="btn-load-project" class="btn-action btn-project" title="Відкрити збережений файл проєкту .json">
-        📂 Відкрити
-      </button>
-      <input id="input-load-project" type="file" accept=".json" style="display:none;" aria-hidden="true" />
-      <button id="btn-snapshot-v1" class="btn-action btn-v1" title="Зафіксувати поточну модель як Версію 1 (Ескіз)">
-        📸 Фіксувати V1
-      </button>
-      <button id="btn-compare-v1v2" class="btn-action btn-v1" title="Відкрити порівняння поступу: Версія 1 (Ескіз) ↔ Версія 2 (Фінал)" style="display:none;">
-        ⚖️ V1 ↔ V2
-      </button>
-      <button id="btn-print-card" class="btn-action btn-card" title="Створити картку для черги 3D-друку (Паспорт деталі для принтера)">
-        📋 Картка для друку
-      </button>
-      <button id="btn-toggle-sound" class="btn-action btn-sound" title="Увімкнути/вимкнути веселі звукові ефекти">
-        🔊 Звук
-      </button>
-      <button id="btn-toggle-music" class="btn-action btn-music" title="Увімкнути/вимкнути фонову мелодію кузні">
-        🎵 Музика
-      </button>
-      <button id="btn-random-wow" class="btn-action btn-random" title="Випадкова генерація / Мутація!">
-        🎲 ВАУ!
-      </button>
-      <button id="btn-simulate-print" class="btn-action btn-sim" title="Показати, як принтер друкує модель шар за шаром">
-        🔥 Симуляція
-      </button>
-      <button id="btn-export-stl" class="btn-action btn-export" title="Експортувати 3D-геометрію у .STL для слайсера (Cura / PrusaSlicer / Tinkercad)">
-        💾 Експорт .STL
-      </button>
+      <!-- Група: Історія -->
+      <div class="top-action-group" aria-label="Історія дій">
+        <button id="btn-undo" class="btn-action btn-history" title="Скасувати останню дію (Ctrl+Z)" aria-label="Скасувати останню дію">
+          ↩️
+        </button>
+        <button id="btn-redo" class="btn-action btn-history" title="Повернути скасовану дію (Ctrl+Y)" aria-label="Повернути скасовану дію">
+          ↪️
+        </button>
+      </div>
+
+      <!-- Група: Відображення -->
+      <div class="top-action-group" aria-label="Режим перегляду">
+        <button id="btn-toggle-mono" class="btn-action btn-mono" title="Перемкнути: кольори прев'ю чи реальний вигляд одним пластиком">
+          🪨 1 Пластик
+        </button>
+      </div>
+
+      <!-- Група: Проєкт -->
+      <div class="top-action-group" aria-label="Файли проєкту">
+        <button id="btn-save-project" class="btn-action btn-project" title="Зберегти проєкт у .json (Ctrl+S)">
+          📥 Зберегти
+        </button>
+        <button id="btn-load-project" class="btn-action btn-project" title="Відкрити файл .json">
+          📂 Відкрити
+        </button>
+        <input id="input-load-project" type="file" accept=".json" style="display:none;" aria-hidden="true" />
+      </div>
+
+      <!-- Група: Контроль якості та паспорт -->
+      <div class="top-action-group" aria-label="Контроль якості">
+        <button id="btn-snapshot-v1" class="btn-action btn-v1" title="Зафіксувати поточну модель як Версію 1 (Ескіз)">
+          📸 Фіксувати V1
+        </button>
+        <button id="btn-compare-v1v2" class="btn-action btn-v1" title="Порівняння поступу: V1 (Ескіз) ↔ V2 (Фінал)" style="display:none;">
+          ⚖️ V1 ↔ V2
+        </button>
+        <button id="btn-print-card" class="btn-action btn-card" title="Створити картку для черги 3D-друку (Паспорт деталі)">
+          📋 Паспорт
+        </button>
+      </div>
+
+      <!-- Група: Системні дії -->
+      <div class="top-action-group" aria-label="Системні дії">
+        <button id="btn-toggle-sound" class="btn-action btn-sound" title="Увімкнути/вимкнути звукові ефекти" aria-label="Звукові ефекти">
+          🔊 Звук
+        </button>
+        <button id="btn-toggle-music" class="btn-action btn-music" title="Увімкнути/вимкнути фонову мелодію кузні" aria-label="Фонова музика">
+          🎵 Музика
+        </button>
+        <button id="btn-random-wow" class="btn-action btn-random" title="Випадкова генерація / Мутація!">
+          🎲 ВАУ!
+        </button>
+        <button id="btn-simulate-print" class="btn-action btn-sim" title="Симуляція пошарового друку">
+          🔥 Симуляція
+        </button>
+        <button id="btn-export-stl" class="btn-action btn-export" title="Експортувати бінарний .STL для слайсера">
+          💾 .STL
+        </button>
+      </div>
     </div>
   </header>
 
@@ -561,12 +580,12 @@
 
       <!-- НИЖНІ ПАНЕЛІ КЕРУВАННЯ КАМЕРОЮ, ПЛАСТИКОМ ТА ДЕМО-ЕФЕКТАМИ -->
       <div class="viewport-hud-bottom">
-        <div class="camera-bar">
-          <button class="cam-btn" data-cam-view="iso">🧊 3D Огляд</button>
-          <button class="cam-btn" data-cam-view="front">👁️ Спереду (0°)</button>
-          <button class="cam-btn" data-cam-view="side90">🔄 Збоку (90°)</button>
-          <button class="cam-btn" data-cam-view="top">⬇️ Зверху</button>
-          <button id="btn-hud-mono" class="cam-btn mono-hud-btn" title="Як виглядатиме одним пластиком без кольору">🪨 Одним пластиком</button>
+        <div class="camera-bar" role="toolbar" aria-label="Ракурси камери 3D-сцени">
+          <button class="cam-btn" data-cam-view="front" data-camera-view="front" title="Ракурс спереду (0°)">👁️ 0°</button>
+          <button class="cam-btn" data-cam-view="side90" data-camera-view="side90" title="Ракурс збоку (90°)">🔄 90°</button>
+          <button class="cam-btn" data-cam-view="top" data-camera-view="top" title="Ракурс зверху">🔝 Зверху</button>
+          <button class="cam-btn active-cam" data-cam-view="iso" data-camera-view="iso" title="Ізометричний 3D ракурс">🧊 Ізометрія</button>
+          <button id="btn-hud-mono" class="cam-btn mono-hud-btn" title="Як виглядатиме одним пластиком без кольору">🪨 1 Пластик</button>
           <input id="mono-color-picker" type="color" value="#cfd6df" title="Колір пластику для одноколірного прев'ю" aria-label="Колір пластику для одноколірного прев'ю" class="mono-color-input" />
         </div>
 
@@ -815,6 +834,11 @@
   <script src="lib/three.min.js"></script>
   <script src="src/voxelFont.js"></script>
   <script src="src/soundEffects.js"></script>
+  <script src="src/safeStorage.js"></script>
+  <script src="src/historyManager.js"></script>
+  <script src="src/missionManager.js"></script>
+  <script src="src/snapshotCompareController.js"></script>
+  <script src="src/passportPrintController.js"></script>
   <script src="src/generators/minecraftForge.js"></script>
   <script src="src/generators/dualIllusion.js"></script>
   <script src="src/generators/physicsMechanics.js"></script>

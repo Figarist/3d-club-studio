@@ -103,12 +103,16 @@
           this.compressor.knee.setValueAtTime(20, this.ctx.currentTime);
           this.compressor.ratio.setValueAtTime(8, this.ctx.currentTime);
           this.compressor.attack.setValueAtTime(0.005, this.ctx.currentTime);
-          this.compressor.release.setValueAtTime(0.18, this.ctx.currentTime);
+          this.lowpass = this.ctx.createBiquadFilter();
+          this.lowpass.type = 'lowpass';
+          this.lowpass.frequency.setValueAtTime(3200, this.ctx.currentTime);
+          this.lowpass.Q.setValueAtTime(0.7, this.ctx.currentTime);
 
           this.masterGain = this.ctx.createGain();
-          this.masterGain.gain.setValueAtTime(0.85, this.ctx.currentTime);
+          this.masterGain.gain.setValueAtTime(0.42, this.ctx.currentTime);
 
-          this.masterGain.connect(this.compressor);
+          this.masterGain.connect(this.lowpass);
+          this.lowpass.connect(this.compressor);
           this.compressor.connect(this.ctx.destination);
 
           this._buildNoiseBuffer();
