@@ -15,7 +15,7 @@
       <div class="brand-title">
         <div class="brand-title-row">
           <h1>3D КУЗНЯ ЧУДЕС</h1>
-          <span id="app-version-pill" class="version-pill" title="Версія програми: v1.5.0">v1.5.0</span>
+          <span id="app-version-pill" class="version-pill" title="Версія програми: v1.5.1">v1.5.1</span>
         </div>
         <p>Minecraft &amp; Print-Safe 3D Генератор • Tinkercad / Makers Empire / 3D-Принтер</p>
       </div>
@@ -122,15 +122,7 @@
     <!-- ЛІВА ПАНЕЛЬ НАЛАШТУВАНЬ -->
     <aside class="sidebar" id="app-sidebar">
 
-      <!-- ПЛАШКА ЗГОРНУТОЇ МІСІЇ (якщо картку закрито) -->
-      <div id="mission-minimized-bar" class="mission-minimized-bar" style="display:none;">
-        <button id="btn-show-active-mission" class="mission-min-btn" title="Показати завдання поточної місії">
-          <span>🗺️ Активна місія #<b id="min-mission-id">1</b>: <span id="min-mission-title">Паспорт</span></span>
-          <span class="min-btn-action">Розгорнути ▾</span>
-        </button>
-      </div>
-
-      <!-- КОМПАКТНА КАРТКА ПОТОЧНОЇ МІСІЇ НАД РЕДАКТОРОМ -->
+      <!-- КОМПАКТНА КАРТКА ПОТОЧНОЇ МІСІЇ НАД РЕДАКТОРОМ (можна згорнути або повністю закрити) -->
       <div id="active-mission-card" class="mission-compact-card">
         <div class="mission-compact-top">
           <span id="active-mission-badge" class="mission-cat-pill">🗺️ Місія #1 • Рельєфи</span>
@@ -247,7 +239,7 @@
           </div>
 
           <div class="pixel-grid-wrapper">
-            <div id="mc-pixel-grid" class="pixel-grid" role="grid" aria-label="Піксельна сітка 16 на 16 для малювання 3D-висоти"></div>
+            <div id="mc-pixel-grid" class="pixel-grid pixel-grid-container" role="grid" aria-label="Піксельна сітка 16 на 16 для малювання 3D-висоти"></div>
           </div>
         </div>
 
@@ -615,8 +607,8 @@
         </div>
 
         <!-- Кутовий бейдж версії програми -->
-        <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • Версія v1.5.0 (ортографічний вигляд, оновлений інтерфейс і закриття місій, калібратор пазів, V1↔V2 поступ, картки черги друку, профіль Anycubic i3 Mega)">
-          ⚒️ v1.5.0
+        <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • Версія v1.5.1 (відновлення 16×16 сітки, чисте закриття місій, оптимізація ортографічного огляду, V1↔V2 поступ, Anycubic i3 Mega)">
+          ⚒️ v1.5.1
         </div>
       </div>
     </section>
