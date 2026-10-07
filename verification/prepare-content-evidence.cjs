@@ -13,7 +13,7 @@ rows.forEach(row=>{
   const reviewPath=path.join(evidenceRoot,row.modelKey,'review.json');
   row.sourceRevision=process.argv[2]||'WORKTREE'; row.sourceHashes=sourceHashes;
   row.physicalEvidence='Not verified'; row.childEnjoyment='Not verified';
-  row.screenshots=[]; row.verdict='BLOCKED'; row.reason='Actual UI capture and main visual review pending.';
+  row.screenshots=[]; row.verdict='BLOCKED'; row.reason='Final capture/review deferred under the owner-requested last bounded packet (2026-10-07).';
   if(fs.existsSync(recordPath)) {
     const record=JSON.parse(fs.readFileSync(recordPath,'utf8'));
     row.capture=record; row.screenshots=record.screenshots||[];
@@ -23,7 +23,7 @@ rows.forEach(row=>{
     Object.assign(row,{verdict:review.verdict,reason:review.reason,reviewer:review.reviewer,reviewedViews:review.reviewedViews});
   }
 });
-const manifest={schemaVersion:1,date:'2026-10-07',priority:'single-color geometry first',sourceRevision:process.argv[2]||'WORKTREE',rows};
+const manifest={schemaVersion:1,date:'2026-10-07',priority:'single-color geometry first',acceptanceStatus:rows.every(r=>r.verdict==='PASS')?'COMPLETE_AGENT_VISUAL_REVIEW':'INCOMPLETE',ownerScope:'Last bounded packet, then polish and close; no further full-catalog run.',sourceRevision:process.argv[2]||'WORKTREE',rows};
 const manifestDir=path.join(root,'verification/content-evidence');fs.mkdirSync(manifestDir,{recursive:true});
 fs.writeFileSync(path.join(manifestDir,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
 const escape=value=>String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
