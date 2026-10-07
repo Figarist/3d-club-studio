@@ -1,5 +1,13 @@
 # Classroom fun and model expansion — execution prompt
 
+> **Closed task status (2026-10-07):** The 48-model implementation is complete.
+> Only 4 of 101 configurations have final visual PASS; 97 remain pending under
+> the owner's stop instruction. Do not automatically repeat the implementation
+> or launch a full-catalog capture from this historical specification; a fresh
+> human request may define new work. See
+> [FUN_CONTENT_REVIEW.md](FUN_CONTENT_REVIEW.md) and
+> [NEXT_AGENT_HANDOFF.md](NEXT_AGENT_HANDOFF.md).
+
 Turn the existing 3D Club Studio models into recognizable, playful things children
 can change and use immediately, and add at least **48 genuinely different models**.
 Every shipped catalog model must have reviewed screenshots from the actual app.
@@ -13,9 +21,9 @@ does not satisfy this task.
 - Delegated workers: **`gpt-6-luna`**, **`reasoning_effort: "xhigh"`**,
   **`fork_turns: "none"`**; at most three concurrently, leaving the main worker
   to integrate and review. Do not silently substitute a different model.
-- Work in `D:\GitHub\3d-club-studio`. The owner authorizes this implementation,
-  bounded delegation, focused verification, separate commits and pushes to
-  `origin/main`. Main owns commits/pushes and the shared browser session.
+- The original authorization applied to the implementation that is now complete.
+  Follow the scope and verification in any fresh human request. The main worker
+  owns commits/pushes and the shared browser session for its active task.
 - Ukrainian progress/handoff and child-facing content; English identifiers,
   commits and technical reports. Preserve unrelated dirty work; stage explicit paths.
 - Read AGENTS.md, applicable nested instructions, GEMINI.md and
@@ -24,8 +32,16 @@ does not satisfy this task.
   Select Basic Memory project `wrist-and-pocket`, recent activity, relevant notes
   only. Routine work does not authorize durable memory writes.
 
-Prepared against **`a29f681`, app `1.8.2`, schema 1**. Recheck the baseline.
-This file specifies future work; it is not a report that the models already passed.
+Planning baseline: **`a29f681`, app `1.8.2`, schema 1**. The 48-model
+implementation is complete at source commit `3df6a40`, app 1.9.0, schema 1.
+Visual release acceptance is still incomplete: 4 of 101 finite configurations
+have final PASS reviews, 13 original screenshots cover those four models, and
+97 configurations remain pending under the owner's stop instruction. This is
+a historical execution specification, not a current expansion request or an
+acceptance report. See [FUN_CONTENT_REVIEW.md](FUN_CONTENT_REVIEW.md) and
+[NEXT_AGENT_HANDOFF.md](NEXT_AGENT_HANDOFF.md). Do not automatically replay the
+48-model task or run a full-catalog capture. A fresh human request may define new
+work; any visual acceptance claim still needs complete supporting evidence.
 
 ## What the owner's screenshot demonstrates
 

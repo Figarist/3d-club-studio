@@ -1,7 +1,15 @@
 # Classroom content implementation plan
 
-Baseline: clean main `ac5f5e1`, app 1.8.2, schema 1 (2026-10-07).
-This is a plan, not acceptance evidence. See FUN_CONTENT_REVIEW.md for verdicts.
+Planning baseline: clean main `ac5f5e1`, app 1.8.2, schema 1 (2026-10-07).
+The 48-model implementation is complete at source commit `3df6a40` (app 1.9.0,
+schema 1); the clean documentation baseline for this refresh was `6546bec`.
+Later documentation commits may advance HEAD without changing the source proof.
+This retained plan is not an active request or acceptance evidence; a fresh
+human request may define follow-up. See
+[FUN_CONTENT_REVIEW.md](FUN_CONTENT_REVIEW.md) for current implementation and
+review status, and [NEXT_AGENT_HANDOFF.md](NEXT_AGENT_HANDOFF.md) for bounded
+follow-up. Do not automatically replay the completed 48-model expansion from
+this plan; a fresh human request may define a new scope.
 
 ## Finite inventory
 
@@ -40,7 +48,10 @@ launch targets and balance investigations. Geometry, not color/name/scale alone,
 must distinguish entries. Twelve or more entries use actual actions across launch,
 balance/retry, reveal and edited silhouette comparison patterns.
 
-## Sequence and gates
+## Original sequence and gates (historical plan)
+
+The following were the plan's acceptance gates. Their current results and
+remaining limits are recorded in [FUN_CONTENT_REVIEW.md](FUN_CONTENT_REVIEW.md).
 
 1. Three read-only investigations, at most five findings each.
 2. Build a repaired catapult plus one relief, character and optical vertical slice.

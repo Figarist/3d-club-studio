@@ -1,16 +1,24 @@
 # Verification audit and scalable architecture — execution prompt
 
-Copy the prompt below to the user's selected **Sol model with low reasoning effort**. Delegate the focused investigations to **`gpt-6-luna` with `reasoning_effort: "xhigh"`**. This document prepares the next task; it is not a completed architecture audit.
+Historical execution prompt: its architecture audit and selected repairs are
+complete. The report is [ARCHITECTURE_AUDIT.md](ARCHITECTURE_AUDIT.md); current
+ownership, evidence limits and follow-up priorities are in
+[NEXT_AGENT_HANDOFF.md](NEXT_AGENT_HANDOFF.md). Do not automatically replay this
+full task or treat its old baseline findings as current defects. A fresh human
+request may authorize new work; use its scope and current source evidence.
 
 ## Objective and authority
 
 Work in `D:\GitHub\3d-club-studio`. Audit the current implementation, then complete evidence-backed, incremental structural improvements that make future content packs, generators, classroom workflows, and independent agent contributions easier to add safely.
 
-The owner authorizes this architecture work, bounded agent delegation, separate commits per completed change, and push to `origin/main`. Keep progressing through implementation and verification. Use Ukrainian for progress and handoff; English for code, identifiers, commits, and technical documentation. Optimize token use: delegate focused questions, read targeted source ranges, and report decisions rather than raw logs.
+The owner's authorization on this prompt applied to the completed audit. Any
+future work follows the scope in a fresh human request and repository policy.
+Use Ukrainian for progress and handoff;
+English for code, identifiers, commits, and technical documentation.
 
 Read the current `AGENTS.md`, applicable nested instructions, and `C:\Users\igors\.codex\RTK.md` first. Inspect Git status, branch, remote, and current commit. Preserve unrelated work and stage explicit paths. Select Basic Memory project `general`; inspect recent activity and only relevant notes. Repository evidence outranks prior reports. Do not create durable memories for routine audit/refactoring work.
 
-The prompt was prepared against commit `1d5543a`, app version `1.8.1`: four generators, 24 missions, Adventure Pack/Shelf, Pixel Editor Tools, Lesson Companion, project persistence, undo, snapshots, passport export, and camera framing. Recheck this baseline; the repository may have advanced.
+Prompt drafting baseline (historical): commit `1d5543a`, app version `1.8.1`, with four generators and 24 missions. The audit's actual inspected baseline and repairs are recorded in `ARCHITECTURE_AUDIT.md`; current runtime source is `3df6a40`, app 1.9.0, schema 1. Do not use the drafting baseline as a present-day task checklist.
 
 ## Constraints that remain binding
 

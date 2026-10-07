@@ -4,6 +4,11 @@ Historical planning snapshot (2026-09-30). The implemented Adventure Pack and
 architecture/state repairs are documented in [ADVENTURE_PACK.md](ADVENTURE_PACK.md)
 and [ARCHITECTURE_AUDIT.md](ARCHITECTURE_AUDIT.md). Unverified physical-print items
 remain unverified; earlier suspected/resolved software gaps are not current defects.
+This dated audit remains a historical planning snapshot. For the 1.9.0 content
+implementation and its incomplete visual acceptance, see
+[FUN_CONTENT_REVIEW.md](FUN_CONTENT_REVIEW.md); for current work boundaries see
+[NEXT_AGENT_HANDOFF.md](NEXT_AGENT_HANDOFF.md). Do not treat this snapshot's
+pre-implementation gaps or proposed work as current findings.
 
 Дата: 30 вересня 2026. Контекст від власника: 2–6 класи, до 10 дітей, заняття до 60 хвилин, один повільний одноколірний Anycubic i3 Mega. Матеріал, установлене сопло, стан принтера та профіль слайсера не перевірялися.
 

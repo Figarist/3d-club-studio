@@ -1,5 +1,18 @@
 # Architecture audit — 2026-10-07
 
+## Current handoff pointer
+
+This report records the audit against clean `main` at `1f0fc11` (app 1.8.1).
+Its selected state, identity, undo, print-evidence and lifecycle repairs were
+integrated before the 1.8.2 audit close at `a29f681`; the current runtime is
+1.9.0 at source commit `3df6a40`, schema 1. The clean documentation baseline
+for this refresh was `6546bec`. Later documentation commits may advance HEAD
+without changing the source baseline. Keep the findings below as historical
+evidence for that baseline. Do not rerun the completed architecture task or
+report its repaired findings as current defects. See
+[NEXT_AGENT_HANDOFF.md](NEXT_AGENT_HANDOFF.md) for current
+ownership, evidence limits and next priorities.
+
 ## Baseline and authority
 
 Inspected clean `main` at `1f0fc11` (app `1.8.1`), origin
@@ -115,7 +128,7 @@ durability, printer throughput and physical print acceptance remain **Not verifi
 Completed source changes: stable atomic registry (`0158f38`), validated state and
 transactions (`d23b33a`), literal print records and resource ownership (`5d97375`).
 These commits were pushed successfully after two transient GitHub server errors.
-Final release metadata is `1.8.2`; schema remains 1.
+Final release metadata at this audit's close was `1.8.2`; schema remained 1.
 
 | Evidence | Focused result |
 |---|---|

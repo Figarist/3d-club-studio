@@ -1,52 +1,92 @@
-# Optional classroom extensions
+# Контракти розширень
 
-The studio keeps its offline Vanilla JavaScript/IIFE architecture. Extensions have their own source, styles, and integration notes. They introduce no CDN, network calls, package manager, or runtime build step.
+Цей документ описує, як розширювати студію збереженням її поточних меж: чотири генератори, реєстр сталих ключів, один власник стану проєкту та локальне завантаження скриптів. Поточний стан продукту та перехід до наступної роботи описані у [NEXT_AGENT_HANDOFF.md](NEXT_AGENT_HANDOFF.md).
 
-| Module | Responsibility | Dependency / state owner |
-|---|---|---|
-| `content/adventurePack.js` | Twelve deterministic mini reliefs and twelve mission definitions | Extends `MINECRAFT_PRESETS` and `STUDIO_MISSIONS` before app construction |
-| `adventureShelf.js` | Three expandable theme groups and dynamic catalog counts | Calls a supplied mission-selection callback; does not rebuild models |
-| `pixelEditorTools.js` | Mirror, rotation, and relief inversion | Reads/writes the generator; callbacks let StudioApp own undo, geometry, verification, and autosave |
-| `lessonCompanion.js` | Lesson phases, scenario prompts, editable challenge deck, and teacher timer | Separate SafeStorage key; supplies mission IDs through a callback |
+## Поточний каталог
 
-Load registries first, the pack next, shelf/tools/companion next, and `app.js` last. Existing core-script relative order remains unchanged. `StudioApp.init()` mounts each available extension once. New source classes are attached to `window` just like the existing core modules.
+У реєстрі 72 місії. З них 48 нових авторських моделей: 20 рельєфів, 12 персонажів, 8 оптичних і 8 інженерних. Інвентар покриття перелічує 101 скінченну конфігурацію. Це окремі лічильники:
 
-## Adding a content pack
+- Числовий mission ID і namespaced mission key задають навчальне завдання.
+- modelKey задає стабільний запис моделі в каталозі.
+- presetKey або config.mcPreset задає вхідний шаблон Minecraft.
+- Конфігурація фіксує конкретні tab і controls для запуску генератора.
 
-Use `StudioContentRegistry.registerPack({ id, presets, missions }, { presetTarget: window.MINECRAFT_PRESETS })` before app startup. This DOM-free boundary stages validation before publishing either presets or missions. Each mission supplies a unique positive numeric `id`, permanent namespaced `key` (`pack-id:mission-name`), and the existing renderer fields (`category`, `categoryLabel`, `targetSize`, `generatorLabel`, `targetTab`, `title`, `riddle`, `grade23`, `grade46`, `steps`, `checklist`, `config`). Presets use sixteen strings of sixteen `.`/`0`–`4` cells and integer RGB colors for active levels. Minecraft mission `config.mcPreset` must resolve to an existing or staged preset.
+Місії можуть ділити той самий задум і пресет; одна модель може мати кілька конкретних конфігурацій. Не створюйте нову місію лише для перейменування існуючого пресета. Нові місії з авторських паків за замовчуванням відкривають одноколірний режим, але це не означає, що фізичний друк перевірено.
 
-Do not allocate IDs from catalog length or maximum. Core IDs 1–12 and Adventure IDs 13–24 retain their historical meaning; reserve a non-conflicting numeric range for a new pack and never reuse an old ID/key. Core keys are `studio-core:mission-01` through `mission-12`; Adventure keys are `studio-adventure-pack:<presetKey>`. Duplicate pack IDs, mission IDs/keys, preset keys, malformed content and missing references reject the entire registration. Unknown mission references return `null`; they do not silently select another model. There is no dynamic pack unload or post-start refresh contract.
+Актуальне покриття на 2026-10-07: 4 із 101 мають фінальний PASS, 97 очікують остаточного знімання й огляду; у звіті є 13 незмінних оригіналів. Це не підтверджує повну візуальну якість, друк чи прийняття дітьми. Перевіряйте [FUN_CONTENT_REVIEW.md](FUN_CONTENT_REVIEW.md) і [coverage.json](../verification/content-evidence/coverage.json).
 
-Small extension recipe:
+## Реєстрація контент-паку
 
-1. Create a local IIFE under `src/content/` containing the pack data and one registration call. Keep student prompts and geometry definitions out of UI controllers.
-2. Load it after Minecraft presets and base missions, before the shelf and app. Preserve other dependency order. A pure registry check can use `.create()` for isolated catalogs without DOM.
-3. To expose a new shelf, supply `groups`, `missionIdByPresetKey` and preset metadata to a separate `AdventureShelf` mount; its callback calls `StudioApp.startMission`. The current app explicitly mounts one Adventure Pack shelf.
-4. Verify two tiny packs in opposite registration orders and an invalid registration that leaves both registries intact. Click the real mission button, undo once, and inspect model, mission and selected UI. Check real generated bounds, not just the grid footprint.
-5. Document physical/slicer checks separately. Registration does not establish printable geometry or print duration.
+Реєстр доступний як window.StudioContentRegistry. Базові місії реєструються до паків; файли паків підключені після генераторів і до побудови UI. Поточна послідовність лежить у [index.html](../index.html).
 
-## Adding a generator
+Пак реєструється одним викликом:
 
-The common generator contract is `build3D(params) -> THREE.Group`. Only Minecraft has grid/palette `getState`/`setState`; other project parameters live in `StudioApp.controls`. Add a local script before the app, instantiate it in the app, add tab/panel/data-attribute controls and scoped styles, map those controls in the rebuild dispatcher, and update ProjectState's allowed tab/fields plus serialization/restoration. Add a mission configuration adapter when missions should start that generator. SceneManager owns the returned group's disposable resources. Do not add empty serialization stubs or a second scene owner.
+~~~js
+window.StudioContentRegistry.registerPack(
+  { id, presets, missions },
+  { presetTarget: window.MINECRAFT_PRESETS }
+);
+~~~
 
-## Project state and transactions
+Реєстратор спершу перевіряє пакет і цільовий словник, а потім публікує пресети й місії. Невдала валідація не повинна частково змінити реєстри. Динамічне вивантаження паків і оновлення UI після старту не є контрактом.
 
-`ProjectState.normalize(state, { missions, presets })` validates and returns detached data before import/autosave restoration. New files carry `schemaVersion: 1`; absent schemaVersion means legacy v1. Release `version` is metadata, not the schema gate. A stable `activeMissionKey` is authoritative; legacy numeric IDs map to the same missions. Missing pack keys/IDs or preset references reject rather than substitute a different design.
+### Вимоги до місій і моделей
 
-Grids are exactly 16×16 integer heights 0–4, palettes contain finite integer RGB values, controls have bounded finite numbers and allowed enum values, and optional fields receive explicit defaults. Legacy numeric strings remain accepted. Legacy finite range values are clamped to the current control limits; malformed values and unknown future schemas are rejected. A null V1 and empty pair code clear the previous values. Legacy computed `estimatedMinutes` is discarded; only literal `slicerRecord` is print-time evidence supplied by the teacher.
+- Кожна місія має унікальний додатний числовий id та унікальний стабільний key. Для паку key починається з id паку та двокрапки, наприклад studio-pack:mission-name. Існуючі ID і ключі не перевикористовуйте.
+- Записи каталогу мають унікальний безпечний modelKey з малих латинських літер, цифр, дефіса чи підкреслення. Один modelKey не слід повторно реєструвати як нову модель.
+- Місія містить текстові поля category, categoryLabel, title, targetSize, generatorLabel, targetTab, riddle, grade23 і grade46. targetTab має бути minecraft, illusion, physics або mob.
+- steps містить непорожній текст riddle, design, mono, improve і result; checklist має не менше трьох текстових пунктів.
+- Запис моделі містить theme, feature, editableAction і interaction, а також повний config.controls. config.tab, якщо задано, має збігатися з targetTab.
+- Пресети Minecraft використовують рівно 16 рядків по 16 символів із ., 0, 1, 2, 3, 4. Для кожного активного рівня 1–4 задайте цілий RGB-колір від 0 до 0xFFFFFF.
+- Якщо присутні presetKey і config.mcPreset, вони мають збігатися. Пресет має існувати в старому або поточному пакеті.
 
-Mission launch records the complete previous project before selection/model changes and suppresses intermediate autosave. Geometry changes clear verification status and stale slicer notes. Undo/redo restore mission identity, checks, model, controls, selected shelf and V1 together. Teacher timer/challenges remain separately owned. Core dialogs use ModalFocus for trap/return; LessonCompanion retains its own dialog lifecycle.
+Перед виділенням ID перегляньте всі базові й пакові файли. Не виводьте ID із довжини каталогу чи найбільшого поточного номера. Після старту StudioApp викликає вибір за ID, key або числовим рядком; невідоме посилання повертає null. Не створюйте непомітну підміну на іншу модель.
 
-Retained verification scripts and synthetic legacy fixtures live in `verification/` and are not loaded by the application. They use Node built-ins and the already bundled Three.js; no package manager or build step is added.
+## Додавання або зміна моделі
 
-Lesson prompts must request a child-authored change, include a presentation or investigation that works without completed printing, and avoid promising unmeasured print time. The model verification status remains owned by StudioApp. Content registration does not mark a design sliced or physically printed.
+Якщо задум використовує наявний генератор, спершу визначте, чи потрібні нова місія, нова скінченна конфігурація, новий пресет або лише текстове перейменування. Змініть лише відповідний рівень даних.
 
-## Camera framing
+1. Для Minecraft додайте пресет у його контент-файл і перевірте формат сітки та RGB-палітру. Для моделей інших вкладок вкажіть підтримувану комбінацію design та controls генератора.
+2. Додайте mission id, stable key, modelKey і опис каталогу з повним config. Переконайтеся, що config запускає потрібну вкладку й початкові значення.
+3. Підключіть код до DOM-контролів лише якщо функція справді нова. Запуск місії має проходити через StudioApp.startMission(), щоб синхронізувати UI, undo, генератор і автозбереження.
+4. Новий пресет, місія або варіант геометрії потребує відповідних рядків у інвентарі контенту та плані огляду. Не редагуйте застарілі докази так, щоб вони наче підтверджували нову версію.
+5. Для приймання фіксуйте оригінальні знімки з фактичних UI-дій. Вказуйте, що саме натиснули, які controls змінилися, як змінився результат та які параметри не вплинули на нього. Не ретушуйте докази.
 
-The explicit `btn-fit-model` button calls `SceneManager.fitModelView()`. Framing uses settled dimensions rather than transient appearance-animation bounds. It preserves camera angles, centers on the model, and adapts to viewport aspect and projection. Wheel and pinch share the adjusted zoom limit. Empty scenes are ignored.
+Зміни авторських моделей мають перевіряти відповідні функції, не лише присутність запису в каталозі. Повне приймання вимагає проходу за затвердженим покриттям; поточний звіт фіксує INCOMPLETE і не є дозволом називати неперевірені конфігурації готовими.
 
-## Verification boundaries
+## Додавання генератора або поля проєкту
 
-Focused isolated-browser checks exercised all new mission buttons, catalog filtering, project save/import/reload, transform/undo/redo, teacher scenario links, grade switching, challenge edits, timer controls, and desktop/tablet layouts. Initial recovery also checked direct `file://` launch. Synthetic slicer estimates were removed from the visible print-time field; teacher-entered slicer notes render as literal text.
+Спільний контракт генератора — build3D(params) -> THREE.Group. Лише MinecraftForgeGenerator має getState()/setState() для сітки та палітри. Поточні параметри беруться з DOM-контролів, кешованих у StudioApp._domCache; serializeState().controls — це знімок для JSON, а не live-об'єкт StudioApp.controls.
 
-Physical prints, material durability, slicer manifold repair, and printer throughput remain unverified. The one-hour timer was checked through short real ticking/pause/resume interactions; a full-hour session was not run.
+Для нової вкладки або параметра:
+
+- Реалізуйте IIFE у src/generators/ і зареєструйте публічний API на window.
+- Додайте script у index.html перед app.js і після його залежностей. Не змінюйте відносний порядок решти скриптів без перевірки всіх залежностей.
+- Додайте вкладку й контролі у index.html; стилі помістіть у відповідний локальний CSS. Повторювані зв'язки мають узгоджуватися з data-* контрактами в AGENTS.md.
+- Підключіть DOM та обробники в StudioApp. Відновлення стану, місій, undo/redo, збереження та експорт мають використовувати той самий власник.
+- Якщо значення стає частиною проєктного JSON, оновіть ProjectState defaults, допустимі значення, межі та нормалізацію. Версія застосунку в полі version є метаданими; schemaVersion визначає формат JSON.
+- Додайте осмислене видалення геометрій і матеріалів. Після SceneManager.setModel() сцена володіє переданою групою і звільняє її ресурси.
+
+Не створюйте дубльоване сховище стану, другий власник сцени або порожні serialize/restore-заглушки. Перед зміною схеми прочитайте [ProjectState](../src/projectState.js) і приклади старих файлів у verification/fixtures/.
+
+## Екранні ефекти та STL
+
+Геометрія, яка є частиною фізичного демо, може мати userData.exportable = false і не потрапляти до STL. Тимчасові цілі, снаряди та реакції мають бути окремо від спокійної моделі. Поточний хук перед експортом скидає фізичну демонстрацію. Якщо додаєте видимий для екрана ефект, перевірте, чи має він бути частиною виробу.
+
+Код SceneManager створює Binary STL і відносить найнижчу точку до Z=0. Це не перевіряє manifold, нависання, допуски, час друку, міцність чи сумісність зі слайсером. Реальний час беріть із зовнішнього слайсера. Друк і фізичні результати документуйте окремо від локальних статичних та браузерних перевірок.
+
+## Перевірки та межі доказів
+
+Для перевірок дотримуйтеся [бюджету власника в AGENTS.md](../AGENTS.md): одна сфокусована партія — не більш як 20 знайдених випадків і 60 секунд; UI-перевірка має проходити справжню дію та перевіряти видимий стан. Не запускайте повні, нефільтровані, stress або довгі симуляції за замовчуванням. Зупиняйтеся після втрати прогресу й фіксуйте INDETERMINATE.
+
+Відокремлюйте докази за класом: статичний код, детермінована перевірка джерела, браузер, файл-завантаження, слайсер, фізичний друк і відгук дітей. Знімок однієї конфігурації не підтверджує інші конфігурації. Повний каталог перевіряйте тільки затвердженим обсягом робіт і в окремому запланованому сеансі.
+
+## Пов'язані документи
+
+- [Передача наступному агенту](NEXT_AGENT_HANDOFF.md)
+- [Технічна архітектура](TECHNICAL_ARCHITECTURE.md)
+- [План контенту](FUN_CONTENT_PLAN.md)
+- [Звіт і межі приймання](FUN_CONTENT_REVIEW.md)
+- [Архітектурний аудит](ARCHITECTURE_AUDIT.md)
+
+\n

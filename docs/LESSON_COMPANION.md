@@ -1,31 +1,48 @@
-# Lesson companion
+# Планувальник заняття
 
-The optional lesson companion gives a teacher a practical 60-minute plan for a group of up to 10 children in grades 2–6 sharing one Anycubic i3 Mega. It adds six scenario cards linked to existing mission IDs, age-specific instructions, an editable challenge deck, and an optional elapsed-time timer.
+`LessonCompanion` — необов’язкова панель планування 60-хвилинного заняття. Вона містить таймлайн, шість сценаріїв із завданнями для 2–3 та 4–6 класів, редаговану колоду з 12 викликів і таймер, який учитель запускає вручну.
 
-## Integration
+## Сценарії та сталі ID місій
 
-Keep this feature opt-in. Add `lesson-companion.css` as a local stylesheet and load `src/lessonCompanion.js` after `src/safeStorage.js` and before `src/app.js`. The root controller can connect the topbar button with:
+Початкові сценарії пов’язані з місіями основного каталогу, чиї ID потрібно зберігати:
+
+| Сценарій | ID місії |
+|---|---:|
+| Мітка для рослини | 9 |
+| Герб космічної фортеці | 2 |
+| Слід із лісу | 5 |
+| Скам’янілість майбутнього | 6 |
+| Жетон нової гри | 8 |
+| Один знак — два ракурси | 12 |
+
+Каталог тепер містить 72 місії, але ці шість карток планувальника й далі посилаються на наведені основні ID. Додавання місій саме по собі не створює нових сценаріїв для планувальника. Під час змін каталогу зберігайте ці зв’язки або додавайте явні нові відповідності.
+
+## Підключення
+
+У поточному `index.html` уже підключено `lesson-companion.css` і `src/lessonCompanion.js`; скрипт завантажується після `safeStorage.js` та до `app.js`. Застосунок ініціалізує панель і передає вибір місії власному контролеру:
 
 ```js
-const lessonCompanion = new window.LessonCompanion({
-  onSelectMission: function (missionId) {
-    // Root-owned mission selection, such as calling the existing mission UI.
+this.lessonCompanion = new window.LessonCompanion({
+  onSelectMission: (id) => {
+    this.startMission(id);
+    this.lessonCompanion.close();
   }
-}).init();
-
-document.getElementById('btn-open-lesson').addEventListener('click', function () {
-  lessonCompanion.open();
 });
+this.lessonCompanion.init();
+document.getElementById('btn-open-lesson')?.addEventListener(
+  'click', () => this.lessonCompanion.open()
+);
 ```
 
-The callback receives one existing numeric mission ID: 2, 5, 6, 8, 9, or 12. It is optional; without it, the lesson plan remains usable and the mission button is disabled. The companion does not select a tab, mutate the model, print, or call other studio globals.
+Сам планувальник показує сценарій, вік і виклик. Callback належить кореневому контролеру: у поточному застосунку він запускає відповідну місію та закриває панель. Без callback вибір місії недоступний, але план і таймер лишаються окремими функціями.
 
-## Behavior
+## Поведінка та збереження
 
-- `open()`, `close()`, and `destroy()` control the modal. Escape, the close buttons, and a backdrop click close it. Focus returns to the opener, Tab stays inside the dialog, and the page scroll lock is restored on close.
-- The grade switch updates the selected scenario's two or three age-appropriate steps. Scenario selection is remembered.
-- Twelve concrete design constraints cycle in shuffled order without repeats until all twelve have appeared. The teacher can edit a constraint or restore its original wording. Edits, the selected scenario, grade, deck position, and timer state use `window.SafeStorage` when available.
-- The timer is opt-in and capped at 60 minutes. It calculates elapsed time from wall-clock timestamps, so throttled browser intervals do not add drift. It continues while the modal is closed and shows that status when reopened. Reset or pause it explicitly; the timer makes no claim about print completion.
-- No audio, external requests, new dependencies, print-time estimates, or printer-ready claims are introduced.
+- План складається з шести відрізків тривалістю 5, 7, 20, 10, 10 і 8 хвилин.
+- Перемикач віку оновлює підказки вибраного сценарію. Вибір сценарію зберігається.
+- Дванадцять викликів показуються у перемішаному порядку без повтору до проходження колоди. Викладач може змінити текст поточного виклику або повернути його початковий варіант.
+- Сценарій, вікова група, порядок викликів, ручні правки й стан таймера зберігаються через `SafeStorage`, якщо він доступний. Це окремий стан викладача; не замінюйте його станом учнівської моделі або новими типовими значеннями під час оновлення UI.
+- Таймер не запускається сам. Він рахує до 60 хвилин від часової позначки, може бути призупинений або скинутий і продовжує відлік, коли панель закрита. Він відображає час заняття, а не час слайсера чи принтера.
+- Escape, кнопки закриття й натискання на фон закривають діалог. Фокус повертається до елемента, з якого його відкрили; блокування прокрутки сторінки відновлюється.
 
-The stylesheet and script are standalone assets. The host page remains responsible for adding the stylesheet, script tag, and topbar button.
+Планувальник не створює нових пресетів і не змінює вручну внесені записи у проєкті: нотатка зі слайсера та поля паспорта деталі залишаються окремими записами викладача. Для оцінок слайсера дивіться [відповідну пам’ятку](SLICER_PROFILES.md).
