@@ -36,6 +36,7 @@
     }
   };
 
+  // Reuse geometries only while constructing a model; its meshes own references after build.
   const geoCache = new Map();
   const getGeo = (w, h, d) => {
     const key = `${w}_${h}_${d}`;
@@ -72,11 +73,15 @@
 
     build3D(params) {
       geoCache.clear();
-      const submode = params.submode || 'catapult'; // 'catapult' або 'balancer'
-      if (submode === 'balancer') {
-        return this.buildBalancer(params);
+      try {
+        const submode = params.submode || 'catapult'; // 'catapult' або 'balancer'
+        if (submode === 'balancer') {
+          return this.buildBalancer(params);
+        }
+        return this.buildCatapult(params);
+      } finally {
+        geoCache.clear();
       }
-      return this.buildCatapult(params);
     }
 
     // =========================================================================
@@ -397,8 +402,10 @@
 
       // Створюємо снаряд для польоту на екрані (не експортується в .STL)
       const pSize = PH_CONFIG.DEMO.PROJECTILE_SIZE;
-      geoCache.delete(`${pSize}_${pSize}_${pSize}`);
+      const projectileCacheKey = `${pSize}_${pSize}_${pSize}`;
+      geoCache.delete(projectileCacheKey);
       const projGeo = getGeo(pSize, pSize, pSize);
+      geoCache.delete(projectileCacheKey);
       const projMat = new THREE.MeshStandardMaterial({
         color: 0xef4444,
         emissive: 0xdc2626,

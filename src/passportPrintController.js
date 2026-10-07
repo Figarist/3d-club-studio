@@ -1,5 +1,18 @@
 // Контролер генерації інженерного паспорта деталі для черги 3D-друку (Anycubic i3 Mega, HiDPI/Retina 2x Canvas, Друк, Буфер обміну)
 (function () {
+  const getPixelGridGroups = (activeTab, snapshot, mcGen) => {
+    if (activeTab !== 'minecraft') return null;
+    const source = snapshot || mcGen?.lastConnectivity;
+    if (!source) return null;
+    if (Number(source.activeCount) === 0) return 0;
+    const count = Number(source.gridGroups ?? source.islands ?? source.finalIslands);
+    return Number.isFinite(count) && count >= 0 ? count : null;
+  };
+
+  const formatPixelGridGroups = (count) => count === null
+    ? 'Не перевірено для цього режиму'
+    : `Групи клітинок у редакторі (4-сусідність): ${count}`;
+
   class PassportPrintController {
     constructor() {
       this.selectedVersion = 'V2';
@@ -66,26 +79,24 @@
 
       // Габарити
       const d = isV1 ? snap.dimensions : (options.sceneManager?.dimensions || { x: 0, y: 0, z: 0 });
+      const activeTab = isV1 ? snap.activeTab : options.activeTab;
       if (dom.pCardDims) {
         dom.pCardDims.textContent = `${d.x} × ${d.y} × ${d.z} мм`;
       }
 
-      // Зв'язність
-      const conn = isV1 ? { finalIslands: snap.islands } : (options.mcGen?.lastConnectivity || { finalIslands: 1 });
+      // Кількість 4-сусідніх груп редактора не перевіряє STL-меш або придатність до друку.
+      const gridGroups = getPixelGridGroups(activeTab, snap, options.mcGen);
       if (dom.pCardConn) {
-        if (conn.finalIslands === 1) {
-          dom.pCardConn.textContent = '✅ 1 суцільна деталь (без розривів)';
-          dom.pCardConn.className = 'status-good';
-        } else {
-          dom.pCardConn.textContent = `🚨 ${conn.finalIslands} розірваних частин`;
-          dom.pCardConn.className = 'status-bad';
-        }
+        dom.pCardConn.textContent = formatPixelGridGroups(gridGroups);
+        dom.pCardConn.className = '';
       }
 
       // Підкладка
       const baseOn = isV1 ? snap.solidBase : !!(dom.mcSolidBase?.checked);
       if (dom.pCardBase) {
-        dom.pCardBase.textContent = baseOn ? 'Увімкнено (1.0 мм шар)' : 'Без підкладки';
+        dom.pCardBase.textContent = activeTab === 'minecraft'
+          ? (baseOn ? 'Увімкнено (1.0 мм шар)' : 'Без підкладки')
+          : 'Не застосовується для цього режиму';
       }
 
       // Специфічний параметр
@@ -159,7 +170,8 @@
       const pairCode = dom.cardPairInput?.value?.trim() || this.getPairCode() || 'Пара #___';
       const mission = options.mission;
       const d = isV1 ? snap.dimensions : (options.sceneManager?.dimensions || { x: 0, y: 0, z: 0 });
-      const conn = isV1 ? { finalIslands: snap.islands } : (options.mcGen?.lastConnectivity || { finalIslands: 1 });
+      const activeTab = isV1 ? snap.activeTab : options.activeTab;
+      const gridGroups = getPixelGridGroups(activeTab, snap, options.mcGen);
       const verLabel = isV1 ? 'V1 (Ескіз)' : 'V2 (Фінал)';
       const filename = (options.filename || 'model.stl').replace(/\.stl$/i, isV1 ? '_V1.stl' : '_V2.stl');
       const checks = options.checks || {};
@@ -252,12 +264,14 @@
         ctx.fillText(`🗺️ Місія: #${mission ? mission.id : 0} ${mission ? mission.title.slice(0, 28) : 'Вільне моделювання'}`, 382, 246);
         ctx.fillText(`📏 Габарити: ${d.x} × ${d.y} × ${d.z} мм`, 382, 274);
 
-        const connText = conn.finalIslands === 1 ? '✅ 1 суцільна деталь (готовність 100%)' : `🚨 ${conn.finalIslands} окремих острівців`;
-        ctx.fillStyle = conn.finalIslands === 1 ? '#047857' : '#b91c1c';
-        ctx.fillText(`🧩 Зв'язність: ${connText}`, 382, 302);
+        ctx.fillStyle = '#334155';
+        ctx.fillText(`🧩 ${formatPixelGridGroups(gridGroups)}`, 382, 302);
 
         ctx.fillStyle = '#334155';
-        ctx.fillText(`🪨 Підкладка: ${dom.mcSolidBase?.checked ? 'Увімкнено (1.0 мм шар)' : 'Без підкладки'}`, 382, 330);
+        const baseText = activeTab === 'minecraft'
+          ? (isV1 ? (snap.solidBase ? 'Увімкнено (1.0 мм шар)' : 'Без підкладки') : (dom.mcSolidBase?.checked ? 'Увімкнено (1.0 мм шар)' : 'Без підкладки'))
+          : 'Не застосовується для цього режиму';
+        ctx.fillText(`🪨 Підкладка: ${baseText}`, 382, 330);
 
         let customParamText = '';
         if (options.activeTab === 'minecraft') {
@@ -282,12 +296,14 @@
         ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
         ctx.fillText('✅ ЧЕК-ЛИСТ ВЗАЄМОПЕРЕВІРКИ (ПАРА: ДИЗАЙНЕР + КОНТРОЛЕР ЯКОСТІ)', 56, 442);
 
-        const chk1 = checks.connected ? '[X] Зв\'язність: усі частини з\'єднані в одну міцну деталь' : '[ ] Зв\'язність: потребує з\'єднання або суцільної підкладки';
+        const chk1 = activeTab === 'minecraft'
+          ? (checks.connected ? '[X] Суміжність пікселів переглянуто в редакторі' : '[ ] Перевірте суміжність пікселів у редакторі')
+          : '[ ] Зв\'язність 3D-сітки не перевірена';
         const chk2 = checks.mono ? '[X] Монохром: перевірено в режимі «1 Пластик», рельєф читається' : '[ ] Монохром: огляд в 1 кольорі ще не пройдено';
         const chk3 = checks.size ? '[X] Габарити: розмір вкладається у норму столу та час уроку' : '[ ] Габарити: розмір перевірити перед слайсером';
 
         ctx.font = '13px system-ui, -apple-system, sans-serif';
-        ctx.fillStyle = checks.connected ? '#047857' : '#64748b';
+        ctx.fillStyle = checks.connected && activeTab === 'minecraft' ? '#047857' : '#64748b';
         ctx.fillText(chk1, 56, 470);
         ctx.fillStyle = checks.mono ? '#047857' : '#64748b';
         ctx.fillText(chk2, 56, 496);

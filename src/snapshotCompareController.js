@@ -1,5 +1,17 @@
 // Контролер фіксації ескізу (V1), аналітичного порівняння поступу (V1 ↔ V2) та дельти метрик
 (function () {
+  const getPixelGridGroups = (snapshot) => {
+    if (!snapshot || snapshot.activeTab !== 'minecraft') return null;
+    if (Number(snapshot.activeCount) === 0) return 0;
+    const count = Number(snapshot.gridGroups ?? snapshot.islands);
+    return Number.isFinite(count) && count >= 0 ? count : null;
+  };
+
+  const getSlicerRecord = (snapshot) => {
+    const value = snapshot && typeof snapshot.slicerRecord === 'string' ? snapshot.slicerRecord : '';
+    return value.trim() ? value : '';
+  };
+
   class SnapshotCompareController {
     constructor() {
       this.v1Snapshot = null;
@@ -34,10 +46,7 @@
       const d = sceneManager.dimensions || { x: 0, y: 0, z: 0 };
       const conn = mcGen?.lastConnectivity || { finalIslands: 1, rawIslands: 1, activeCount: 0 };
       const date = new Date();
-
-      const rawMinutesStr = slicerTimeInput?.value?.trim();
-      const fallbackMinutes = d.z > 0 ? Math.ceil(d.x * d.y * d.z / 180) : 15;
-      const parsedMinutes = parseInt(rawMinutesStr, 10) || fallbackMinutes;
+      const slicerRecord = typeof slicerTimeInput?.value === 'string' ? slicerTimeInput.value : '';
 
       this.v1Snapshot = {
         capturedAt: date.toISOString(),
@@ -47,11 +56,12 @@
         missionId: mission ? mission.id : 1,
         missionTitle: mission ? mission.title : 'Вільне моделювання',
         dimensions: { x: d.x, y: d.y, z: d.z },
+        gridGroups: activeTab === 'minecraft' ? (conn.activeCount > 0 ? conn.finalIslands : 0) : null,
         islands: conn.finalIslands || 1,
         rawIslands: conn.rawIslands || 1,
         activeCount: conn.activeCount || 0,
         solidBase: !!(document.getElementById('mc-solid-base')?.checked),
-        estimatedMinutes: parsedMinutes
+        slicerRecord
       };
 
       if (!silent && window.StudioSound) {
@@ -71,19 +81,14 @@
       const dy = Math.round((d2.y - d1.y) * 10) / 10;
       const dz = Math.round((d2.z - d1.z) * 10) / 10;
 
-      const islands1 = v1.islands || 1;
-      const islands2 = v2.islands || 1;
-      const islandsDelta = islands2 - islands1;
-
-      const time1 = v1.estimatedMinutes || 15;
-      const time2 = v2.estimatedMinutes || 15;
-      const timeDelta = time2 - time1;
-      const timePct = time1 > 0 ? Math.round(((time2 - time1) / time1) * 100) : 0;
+      const gridGroups1 = getPixelGridGroups(v1);
+      const gridGroups2 = getPixelGridGroups(v2);
 
       return {
         dims: { dx, dy, dz },
-        islands: { v1: islands1, v2: islands2, delta: islandsDelta },
-        time: { v1: time1, v2: time2, delta: timeDelta, pct: timePct },
+        gridGroups: gridGroups1 === null || gridGroups2 === null
+          ? null
+          : { v1: gridGroups1, v2: gridGroups2, delta: gridGroups2 - gridGroups1 },
         solidBase: { v1: !!v1.solidBase, v2: !!v2.solidBase }
       };
     }
@@ -111,82 +116,70 @@
       const v2Thumb = sceneManager?.renderer?.domElement?.toDataURL('image/png') || '';
       const d2 = sceneManager?.dimensions || { x: 0, y: 0, z: 0 };
       const conn2 = mcGen?.lastConnectivity || { finalIslands: 1, rawIslands: 1, activeCount: 0 };
-      const rawMinStr = dom.slicerTimeInput?.value?.trim();
-      const fallbackMin2 = d2.z > 0 ? Math.ceil(d2.x * d2.y * d2.z / 180) : 15;
-      const v2Minutes = parseInt(rawMinStr, 10) || fallbackMin2;
+      const slicerRecord = typeof dom.slicerTimeInput?.value === 'string' ? dom.slicerTimeInput.value : '';
 
       const v2State = {
         dimensions: { x: d2.x, y: d2.y, z: d2.z },
+        activeTab,
+        gridGroups: activeTab === 'minecraft' ? (conn2.activeCount > 0 ? conn2.finalIslands : 0) : null,
         islands: conn2.finalIslands || 1,
-        estimatedMinutes: v2Minutes,
-        solidBase: !!(dom.mcSolidBase?.checked)
+        solidBase: activeTab === 'minecraft' ? !!(dom.mcSolidBase?.checked) : null,
+        slicerRecord
       };
 
       const now = new Date();
       const v2Time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       const delta = this.calculateDelta(v1, v2State);
 
+      const renderMetrics = (container, snapshot) => {
+        const dimensions = snapshot.dimensions || { x: 0, y: 0, z: 0 };
+        const gridGroups = getPixelGridGroups(snapshot);
+        const gridGroupsRow = gridGroups === null
+          ? ''
+          : `<div class="metric-row"><span>🧩 Групи клітинок у редакторі:</span><b class="num-tabular">${gridGroups}</b></div>`;
+        const baseRow = snapshot.activeTab === 'minecraft'
+          ? `<div class="metric-row"><span>🪨 Підкладка в редакторі:</span><b>${snapshot.solidBase ? 'Увімкнено' : 'Вимкнено'}</b></div>`
+          : '';
+
+        container.innerHTML = `
+          <div class="metric-row"><span>📐 Габарити:</span><b class="num-tabular">${dimensions.x} × ${dimensions.y} × ${dimensions.z} мм</b></div>
+          ${gridGroupsRow}
+          ${baseRow}
+          <div class="metric-row"><span>⏱️ Запис зі слайсера:</span><b class="num-tabular" data-slicer-record></b></div>
+        `;
+        const recordNode = container.querySelector('[data-slicer-record]');
+        if (recordNode) recordNode.textContent = getSlicerRecord(snapshot) || 'Не записано';
+      };
+
       // Оновлення V1 картки
       if (dom.v1PreviewImg) dom.v1PreviewImg.src = v1.thumbnail;
       if (dom.v1Timestamp) dom.v1Timestamp.textContent = `Зафіксовано: ${v1.displayTime}`;
       if (dom.v1Metrics) {
-        const d1 = v1.dimensions || { x: 0, y: 0, z: 0 };
-        dom.v1Metrics.innerHTML = `
-          <div class="metric-row"><span>📐 Габарити:</span><b class="num-tabular">${d1.x} × ${d1.y} × ${d1.z} мм</b></div>
-          <div class="metric-row"><span>🧩 Зв'язність:</span><b class="${v1.islands > 1 ? 'metric-bad' : 'metric-good'}">${v1.islands} ${v1.islands > 1 ? '🚨 (окремі частини)' : '✅ (1 деталь)'}</b></div>
-          <div class="metric-row"><span>🪨 Підкладка:</span><b>${v1.solidBase ? 'Увімкнено' : 'Вимкнено'}</b></div>
-          <div class="metric-row"><span>⏱️ Час друку:</span><b class="num-tabular">~${v1.estimatedMinutes} хв</b></div>
-        `;
+        renderMetrics(dom.v1Metrics, v1);
       }
 
       // Оновлення V2 картки
       if (dom.v2PreviewImg) dom.v2PreviewImg.src = v2Thumb;
       if (dom.v2Timestamp) dom.v2Timestamp.textContent = `Поточний стан: ${v2Time}`;
       if (dom.v2Metrics) {
-        const isOk = v2State.islands === 1;
-        dom.v2Metrics.innerHTML = `
-          <div class="metric-row"><span>📐 Габарити:</span><b class="num-tabular">${d2.x} × ${d2.y} × ${d2.z} мм</b></div>
-          <div class="metric-row"><span>🧩 Зв'язність:</span><b class="${isOk ? 'metric-good' : 'metric-bad'}">${v2State.islands} ${isOk ? '✅ (1 суцільна деталь)' : '🚨 (' + v2State.islands + ' розривів)'}</b></div>
-          <div class="metric-row"><span>🪨 Підкладка:</span><b>${v2State.solidBase ? 'Увімкнено' : 'Вимкнено'}</b></div>
-          <div class="metric-row"><span>⏱️ Час друку:</span><b class="num-tabular">~${v2Minutes} хв</b></div>
-        `;
+        renderMetrics(dom.v2Metrics, v2State);
       }
 
       // Дельта-банер поступу
       if (dom.compareSummaryBanner && delta) {
-        let badgeClass = 'banner-good';
-        let headline = '';
-        let deltaBadges = [];
+        const deltaBadges = [];
 
-        // Острови
-        if (delta.islands.v1 > 1 && delta.islands.v2 === 1) {
-          headline = `🎉 <b>Інженерний успіх:</b> У V1 було ${delta.islands.v1} розірваних острівців, а у V2 модель об'єднана в <b>1 суцільну надійну деталь</b>!`;
-          badgeClass = 'banner-success';
-          deltaBadges.push(`<span class="delta-chip chip-success">🧩 Острови: ${delta.islands.v1} 🚨 → 1 ✅ (-${delta.islands.v1 - 1})</span>`);
-        } else if (delta.islands.v2 === 1) {
-          headline = `✅ <b>Готово до друку:</b> Виріб суцільний, геометрія монолітна, без відірваних елементів.`;
-          badgeClass = 'banner-good';
-          deltaBadges.push(`<span class="delta-chip chip-good">🧩 Острови: 1 ✅</span>`);
-        } else {
-          headline = `⚠️ <b>Потрібне доопрацювання:</b> У моделі V2 лишається ${delta.islands.v2} розірваних острівців. Увімкніть підкладку або з'єднайте пікселі перед відправкою до слайсера.`;
-          badgeClass = 'banner-warn';
-          deltaBadges.push(`<span class="delta-chip chip-warn">🧩 Острови: ${delta.islands.v2} 🚨</span>`);
-        }
-
-        // Час друку
-        if (delta.time.delta !== 0) {
-          const sign = delta.time.delta > 0 ? '+' : '';
-          const chipClass = delta.time.delta < 0 ? 'chip-good' : 'chip-neutral';
-          deltaBadges.push(`<span class="delta-chip ${chipClass}">⏱️ Час: ${delta.time.v1} хв → ${delta.time.v2} хв (${sign}${delta.time.pct}%)</span>`);
+        if (delta.gridGroups) {
+          deltaBadges.push(`<span class="delta-chip chip-neutral">🧩 Групи клітинок у редакторі: ${delta.gridGroups.v1} → ${delta.gridGroups.v2}</span>`);
         }
 
         // Габарити
         const dimStr = `Δ: ${delta.dims.dx >= 0 ? '+' : ''}${delta.dims.dx} × ${delta.dims.dy >= 0 ? '+' : ''}${delta.dims.dy} × ${delta.dims.dz >= 0 ? '+' : ''}${delta.dims.dz} мм`;
         deltaBadges.push(`<span class="delta-chip chip-neutral">📐 ${dimStr}</span>`);
 
-        dom.compareSummaryBanner.className = `compare-summary-banner ${badgeClass}`;
+        dom.compareSummaryBanner.className = 'compare-summary-banner';
         dom.compareSummaryBanner.innerHTML = `
-          <div class="summary-headline">${headline}</div>
+          <div class="summary-headline">Порівняння параметрів знімків V1 і V2</div>
           <div class="summary-chips-row">${deltaBadges.join(' ')}</div>
         `;
       }
