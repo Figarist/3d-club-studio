@@ -1,0 +1,155 @@
+{
+  "sourceRevision": "3df6a40",
+  "sourceHashes": {
+    "index.html": "09d14e33e51b43faeb58363628d80dab515e49437e2901233b9467554c44fe69",
+    "styles.css": "6f4008fb6a0379b7f7c2e76bf095ef50d28b0c7cd7cbe667d894f72a23fa9c11",
+    "src/app.js": "6fd4fd10d93682c831040937500d3d3faf9966eaaa5d67c67769c971b7db446a",
+    "src/sceneManager.js": "e07e983345102d5bfbdf749b3fbc0ee976fc4ebe554891fa450c9dbb47024b86",
+    "src/projectState.js": "b5969625a513785b314333c43732980bc138afffcbbc1d99985062e0106195a6",
+    "src/contentRegistry.js": "540a3a425a48a2e7faec433a6a761ecdec0582f2407c621c2a7d05729094000d",
+    "src/missionManager.js": "9e15116c68c7d742bc44409bd6dbd044392238177e1e3a33d28a9d9058038486",
+    "src/generators/minecraftForge.js": "a394b814f20619dc8679abd2e914b696e0a48b0e10b45c1addc5fb4508a799c6",
+    "src/generators/dualIllusion.js": "256966d0336e45731e6cd6535f72b59ec0ca3b7eea007aacc9633c512338bf18",
+    "src/generators/physicsMechanics.js": "10fccc1ad48192d0ca2e597708e0d8a31812399173d464913538ef5fa1cb7c46",
+    "src/generators/mobMutator.js": "27fba04b405af4c1f25baf0788a0f8359331d3f19cf43853ed320f917f050175",
+    "src/content/adventurePack.js": "7f4d4cd6888bd1cfd7aeaaf853eab29aa3b0c096b186b4b4c493064c72277a3f",
+    "src/content/funReliefs.js": "facfdc04fc339929ed48e479eb626432997a41a7be9540ca06a005a65dd9daff",
+    "src/content/funDiscoveries.js": "b0838ce976eabf9994fd8e67446ec826b656009e45d5a8163d047190bb442577",
+    "src/content/funEngineering.js": "a2b5f117ac699f32038a3f18e44cbb13113ca542011d419616f4c5d4f480c8ab"
+  },
+  "modelKey": "iron_mole",
+  "config": {
+    "tab": "mob",
+    "controls": {
+      "mobArchetype": "golem",
+      "mobHeadScale": "1.10",
+      "mobBodyBulk": "1.10",
+      "mobEyeType": "two",
+      "mobHeadgear": "none",
+      "mobBackgear": "none",
+      "mobWeapon": "sword",
+      "mobName": "",
+      "mobTinkercadBlank": false,
+      "mobDesign": "iron_mole"
+    }
+  },
+  "exactObservedControls": {
+    "mobArchetype": "golem",
+    "mobHeadScale": "1.1",
+    "mobBodyBulk": "1.1",
+    "mobEyeType": "two",
+    "mobHeadgear": "none",
+    "mobBackgear": "none",
+    "mobWeapon": "sword",
+    "mobName": "",
+    "mobTinkercadBlank": false,
+    "mobDesign": "iron_mole"
+  },
+  "ignoredByGenerator": [
+    "mobArchetype",
+    "mobHeadgear",
+    "mobBackgear",
+    "mobWeapon",
+    "mobName"
+  ],
+  "viewport": {
+    "width": 1366,
+    "height": 768
+  },
+  "bounds": {
+    "x": 54,
+    "y": 47.7,
+    "z": 28,
+    "fitsBed": true,
+    "safeBed": true,
+    "isMini": false
+  },
+  "selection": [
+    {
+      "kind": "mission",
+      "key": "studio-fun-discoveries:character-iron-mole",
+      "id": 151
+    }
+  ],
+  "screenshots": [
+    {
+      "view": "color",
+      "path": "docs/evidence/fun-content/iron_mole/color.jpg",
+      "monochrome": false,
+      "projection": "orthographic",
+      "camera": {
+        "radius": 116.96796213069004,
+        "theta": 0.7853981633974472,
+        "phi": 0.9553166181245083,
+        "target": {
+          "x": 0,
+          "y": 14.024308949799597,
+          "z": 0
+        }
+      },
+      "bounds": {
+        "x": 54,
+        "y": 47.7,
+        "z": 28,
+        "fitsBed": true,
+        "safeBed": true,
+        "isMini": false
+      }
+    },
+    {
+      "view": "mono",
+      "path": "docs/evidence/fun-content/iron_mole/mono.jpg",
+      "monochrome": true,
+      "projection": "orthographic",
+      "camera": {
+        "radius": 116.95027655175444,
+        "theta": 0.7853981633974473,
+        "phi": 0.9553166181245084,
+        "target": {
+          "x": 0,
+          "y": 14.021800665778635,
+          "z": 0
+        }
+      },
+      "bounds": {
+        "x": 54,
+        "y": 47.7,
+        "z": 28,
+        "fitsBed": true,
+        "safeBed": true,
+        "isMini": false
+      }
+    },
+    {
+      "view": "action",
+      "path": "docs/evidence/fun-content/iron_mole/action.jpg",
+      "monochrome": true,
+      "projection": "orthographic",
+      "camera": {
+        "radius": 118.87955997639715,
+        "theta": 1.5700295880815986,
+        "phi": 1.5691964458642673,
+        "target": {
+          "x": 0,
+          "y": 14.487694946277495,
+          "z": 0
+        }
+      },
+      "bounds": {
+        "x": 54,
+        "y": 49.2,
+        "z": 28.9,
+        "fitsBed": true,
+        "safeBed": true,
+        "isMini": false
+      }
+    }
+  ],
+  "interaction": {
+    "action": "Actual head-scale slider keyboard input",
+    "before": "1.1",
+    "after": "1.2",
+    "result": "Head proportions changed in the actual rendered model.",
+    "retry": "Actual Undo restored the original editable model state."
+  }
+}

@@ -1,44 +1,82 @@
-# Fun content review — work in progress
+# Single-color classroom content — 2026-10-07
 
-Baseline `ac5f5e1`, 2026-10-07. This document is a recovery checkpoint and
-does not certify a completed release. Source and originals remain uncommitted
-at this checkpoint. Final captures must be made against committed source.
+Implementation source: `3df6a40`, app 1.9.0, schema 1. The owner requested one
+last bounded packet and task closure to conserve usage. The implementation is
+available; full visual release acceptance is **incomplete**, not silently waived.
 
-Owner priority: a single-color Anycubic i3 Mega. Recognizability depends on
-geometry, relief and silhouette. Colors are secondary preview only. New
-mission selection starts in one-plastic mode; saved child projects retain
-their own monochrome setting.
+## Implemented scope
 
-## Main visual review checkpoints
+| Family | New authored models |
+|---|---:|
+| Reliefs and useful artifacts | 20 |
+| Characters and creatures | 12 |
+| Optical discoveries | 8 |
+| Playful engineering | 8 |
+| Total | 48 |
 
-| Entry | Observation from actual local HTTP UI | Verdict |
+All 72 missions are accessible through the catalog, with search, theme and family
+filters. New missions start in one-plastic mode. Imports retain child grids and
+the saved monochrome preference; three optional design fields default to classic.
+Fixed mission IDs, stable model keys and atomic registration remain the boundary.
+
+The catapult has a readable cup, arm and curved spring with cleaned surface joins.
+Engineering adds three launchers, two bridges and three balance creatures with
+screen results and retry. These are demonstrations, not physical simulations.
+Optional printed ammo remains exportable; resting cues, flight and targets are
+excluded from STL. Export resets the demonstration to the resting configuration.
+Classic characters gained role silhouettes. The slot calibrator keeps its four
+gaps, with smaller labels and a movable raised comparison marker. Unused custom
+controls are hidden. No runtime package or external asset was added.
+
+## Final original evidence
+
+[Offline gallery](evidence/fun-content/gallery.html) ·
+[Machine manifest](../verification/content-evidence/manifest.json)
+
+The manifest contains **101 distinct finite configurations**, including retained
+starters, exact mission aliases and eight alternative optical arrangements.
+Only **4/101** have complete final capture and main review; **97** are pending
+under the owner's stop instruction. No complete-coverage claim is made.
+
+| Model key | Main review | Actual UI action |
 |---|---|---|
-| Baseline catapult | Stripes at spring/base and arm/support; oversized ТАНК competes with mechanism; separate ammo block | REWORK |
-| ID101 funrelief_compass_treasure_map | After X repair, mono iso/top show compass cross, winding path and distinct X; no observed surface stripes | PASS for slice grammar; final source-revision captures pending |
-| ID151 iron_mole | Mono iso/color/side show large cuboid body, small face, chimney tail; no clear digging snout | REWORK; owner worker repairing |
-| ID163 mountain_boat | Actual ortho mono front/side show two stepped towers; sailboat not recognizable | REWORK; optical geometry under redesign |
+| funrelief_compass_treasure_map | PASS, 3 originals | Brush/cell edit; raised cell visible; Undo restored grid |
+| iron_mole | PASS, 3 originals | Head-scale slider changed proportions; Undo restored state |
+| mountain_boat | PASS, 3 originals | Reveal button changed front peaks to side sail/mast/hull |
+| ballista_bow | PASS, 4 originals | Launch showed a target hit; reset cleared demo effects |
 
-Capture/setup evidence: first browser reload retained old JS. Readback confirmed
-toneMapping 0 / mono roughness .52 before cache disabling, then 2 / .9 after.
-An initial 5-second scene-settle wait was INDETERMINATE. It completed its bounded
-wait and stopped; no process was killed. Source inspection identified per-frame
-camera damping and slow animation accumulation. Camera/pop now use elapsed frame
-time; the repaired focused settle observation succeeded. Previous captures are
-drafts and are not final release evidence.
+All 13 originals are unretouched browser JPEGs at 1366×768. Main opened every
+view. Records include observed controls, ignored parameters, camera/projection,
+bounds, source hashes and actual interaction results. Revision/hashes match the
+implementation source. Earlier 1.8.2 baseline/draft images are historical only.
 
-Actual mono clicks also exposed a missing `StudioSound.playMonoSwitch` method,
-which threw before autosave. The handler now uses the supported optional playPop.
-The separate checkbox feedback used another missing method and was repaired too.
+Earlier slice reviews requested repairs to the mole, optical silhouettes,
+ammonite coil and seven-star constellation. Those source repairs were made;
+ammonite/constellation final recapture remains pending. At least 16 new entries
+have explicit reveal/launch/balance/bridge loops in source, but **12-entry actual
+UI interaction coverage is not established**. Child enjoyment is **Not verified**.
 
-## Remaining required work
+## Focused verification and limits
 
-Complete 20 reliefs, 12 characters, 8 optical and 8 engineering entries; review
-repaired catapult and all weak retained finite configurations. Add the final
-machine-readable manifest and offline gallery, three original views per entry
-plus resting/action proof for interactive entries. Verify >=12 interactions,
-schema/selection/undo/reload/reset, desktop/tablet layout and focused export.
-Commit owned units, push origin/main, capture committed source and check coverage.
+- Earlier focused checks passed 15 legacy/schema cases and 10 registry scenarios.
+- New configuration roundtrips passed in 20/20/8-case batches.
+- Four representative binary exports passed record length, triangle counts,
+  finite coordinates, bottom Z=0 and exclusion of screen-only effects.
+- Workers reported bounded authored-grid, silhouette/bounds and demo checks;
+  these are source execution, not browser or physical evidence.
+- Final static gates passed syntax, local assets/dependency order, synchronized
+  release metadata and styles. The last four-model UI capture took 29.1 seconds.
+- Final UI had no console errors. The pre-review project was restored through
+  the real file chooser; viewport/cache overrides were cleared. Teacher state
+  was not changed.
 
-Physical spring reliability, force, durability, manifold/slicer acceptance and
-child enjoyment remain Not verified. Agent screenshot review is visual evidence,
-not physical or child/teacher testing.
+No full suite, stress/soak, new content wave or full-catalog screenshot run followed
+the owner's stop instruction. The retained physics cache verifier was adapted to
+scoped effects/persistent results but was not rerun afterward.
+`verify-content-evidence.cjs` remains a strict complete-release gate; it is not
+reported as passing while 97 configurations lack final evidence.
+
+Pending: remaining original captures/main review, complete interaction and
+compatibility UI coverage, current 1024×768 layout, direct-file launch, actual
+download readback, slicer/manifold acceptance and physical printing. Printed
+spring strength, force, durability and classroom outcomes are **Not verified**.

@@ -57,3 +57,11 @@ Acceptance requires 48 distinct new accessible entries, improved weak existing
 models, at least 12 meaningful interactions, all finite configurations covered,
 no unresolved REWORK, compatible old projects and confirmed pushed HEAD.
 Actual child enjoyment and physical printing are separate unverified gates.
+
+## Owner scope closure
+
+On 2026-10-07 the owner requested one last bounded packet, polishing and task
+closure to conserve usage. All 48 source entries were completed; final capture
+was limited to four representative models. Complete-catalog visual acceptance
+remains pending. FUN_CONTENT_REVIEW.md and the manifest distinguish implemented
+content, reviewed originals and deferred gates.
