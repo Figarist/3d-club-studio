@@ -236,7 +236,7 @@
       const savedPair = this.safeStorage.getItem('3d_kuznya_pair_code') || '';
       return {
         app: '3d-club-studio',
-        version: '1.8.0',
+        version: '1.8.1',
         savedAt: new Date().toISOString(),
         activeTab: this.activeTab,
         activeMissionId: this.missions.activeMissionId,
@@ -1184,6 +1184,7 @@
     }
 
     bindCameraControls() {
+      document.getElementById('btn-fit-model')?.addEventListener('click', () => this.sceneManager?.fitModelView());
       if (this.sceneManager) {
         this.sceneManager.onUserCameraInteraction = () => {
           document.querySelectorAll('[data-camera-view]').forEach(b => b.classList.remove('active-cam'));

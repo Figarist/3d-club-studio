@@ -26,6 +26,7 @@
         phi: Math.PI / 3,
         target: new THREE.Vector3(0, 18, 0)
       };
+      this._maxZoomRadius = 340;
 
       this.isDragging = false;
       this.isRightDrag = false;
@@ -281,7 +282,7 @@
 
       dom.addEventListener('wheel', (e) => {
         e.preventDefault();
-        this.targetSpherical.radius = Math.max(45, Math.min(340, this.targetSpherical.radius + e.deltaY * 0.12));
+        this.targetSpherical.radius = Math.max(45, Math.min(this._maxZoomRadius, this.targetSpherical.radius + e.deltaY * 0.12));
         if (this.onUserCameraInteraction) this.onUserCameraInteraction();
       }, { passive: false });
 
@@ -315,7 +316,7 @@
           const dy = e.touches[0].clientY - e.touches[1].clientY;
           const dist = Math.hypot(dx, dy);
           if (prevTouchDist > 0) {
-            this.targetSpherical.radius = Math.max(45, Math.min(340, this.targetSpherical.radius - (dist - prevTouchDist) * 0.45));
+            this.targetSpherical.radius = Math.max(45, Math.min(this._maxZoomRadius, this.targetSpherical.radius - (dist - prevTouchDist) * 0.45));
             if (this.onUserCameraInteraction) this.onUserCameraInteraction();
           }
           prevTouchDist = dist;
@@ -425,6 +426,39 @@
         this.targetSpherical.phi = this.isOrthographic ? Math.atan(Math.SQRT2) : (Math.PI / 3.0);
         this.targetSpherical.radius = 145;
       }
+    }
+
+    // Підігнати поточну модель до вікна, зберігши чинний ракурс камери.
+    fitModelView() {
+      if (!this.modelGroup || this.modelGroup.children.length === 0 || (!this.perspCamera && !this.orthoCamera)) {
+        return false;
+      }
+
+      // dimensions записуються до анімації появи, тож їхні межі не залежать від поточного pop-кадру.
+      const width = Math.max(0, Number(this.dimensions.x) || 0);
+      const depth = Math.max(0, Number(this.dimensions.y) || 0);
+      const height = Math.max(0, Number(this.dimensions.z) || 0);
+      if (width === 0 && depth === 0 && height === 0) return false;
+
+      const viewportWidth = (this.container && this.container.clientWidth) || this.cachedWidth || 800;
+      const viewportHeight = (this.container && this.container.clientHeight) || this.cachedHeight || 600;
+      const aspect = viewportWidth / Math.max(1, viewportHeight);
+      const verticalFov = THREE.MathUtils.degToRad(this.perspCamera ? this.perspCamera.fov : 42);
+      const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * aspect);
+      const limitingHalfFov = Math.max(0.01, Math.min(verticalFov, horizontalFov) / 2);
+      const halfDiagonal = Math.sqrt(width * width + depth * depth + height * height) / 2;
+      const fitScale = this.isOrthographic
+        ? 1 / Math.tan(limitingHalfFov)
+        : 1 / Math.sin(limitingHalfFov);
+      const fitRadius = Math.max(45, halfDiagonal * fitScale * 1.16);
+
+      // setModel() centers X/Z on the table and keeps the settled model bottom at Y=0.
+      this.targetSpherical.target.set(0, height / 2, 0);
+      this.targetSpherical.radius = fitRadius;
+      this._maxZoomRadius = Math.max(340, Math.ceil(fitRadius * 1.35));
+
+      if (this.onUserCameraInteraction) this.onUserCameraInteraction();
+      return true;
     }
 
 
