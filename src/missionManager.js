@@ -571,14 +571,18 @@
       const container = dom.missionsGrid;
       if (!container) return;
 
-      const list = this.missionFilter === 'all'
+      const categoryList = this.missionFilter === 'all'
         ? this.missions
         : this.missions.filter((m) => m.category === this.missionFilter);
+      const query = (this.catalogQuery || '').trim().toLocaleLowerCase('uk');
+      const list = categoryList.filter(m => (!this.catalogTheme || m.theme === this.catalogTheme) &&
+        (!query || [m.title, m.riddle, m.theme || '', m.generatorLabel].join(' ').toLocaleLowerCase('uk').includes(query)));
 
       container.innerHTML = '';
       list.forEach((m) => {
         const card = document.createElement('article');
         card.className = 'mission-card' + (m.id === this.activeMissionId ? ' active-mission' : '');
+        if (m.modelKey) card.dataset.modelKey = m.modelKey;
         card.innerHTML = `
           <div class="mission-card-inner">
             <div class="mission-card-header">
