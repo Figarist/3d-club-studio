@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="adventure-shelf.css" />
   <link rel="stylesheet" href="pixel-editor-tools.css" />
+  <link rel="stylesheet" href="lesson-companion.css" />
 </head>
 <body>
 
@@ -17,7 +18,7 @@
       <div class="brand-title">
         <div class="brand-title-row">
           <h1>3D КУЗНЯ ЧУДЕС</h1>
-          <span id="app-version-pill" class="version-pill" title="Версія програми: v1.7.0">v1.7.0</span>
+          <span id="app-version-pill" class="version-pill" title="Версія програми: v1.8.0">v1.8.0</span>
         </div>
         <p class="brand-subtitle">Minecraft &amp; Print-Safe 3D Генератор • Tinkercad / Makers Empire / 3D-Принтер</p>
       </div>
@@ -27,6 +28,9 @@
     <nav class="gen-tabs">
       <button id="btn-open-missions" class="gen-tab-btn btn-missions-tab" title="Відкрити каталог із 12 навчальних місій гуртка (2–6 класи)">
         🗺️ Місії гуртка (12)
+      </button>
+      <button id="btn-open-lesson" class="gen-tab-btn btn-missions-tab" title="План години, таймер та творчі виклики для гуртка">
+        ⏱️ Заняття
       </button>
       <button class="gen-tab-btn active" data-tab="minecraft">
         ⛏️ Майнкрафт-Кузня
@@ -616,8 +620,8 @@
         </div>
 
         <!-- Кутовий бейдж версії програми -->
-        <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • Версія v1.7.0 (повноцінний UI/UX редизайн карток і шаблонів, адаптивна шапка 1366px, виправлення звуку, ізометрії та ракурсів)">
-          ⚒️ v1.7.0
+        <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • Версія v1.8.0 (повноцінний UI/UX редизайн карток і шаблонів, адаптивна шапка 1366px, виправлення звуку, ізометрії та ракурсів)">
+          ⚒️ v1.8.0
         </div>
       </div>
     </section>
@@ -855,6 +859,7 @@
   <script src="src/content/adventurePack.js"></script>
   <script src="src/adventureShelf.js"></script>
   <script src="src/pixelEditorTools.js"></script>
+  <script src="src/lessonCompanion.js"></script>
   <script src="src/sceneManager.js"></script>
   <script src="src/app.js"></script>
 </body>
