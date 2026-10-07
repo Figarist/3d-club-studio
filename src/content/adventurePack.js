@@ -3,10 +3,11 @@
 (function () {
   'use strict';
 
+  const PACK_ID = 'studio-adventure-pack';
   const presets = window.MINECRAFT_PRESETS;
-  const missions = window.STUDIO_MISSIONS;
-  if (!presets || !Array.isArray(missions)) {
-    throw new Error('StudioAdventurePack requires MINECRAFT_PRESETS and STUDIO_MISSIONS.');
+  const registry = window.StudioContentRegistry;
+  if (!presets || !registry) {
+    throw new Error('StudioAdventurePack requires MINECRAFT_PRESETS and StudioContentRegistry.');
   }
 
   const SIZE = 16;
@@ -359,18 +360,19 @@
     }
   ];
 
+  const packPresets = Object.create(null);
   motifs.forEach((motif) => {
-    if (Object.prototype.hasOwnProperty.call(presets, motif.key)) {
-      throw new Error('Adventure preset key already exists: ' + motif.key);
+    if (Object.prototype.hasOwnProperty.call(packPresets, motif.key)) {
+      throw new Error('Adventure preset key is duplicated: ' + motif.key);
     }
-    presets[motif.key] = {
+    packPresets[motif.key] = {
       name: motif.name,
       isMiniPreset: true,
       recommendedParams: Object.assign({}, recommendedParams),
       colors: Object.assign({}, motif.colors),
       grid: buildGrid(motif.draw, motif.key),
       adventure: {
-        packId: 'studio-adventure-pack',
+        packId: PACK_ID,
         themeId: motif.themeId,
         themeLabel: motif.themeLabel,
         concept: motif.concept
@@ -389,7 +391,7 @@
 
   const missionSpecs = [
     {
-      key: 'adv_space_rocket', category: 'relief',
+      id: 13, key: 'adv_space_rocket', category: 'relief',
       title: '🚀 Рятувальна ракета',
       question: 'Яка ракета залишить зрозумілий знак для команди на далекій планеті?',
       starter: 'Зміни форму ілюмінатора та щонайменше три клітинки корпусу.',
@@ -398,7 +400,7 @@
       explain: 'Покажи, як широкий корпус і короткі крила тримаються разом у сітці.'
     },
     {
-      key: 'adv_space_rover', category: 'relief',
+      id: 14, key: 'adv_space_rover', category: 'relief',
       title: '🌙 Місяцехід для кам’яної долини',
       question: 'Як місяцехід може триматися на нерівній поверхні Місяця?',
       starter: 'Перемісти один датчик і зміни розташування щонайменше трьох клітинок коліс.',
@@ -407,7 +409,7 @@
       explain: 'Порівняй ширину опори й положення датчика на початковому та власному варіанті.'
     },
     {
-      key: 'adv_space_satellite', category: 'relief',
+      id: 15, key: 'adv_space_satellite', category: 'relief',
       title: '🛰️ Супутник для мапи сигналу',
       question: 'Які частини супутника збирають енергію, а які передають сигнал?',
       starter: 'Зміни візерунок обох сонячних крил і познач центральний приймач.',
@@ -416,7 +418,7 @@
       explain: 'Назви на моделі панелі, корпус і приймач; покажи, як вони торкаються.'
     },
     {
-      key: 'adv_space_comet', category: 'texture',
+      id: 16, key: 'adv_space_comet', category: 'texture',
       title: '☄️ Слід комети',
       question: 'Що допоможе відрізнити ядро комети від її довгого хвоста?',
       starter: 'Перебудуй щонайменше три клітинки хвоста та додай власний відблиск ядра.',
@@ -425,7 +427,7 @@
       explain: 'Розкажи, яка смуга або фактура передає рух, а яка підкреслює ядро.'
     },
     {
-      key: 'adv_nature_leaf', category: 'texture',
+      id: 17, key: 'adv_nature_leaf', category: 'texture',
       title: '🍃 Листок під лупою',
       question: 'Як жилки листка розходяться від середини до краю?',
       starter: 'Зміни центральну жилку та намалюй щонайменше дві бічні гілочки.',
@@ -434,7 +436,7 @@
       explain: 'Покажи центральну жилку та два місця, де вона підтримує візерунок.'
     },
     {
-      key: 'adv_nature_bee', category: 'texture',
+      id: 18, key: 'adv_nature_bee', category: 'texture',
       title: '🐝 Бджола на квітковому маршруті',
       question: 'Які позначки допоможуть упізнати запилювача на квітковому маршруті?',
       starter: 'Зміни порядок смуг і колір крил щонайменше в трьох клітинках.',
@@ -443,7 +445,7 @@
       explain: 'Назви ознаки запилювача, які ти передав формою або рельєфом.'
     },
     {
-      key: 'adv_nature_mountain', category: 'boardgame',
+      id: 19, key: 'adv_nature_mountain', category: 'boardgame',
       title: '🏔️ Карта гірської стежки',
       question: 'Як позначити снігову вершину та безпечну стежку на настільній мапі?',
       starter: 'Перемісти снігову шапку й познач щонайменше три клітинки стежки.',
@@ -452,7 +454,7 @@
       explain: 'Покажи, як висота й форма схилу відрізняють вершину від долини.'
     },
     {
-      key: 'adv_nature_mushroom', category: 'boardgame',
+      id: 20, key: 'adv_nature_mushroom', category: 'boardgame',
       title: '🍄 Маркер лісового пошуку',
       question: 'Яка ознака допоможе гравцям знайти гриб на карті лісу?',
       starter: 'Перероби плями на шапці та зміни щонайменше три клітинки.',
@@ -461,7 +463,7 @@
       explain: 'Поясни, як візерунок допомагає побачити гриб на ігровій мапі.'
     },
     {
-      key: 'adv_city_house', category: 'useful',
+      id: 21, key: 'adv_city_house', category: 'useful',
       title: '🏠 Знак дружнього будинку',
       question: 'Який знак на будинку легко помітити й прочитати з першого погляду?',
       starter: 'Зміни вікна, двері й щонайменше одну частину даху.',
@@ -470,7 +472,7 @@
       explain: 'Покажи корисну підказку на фасаді й поясни її призначення.'
     },
     {
-      key: 'adv_city_bridge', category: 'cardboard',
+      id: 22, key: 'adv_city_bridge', category: 'cardboard',
       title: '🌉 Міст для картонного міста',
       question: 'Де потрібні опори, щоб настил мосту мав шлях до берега?',
       starter: 'Зміни арку та щонайменше одну опору мосту.',
@@ -479,7 +481,7 @@
       explain: 'Поясни, як опори передають навантаження від настилу до землі.'
     },
     {
-      key: 'adv_city_turbine', category: 'cardboard',
+      id: 23, key: 'adv_city_turbine', category: 'cardboard',
       title: '🌬️ Вітрова турбіна району',
       question: 'Як три лопаті можуть торкатися маточини та залишатися однією моделлю?',
       starter: 'Перемісти одну лопать і зміни щонайменше три клітинки навколо маточини.',
@@ -488,7 +490,7 @@
       explain: 'Покажи маточину, лопаті й опору та назви їхні ролі.'
     },
     {
-      key: 'adv_city_sundial', category: 'optical',
+      id: 24, key: 'adv_city_sundial', category: 'optical',
       title: '☀️ Сонячний годинник світла й тіні',
       question: 'Куди впаде тінь, якщо сонячне світло прийде з іншого боку?',
       starter: 'Зміни напрям тіні та щонайменше три клітинки шкали.',
@@ -498,24 +500,22 @@
     }
   ];
 
-  const existingIds = missions.map((mission) => Number(mission.id)).filter(Number.isFinite);
-  const firstMissionId = Math.max(12, ...existingIds) + 1;
-  const missionIds = [];
-  const missionIdByPresetKey = Object.create(null);
-  missionSpecs.forEach((spec, index) => {
-    if (!Object.prototype.hasOwnProperty.call(presets, spec.key)) {
+  const missions = missionSpecs.map((spec) => {
+    if (!Object.prototype.hasOwnProperty.call(packPresets, spec.key)) {
       throw new Error('Adventure mission refers to a missing preset: ' + spec.key);
     }
-    const id = firstMissionId + index;
-    const mission = {
-      id,
+    return {
+      id: spec.id,
+      key: PACK_ID + ':' + spec.key,
+      packId: PACK_ID,
+      presetKey: spec.key,
       category: spec.category,
       categoryLabel: categoryLabels[spec.category],
       title: spec.title,
       targetSize: 'до 28,8 × 28,8 × 7,2 мм',
       generatorLabel: '⛏️ Майнкрафт-Кузня',
       targetTab: 'minecraft',
-      theme: presets[spec.key].adventure.themeLabel,
+      theme: packPresets[spec.key].adventure.themeLabel,
       riddle: spec.question,
       grade23: spec.starter + ' Початковий шаблон потрібно змінити власноруч.',
       grade46: spec.challenge + ' Обґрунтуй одне інженерне рішення.',
@@ -543,9 +543,17 @@
         }
       }
     };
-    missions.push(mission);
-    missionIds.push(id);
-    missionIdByPresetKey[spec.key] = id;
+  });
+
+  const registration = registry.registerPack({
+    id: PACK_ID,
+    presets: packPresets,
+    missions
+  }, { presetTarget: presets });
+  const missionIds = registration.missionIds;
+  const missionIdByPresetKey = Object.create(null);
+  missions.forEach((mission) => {
+    missionIdByPresetKey[mission.presetKey] = mission.id;
   });
 
   const presetKeys = motifs.map((motif) => motif.key);
@@ -567,7 +575,7 @@
 
   window.StudioAdventurePack = Object.freeze({
     metadata: Object.freeze({
-      id: 'studio-adventure-pack',
+      id: PACK_ID,
       version: '1.0.0',
       title: 'Експедиції: космос, природа й місто',
       summary: '12 авторських рельєфів і місій для дослідження, власних змін та перевірки геометрії.',
