@@ -2,6 +2,14 @@
 
 Цей документ детально описує інженерні рішення, математичні алгоритми побудови геометрії та внутрішню архітектуру веб-студії **«3D Кузня Чудес»**.
 
+Current ownership, schema/identity contracts and validation limits are recorded in
+[ARCHITECTURE_AUDIT.md](ARCHITECTURE_AUDIT.md) and [EXTENSIONS.md](EXTENSIONS.md)
+(2026-10-07, v1.8.2). Algorithm descriptions below describe intended construction;
+they do not establish manifold STL, physical durability or verified printer results.
+Only Minecraft owns grid/palette serialization; StudioApp owns the other controls.
+ContentRegistry, ProjectState and ModalFocus are local IIFE helpers loaded before
+the app. See `index.html` and AGENTS §3.2 for the exact dependency order.
+
 ---
 
 ## 1. Загальна Архітектура (Zero-Dependency Offline Design)
@@ -107,4 +115,6 @@ $$
 Щоб додати новий генератор (наприклад, *«Генератор Скринь»* або *«Генератор Космольотів»*):
 1. Створіть файл `src/generators/myNewGenerator.js` із класом, що має метод `build3D(params)` і повертає `THREE.Group`.
 2. Підключіть скрипт у `index.html` та додайте кнопку вкладки `.gen-tab-btn` і секцію налаштувань `.panel-section`.
-3. Викличте `this.myNewGen.build3D(...)` у методі `rebuildCurrentModel()` у файлі `src/app.js` — масштабування на столі принтера, анімація блоків, лазерна симуляція друку та експорт у `.STL` запрацюють автоматично!
+3. Instantiate the generator and map controls to `build3D` in `StudioApp.rebuildCurrentModel()`. Pass its group to SceneManager, which owns disposal, camera framing and binary triangle export.
+4. Extend serialization/restoration and ProjectState's allowed tabs/controls; add a mission-config adapter when needed. Update the module map and preserve old files.
+5. Verify the actual controls, undo/import, bounds and export separately. Scene handoff does not establish print readiness. Follow the bounded recipe in EXTENSIONS.
