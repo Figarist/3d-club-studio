@@ -4,6 +4,7 @@
     // === 4 РЕЛЬЄФИ ===
     {
       id: 1,
+      key: 'studio-core:mission-01',
       category: 'relief',
       categoryLabel: '🛡️ Рельєф (1/4)',
       title: '⚡ Паспорт таємного дослідника',
@@ -33,6 +34,7 @@
     },
     {
       id: 2,
+      key: 'studio-core:mission-02',
       category: 'relief',
       categoryLabel: '🛡️ Рельєф (2/4)',
       title: '🛡️ Герб космічної фортеці',
@@ -62,6 +64,7 @@
     },
     {
       id: 3,
+      key: 'studio-core:mission-03',
       category: 'relief',
       categoryLabel: '🛡️ Рельєф (3/4)',
       title: '⚔️ Артефакт світла й тіні',
@@ -91,6 +94,7 @@
     },
     {
       id: 4,
+      key: 'studio-core:mission-04',
       category: 'relief',
       categoryLabel: '🛡️ Рельєф (4/4)',
       title: '🔧 Інженерний ремонт (V1 → V2)',
@@ -122,6 +126,7 @@
     // === 2 ФАКТУРИ / СЛІДИ ===
     {
       id: 5,
+      key: 'studio-core:mission-05',
       category: 'texture',
       categoryLabel: '🐾 Фактури і сліди (1/2)',
       title: '🐾 Хто залишив цей слід?',
@@ -151,6 +156,7 @@
     },
     {
       id: 6,
+      key: 'studio-core:mission-06',
       category: 'texture',
       categoryLabel: '🐾 Фактури і сліди (2/2)',
       title: '🐚 Археологічна експедиція (Скам\'янілість)',
@@ -182,6 +188,7 @@
     // === 2 НАСТІЛЬНІ ІГРИ / ЖЕТОНИ ===
     {
       id: 7,
+      key: 'studio-core:mission-07',
       category: 'boardgame',
       categoryLabel: '🎲 Настільні ігри (1/2)',
       title: '🪙 Монета вигаданого міста',
@@ -211,6 +218,7 @@
     },
     {
       id: 8,
+      key: 'studio-core:mission-08',
       category: 'boardgame',
       categoryLabel: '🎲 Настільні ігри (2/2)',
       title: '🎲 Гра, якої ще не існувало (Жетон гравця)',
@@ -242,6 +250,7 @@
     // === 2 КОРИСНІ ДРІБНИЦІ ===
     {
       id: 9,
+      key: 'studio-core:mission-09',
       category: 'useful',
       categoryLabel: '🏷️ Корисна дрібниця (1/2)',
       title: '🏷️ Табличка-маркер для рослини чи коробки',
@@ -271,6 +280,7 @@
     },
     {
       id: 10,
+      key: 'studio-core:mission-10',
       category: 'useful',
       categoryLabel: '🏷️ Корисна дрібниця (2/2)',
       title: '🔑 Іменний брелок-ідентифікатор для рюкзака',
@@ -302,6 +312,7 @@
     // === 1 КАРТОННИЙ МЕГАПОЛІС ===
     {
       id: 11,
+      key: 'studio-core:mission-11',
       category: 'cardboard',
       categoryLabel: '🏙️ Картонний мегаполіс (1/1)',
       title: '🏙️ Місто майбутнього (Пазова підставка для картону)',
@@ -333,6 +344,7 @@
     // === 1 ОПТИЧНИЙ ЕКСПЕРИМЕНТ ===
     {
       id: 12,
+      key: 'studio-core:mission-12',
       category: 'optical',
       categoryLabel: '🔮 Оптичний експеримент (1/1)',
       title: '🔮 Одна річ — дві тіні (Секретний знак 0° / 90°)',
@@ -361,10 +373,18 @@
     }
   ];
 
+  const contentRegistry = window.StudioContentRegistry;
+  if (!contentRegistry) {
+    throw new Error('MissionManager requires src/contentRegistry.js to be loaded first.');
+  }
+  contentRegistry.registerBaseMissions(STUDIO_MISSIONS);
+
   class MissionManager {
     constructor(options = {}) {
-      this.missions = STUDIO_MISSIONS;
+      this.registry = contentRegistry;
+      this.missions = this.registry.missions;
       this.activeMissionId = options.initialMissionId || 1;
+      this.activeMissionKey = this.registry.getMissionKey(this.activeMissionId);
       this.missionFilter = 'all';
       this.missionChecks = { connected: false, mono: false, size: false };
       this.bodyCollapsed = false;
@@ -374,33 +394,39 @@
     }
 
     getActiveMission() {
-      return this.missions.find((m) => m.id === this.activeMissionId) || this.missions[0];
+      return this.registry.resolveMission(this.activeMissionKey || this.activeMissionId);
     }
 
     setMission(id, forceShow = false) {
-      const parsedId = parseInt(id, 10);
-      const found = this.missions.find((m) => m.id === parsedId);
-      if (found) {
-        this.activeMissionId = found.id;
-        this.missionChecks = { connected: false, mono: false, size: false };
-        if (forceShow) {
-          this.cardVisible = true;
-        }
-        if (typeof this.onMissionChange === 'function') {
-          this.onMissionChange(found);
-        }
+      const found = this.registry.resolveMission(id);
+      if (!found) return null;
+
+      this.activeMissionId = found.id;
+      this.activeMissionKey = found.key;
+      this.missionChecks = { connected: false, mono: false, size: false };
+      if (forceShow) {
+        this.cardVisible = true;
       }
-      return this.getActiveMission();
+      if (typeof this.onMissionChange === 'function') {
+        this.onMissionChange(found);
+      }
+      return found;
     }
 
     nextMission() {
-      const idx = this.missions.findIndex((m) => m.id === this.activeMissionId);
+      const current = this.getActiveMission();
+      if (!current) return null;
+      const idx = this.missions.indexOf(current);
+      if (idx < 0 || this.missions.length === 0) return null;
       const nextIdx = (idx + 1) % this.missions.length;
       return this.setMission(this.missions[nextIdx].id, true);
     }
 
     prevMission() {
-      const idx = this.missions.findIndex((m) => m.id === this.activeMissionId);
+      const current = this.getActiveMission();
+      if (!current) return null;
+      const idx = this.missions.indexOf(current);
+      if (idx < 0 || this.missions.length === 0) return null;
       const prevIdx = (idx - 1 + this.missions.length) % this.missions.length;
       return this.setMission(this.missions[prevIdx].id, true);
     }
@@ -441,6 +467,7 @@
     getState() {
       return {
         activeMissionId: this.activeMissionId,
+        activeMissionKey: this.activeMissionKey,
         missionChecks: Object.assign({}, this.missionChecks),
         cardVisible: this.cardVisible,
         bodyCollapsed: this.bodyCollapsed
@@ -448,10 +475,14 @@
     }
 
     applyState(state) {
-      if (!state) return;
-      if (state.activeMissionId) {
-        this.activeMissionId = parseInt(state.activeMissionId, 10) || 1;
-      }
+      if (!state || typeof state !== 'object') return false;
+      const hasStableKey = Object.prototype.hasOwnProperty.call(state, 'activeMissionKey');
+      const missionReference = hasStableKey ? state.activeMissionKey : state.activeMissionId;
+      const activeMission = missionReference === undefined ? this.getActiveMission() : this.registry.resolveMission(missionReference);
+      if (!activeMission) return false;
+
+      this.activeMissionId = activeMission.id;
+      this.activeMissionKey = activeMission.key;
       if (typeof state.cardVisible === 'boolean') {
         this.cardVisible = state.cardVisible;
       }
@@ -465,6 +496,7 @@
           size: !!state.missionChecks.size
         };
       }
+      return true;
     }
 
     updateActiveMissionUI(domCache) {
@@ -591,6 +623,6 @@
     }
   }
 
-  window.STUDIO_MISSIONS = STUDIO_MISSIONS;
+  window.STUDIO_MISSIONS = contentRegistry.missions;
   window.MissionManager = MissionManager;
 })();
