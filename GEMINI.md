@@ -4,11 +4,16 @@
 
 Детальні інженерні стандарти дивіться у [AGENTS.md](AGENTS.md).
 
+Current schema/identity and ownership contracts: [docs/EXTENSIONS.md](docs/EXTENSIONS.md).
+Use ContentRegistry for packs and ProjectState before applying imported JSON.
+Stage only owned paths. Verification evidence and deferred print/file-download
+gates are recorded in [docs/ARCHITECTURE_AUDIT.md](docs/ARCHITECTURE_AUDIT.md).
+
 ## ⚡ Обов'язкові Дії при завершенні кожної задачі
 1. **Завжди робити Git Commit & Push**:
    - Після виконання будь-яких правок чи фіч обов'язково виконати:
      ```bash
-     git add .
+     git add <owned-paths>
      git commit -m "..."
      git push origin main
      ```

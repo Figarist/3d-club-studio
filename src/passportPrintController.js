@@ -95,7 +95,7 @@
       const baseOn = isV1 ? snap.solidBase : !!(dom.mcSolidBase?.checked);
       if (dom.pCardBase) {
         dom.pCardBase.textContent = activeTab === 'minecraft'
-          ? (baseOn ? 'Увімкнено (1.0 мм шар)' : 'Без підкладки')
+          ? (baseOn ? 'Увімкнено (2.0 мм шар)' : 'Без підкладки')
           : 'Не застосовується для цього режиму';
       }
 
@@ -269,7 +269,7 @@
 
         ctx.fillStyle = '#334155';
         const baseText = activeTab === 'minecraft'
-          ? (isV1 ? (snap.solidBase ? 'Увімкнено (1.0 мм шар)' : 'Без підкладки') : (dom.mcSolidBase?.checked ? 'Увімкнено (1.0 мм шар)' : 'Без підкладки'))
+          ? (isV1 ? (snap.solidBase ? 'Увімкнено (2.0 мм шар)' : 'Без підкладки') : (dom.mcSolidBase?.checked ? 'Увімкнено (2.0 мм шар)' : 'Без підкладки'))
           : 'Не застосовується для цього режиму';
         ctx.fillText(`🪨 Підкладка: ${baseText}`, 382, 330);
 
@@ -344,7 +344,7 @@
         // Підвал
         ctx.fillStyle = '#94a3b8';
         ctx.font = '11px system-ui, -apple-system, sans-serif';
-        ctx.fillText('«3D Кузня Чудес v1.8.1» • 100% Автономна навчальна студія 3D-моделювання (2–6 класи)', 140, 1060);
+        ctx.fillText('«3D Кузня Чудес v1.8.2» • 100% Автономна навчальна студія 3D-моделювання (2–6 класи)', 140, 1060);
 
         callback(canvas);
       };

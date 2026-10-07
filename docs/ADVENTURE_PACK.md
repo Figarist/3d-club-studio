@@ -7,13 +7,14 @@ Adventure Pack adds twelve Ukrainian classroom missions and twelve matching 16×
 Load the module after both public registries have been created and before the app starts:
 
 ```html
+<script src="src/contentRegistry.js"></script>
 <script src="src/missionManager.js"></script>
 <script src="src/generators/minecraftForge.js"></script>
 <script src="src/content/adventurePack.js"></script>
 <script src="src/app.js"></script>
 ```
 
-The module mutates the existing `window.MINECRAFT_PRESETS` and `window.STUDIO_MISSIONS` objects. It exposes `window.StudioAdventurePack` with `metadata`, `presetKeys`, numeric `missionIds`, `missionIdByPresetKey`, and three `groups` records. With the current catalog, the new mission IDs are 13–24; if the catalog grows first, IDs are allocated after its highest numeric ID. Preset keys use the `adv_` prefix. It requires only browser JavaScript and the registries above; no network access, package, or build step is used.
+The module stages its data and calls `StudioContentRegistry.registerPack` once. The registry validates the complete pack before extending `window.MINECRAFT_PRESETS` and the ordered mission list exposed as `window.STUDIO_MISSIONS`. It exposes `window.StudioAdventurePack` with `metadata`, `presetKeys`, numeric `missionIds`, `missionIdByPresetKey`, and three `groups` records. Mission IDs are permanently 13–24; stable keys are `studio-adventure-pack:<presetKey>`. Preset keys retain the `adv_` prefix. A collision or invalid reference rejects registration without a partial pack. See [EXTENSIONS](EXTENSIONS.md) for the full load order and extension recipe; this snippet shows only the relevant dependency edges.
 
 ## Mission cards and presets
 

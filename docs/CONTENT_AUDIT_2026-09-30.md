@@ -1,5 +1,10 @@
 # Аудит і контент-план «3D Кузні Чудес»
 
+Historical planning snapshot (2026-09-30). The implemented Adventure Pack and
+architecture/state repairs are documented in [ADVENTURE_PACK.md](ADVENTURE_PACK.md)
+and [ARCHITECTURE_AUDIT.md](ARCHITECTURE_AUDIT.md). Unverified physical-print items
+remain unverified; earlier suspected/resolved software gaps are not current defects.
+
 Дата: 30 вересня 2026. Контекст від власника: 2–6 класи, до 10 дітей, заняття до 60 хвилин, один повільний одноколірний Anycubic i3 Mega. Матеріал, установлене сопло, стан принтера та профіль слайсера не перевірялися.
 
 ## Головний висновок

@@ -69,13 +69,17 @@
 | `src/generators/physicsMechanics.js` | `window.PhysicsMechanicsGenerator` | Клас | 🎯 Фізика без Шестерень |
 | `src/generators/mobMutator.js` | `window.MobMutatorGenerator` | Клас | 👾 Мутатор Мобів |
 | `src/sceneManager.js` | `window.SceneManager` | Клас | 3D-сцена, камера, STL-експорт |
-| `src/app.js` | *(немає — самозапуск)* | IIFE | Головний контролер UI |
+| `src/contentRegistry.js` | `window.StudioContentRegistry` | Об'єкт | Сталі ключі, атомарна реєстрація контенту |
+| `src/projectState.js` | `window.ProjectState` | Об'єкт | Валідація та міграція JSON до застосування |
+| `src/modalFocus.js` | `window.ModalFocus` | Об'єкт | Фокус основних діалогів |
+| `src/app.js` | `window.StudioApp` | Клас → інстанс | Головний контролер UI, самозапуск |
 
 ### 3.2. Порядок `<script>` тегів — КРИТИЧНИЙ
 Порядок у `index.html` **визначає залежності**. `app.js` завантажується **останнім**, бо він є кореневим контролером і створює інстанси всіх інших модулів.
 ```
 three.min.js → voxelFont → soundEffects → safeStorage → historyManager →
-missionManager → snapshotCompareController → passportPrintController →
+contentRegistry → missionManager → projectState → modalFocus →
+snapshotCompareController → passportPrintController →
 generators/* → content/adventurePack → adventureShelf → pixelEditorTools →
 lessonCompanion → sceneManager → app.js
 ```
@@ -84,11 +88,13 @@ lessonCompanion → sceneManager → app.js
 Опис контрактів розширень і меж перевірки: `docs/EXTENSIONS.md`.
 
 ### 3.3. Контракт Генераторів
-Усі 4 генератори дотримуються спільного інтерфейсу:
+Спільний інтерфейс усіх 4 генераторів:
 - `build3D(params)` → повертає `THREE.Group` для `sceneManager.setModel()`
-- `getState()` → серіалізований об'єкт для автозбереження
-- `setState(data)` → відновлення стану з автозбереження
-- Пресети визначаються у масиві `this.presets[]` або об'єкті `PRESETS {}`
+- Лише `MinecraftForgeGenerator` має `getState()` / `setState(data)` для редагованої сітки та палітри.
+- Параметри інших генераторів серіалізує `StudioApp.controls`; генератори не мають власного стану проєкту.
+- Minecraft-пресети містяться в `window.MINECRAFT_PRESETS`; місії реєструються через `StudioContentRegistry` до запуску UI.
+- `schemaVersion` визначає формат JSON окремо від версії релізу. Перед зміною стану викликати `ProjectState.normalize()`.
+- Після передачі групи SceneManager володіє її геометріями/матеріалами та звільняє їх; піксельна зв’язність не доводить manifold STL.
 
 ---
 
@@ -201,6 +207,13 @@ lessonCompanion → sceneManager → app.js
 │   ├── soundEffects.js             # Процедурний Web Audio синтезатор
 │   ├── voxelFont.js                # Воксельний шрифт 5×7 (UKR/LAT/цифри/іконки)
 │   ├── safeStorage.js              # Безпечна обгортка localStorage (try/catch)
+│   ├── contentRegistry.js          # Stable mission identities and atomic packs
+│   ├── projectState.js             # Pure file-schema validation/migration
+│   ├── modalFocus.js               # Core dialog focus ownership
+│   ├── adventureShelf.js           # Content-pack selection UI
+│   ├── pixelEditorTools.js         # Grid transforms through app transactions
+│   ├── lessonCompanion.js          # Separate teacher state/timer
+│   ├── content/adventurePack.js    # Twelve additional missions and reliefs
 │   ├── historyManager.js           # Undo/Redo стек (до 35 кроків)
 │   ├── missionManager.js           # Каталог 12 навчальних місій гуртка
 │   ├── snapshotCompareController.js # V1 ↔ V2 порівняння знімків
@@ -225,5 +238,5 @@ lessonCompanion → sceneManager → app.js
 - [ ] Версії у файлах узгоджені у всіх 5 місцях (див. §1.2).
 - [ ] Жодних зовнішніх залежностей, CDN або мережевих запитів не додано.
 - [ ] `git status` чистий від тимчасових файлів.
-- [ ] Зроблено `git add .` та `git commit -m "тип(скоуп): опис"`.
+- [ ] Додано лише належні задачі явні шляхи (`git add <paths>`) та зроблено `git commit -m "тип(скоуп): опис"`.
 - [ ] Зроблено `git push origin main`.
