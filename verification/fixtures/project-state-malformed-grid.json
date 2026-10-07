@@ -1,0 +1,10 @@
+{
+  "app": "3d-club-studio",
+  "schemaVersion": 1,
+  "activeTab": "minecraft",
+  "activeMissionId": 1,
+  "minecraft": {
+    "currentPresetKey": "sword",
+    "grid": [{ "row": "not a 16 by 16 grid" }]
+  }
+}

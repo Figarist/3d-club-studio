@@ -1,0 +1,47 @@
+{
+  "app": "3d-club-studio",
+  "version": "1.8.1",
+  "savedAt": "2026-09-30T12:00:00.000Z",
+  "activeTab": "minecraft",
+  "activeMissionId": 1,
+  "activeMissionVisible": true,
+  "activeMissionCollapsed": false,
+  "isOrthographic": false,
+  "v1Snapshot": null,
+  "studentPairCode": "",
+  "missionChecks": { "connected": false, "mono": true, "size": false },
+  "monochrome": false,
+  "monoColor": "#cfd6df",
+  "verificationStatus": "generated",
+  "slicerNote": "",
+  "minecraft": {
+    "currentPresetKey": "sword",
+    "colors": { "1": 6044193, "2": 165063, "3": 3718648, "4": 14742270 },
+    "grid": [
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 3],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 3, 2],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 3, 2, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 3, 2, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 3, 2, 0, 0, 0],
+      [0, 0, 2, 2, 0, 0, 2, 3, 4, 3, 2, 0, 0, 0, 0, 0],
+      [0, 0, 2, 3, 2, 2, 3, 4, 3, 2, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 2, 3, 3, 4, 3, 2, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 2, 3, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 2, 2, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 2, 4, 1, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0],
+      [0, 1, 4, 1, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ]
+  },
+  "controls": {
+    "mcVoxelSize": "2.0",
+    "mcHeightStep": "1.2",
+    "mcMountType": "keychain",
+    "mcSlotWidth": "2.0",
+    "phWingWeight": "3.5",
+    "phArmLength": "50"
+  }
+}
