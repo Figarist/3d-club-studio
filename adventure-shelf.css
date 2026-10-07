@@ -1,0 +1,24 @@
+.adventure-shelf-intro {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 6px;
+}
+.adventure-shelf-group {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+}
+.adventure-shelf-group + .adventure-shelf-group { margin-top: 6px; }
+.adventure-shelf-group > summary {
+  padding: 9px;
+  color: var(--text-main);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+.adventure-shelf-group > summary:hover { background: var(--bg-card-hover); }
+.adventure-shelf-group > summary:active { color: var(--accent-gold); }
+.adventure-shelf-group > summary:focus-visible { outline: 2px solid var(--border-focus); outline-offset: -2px; }
+.adventure-shelf-group[open] > summary { color: var(--accent-gold); }
+.adventure-shelf-grid { padding: 0 8px 8px; }
