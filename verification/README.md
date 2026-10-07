@@ -3,6 +3,9 @@
 These helpers are outside the runtime. Use installed Node and local files only;
 do not add packages or run every script automatically for an unrelated change.
 Select a single affected batch under the owner's 20-case / 60-second budget.
+The current owner policy is authoritative: choose only checks justified by the
+changed behavior; documentation-only work needs static checks. UI checks must
+operate real controls and observe resulting state.
 
 | Change | Command | Scope |
 |---|---|---|
@@ -10,6 +13,15 @@ Select a single affected batch under the owner's 20-case / 60-second budget.
 | Project schema | `rtk proxy node verification/verify-project-state.cjs` | 15 cases, synthetic fixtures, field errors, detached state and roundtrip |
 | History | `rtk proxy node verification/verify-history-transactions.cjs` | 2 cases, timestamp dedup and undo/redo |
 | Physics resources | `rtk proxy node verification/verify-physics-geometry-cache.cjs` | One bounded build/demo/dispose/rebuild using actual SceneManager cleanup |
+| Visual capture helper syntax | `rtk proxy node --check verification/capture-content-ui.mjs` | Syntax only; the `.mjs` helper uses the active CUA tab and captures one selected catalog row per `captureRow(...)` call |
+
+The capture helper is not a standalone browser runner. Use it only inside the
+documented CUA workflow with a real local app tab, a selected catalog row and
+actual visible controls. Keep each capture batch bounded; inspect and review
+original screenshots before recording a verdict. Do not rebuild evidence JSON
+or images for documentation-only changes. The strict `verify-content-evidence`
+gate is a release-completeness check and currently remains incomplete while 97
+of 101 configurations await final review.
 
 ## Exact manual interaction recipes
 

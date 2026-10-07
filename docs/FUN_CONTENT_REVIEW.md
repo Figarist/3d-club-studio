@@ -3,6 +3,11 @@
 Implementation source: `3df6a40`, app 1.9.0, schema 1. The owner requested one
 last bounded packet and task closure to conserve usage. The implementation is
 available; full visual release acceptance is **incomplete**, not silently waived.
+At the clean documentation baseline `6546bec`, runtime source and all manifest
+hashes still matched the pinned implementation. Documentation-only commits do
+not change that source proof. This update does not refresh captures or rewrite
+evidence. For current priorities see
+[NEXT_AGENT_HANDOFF.md](NEXT_AGENT_HANDOFF.md).
 
 ## Implemented scope
 
@@ -77,6 +82,8 @@ scoped effects/persistent results but was not rerun afterward.
 reported as passing while 97 configurations lack final evidence.
 
 Pending: remaining original captures/main review, complete interaction and
-compatibility UI coverage, current 1024×768 layout, direct-file launch, actual
-download readback, slicer/manifold acceptance and physical printing. Printed
-spring strength, force, durability and classroom outcomes are **Not verified**.
+compatibility UI coverage, current 1024×768 layout, direct-file launch, and
+readback of the actual file downloaded through Save/export. Import/restore
+through the real file chooser was exercised as noted above. Slicer/manifold
+acceptance and physical printing remain pending. Printed spring strength, force,
+durability and classroom outcomes are **Not verified**.
