@@ -64,8 +64,6 @@
         x: 0,
         y: 0,
         z: 0,
-        volumeCm3: 0,
-        roughMinutes: 0,
         fitsBed: true,
         safeBed: true,
         isMini: false
@@ -572,18 +570,10 @@
       const dy = Math.round(size.z * 10) / 10; // Глибина на столі
       const dz = Math.round(size.y * 10) / 10; // Висота друку
 
-      // Груба оцінка об'єму за габаритним паралелепіпедом (НЕ є заміром слайсера)
-      const approxVolCm3 = Math.max(0.5, (size.x * size.y * size.z * 0.32) / 1000);
-      const volRounded = Math.round(approxVolCm3 * 10) / 10;
-      const roughMinutes = Math.max(6, Math.round(approxVolCm3 * 3.2));
-
       this.dimensions = {
         x: dx,
         y: dy,
         z: dz,
-        volumeCm3: volRounded,
-        roughMinutes,
-        estMinutes: roughMinutes,
         fitsBed: dx <= 200 && dy <= 200,
         safeBed: dx <= 190 && dy <= 190,
         isMini: dx <= 35 && dy <= 35
