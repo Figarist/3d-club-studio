@@ -1,4 +1,4 @@
-# ⚒️ 3D Кузня Чудес (3D Club Studio: v1.8.1 Minecraft & Print-Safe Edition)
+# ⚒️ 3D Кузня Чудес (3D Club Studio: v1.8.2 Minecraft & Print-Safe Edition)
 
 > **Інтерактивна офлайн веб-студія процедурної 3D-генерації для шкільних гуртків 3D-моделювання (2–6 класи).**  
 > Розроблено спеціально для роботи у зв'язці з **Tinkercad**, **Makers Empire** та **простими/старими шкільними FDM 3D-принтерами (Anycubic i3 Mega тощо)**.
@@ -45,7 +45,7 @@
 
 ---
 
-## 🎓 Інструменти для викладача (v1.8.1)
+## 🎓 Інструменти для викладача (v1.8.2)
 
 - **📐 Справжній Ортографічний вигляд (Orthographic Projection):** кнопка `[📐 Орто]` у панелі 3D-сцени та гаряча клавіша `O` / `5`. Повністю прибирає перспективні спотворення, перетворює ракурс `🧊 Ізометрія` на точну креслярську ізометрію, а ракурси `0°` та `90°` — на ідеальні проекційні силуети без спотворень.
 - **🔍 Крупно:** підганяє масштаб камери під поточну модель, зберігаючи її ракурс. Працює у перспективі та ортографічному режимі; допомагає показувати маленькі рельєфи на проєкторі.
@@ -88,11 +88,23 @@
 │   └── three.min.js                # Локальна копія 3D-рушія Three.js (r128) для офлайн-роботи
 ├── src/
 │   ├── app.js                      # Головний контролер UI, вкладок та параметрів генерації
+│   ├── contentRegistry.js          # Stable identities and atomic pack registration
+│   ├── projectState.js             # Pure schema validation and legacy migration
+│   ├── modalFocus.js               # Core dialog focus trap and restoration
+│   ├── safeStorage.js              # Guarded local storage
+│   ├── historyManager.js           # Project undo/redo transactions
+│   ├── missionManager.js           # Base missions, selected state and catalog UI
+│   ├── snapshotCompareController.js # V1 image and metric comparison
+│   ├── passportPrintController.js  # Passport preview and PNG export
+│   ├── adventureShelf.js           # Content pack selection UI
+│   ├── pixelEditorTools.js         # Grid transforms
+│   ├── lessonCompanion.js          # Separate teacher state and timer
+│   ├── content/adventurePack.js    # Twelve relief presets and missions
 │   ├── sceneManager.js             # 3D-сцена, стіл принтера 200×200 мм, симулятор слайсера та Binary STL Exporter
 │   ├── voxelFont.js                # Векторно-воксельний 5×7 шрифт (Українська кирилиця, Латиниця, Цифри, Іконки)
 │   ├── soundEffects.js             # Процедурний звуковий синтезатор на базі Web Audio API
 │   └── generators/
-│       ├── minecraftForge.js       # Модуль 1: Майнкрафт-Кузня (16×16 редактор висот + 8 пресетів)
+│       ├── minecraftForge.js       # Модуль 1: Майнкрафт-Кузня (16×16 редактор висот)
 │       ├── dualIllusion.js         # Модуль 2: Оптичний Перевертень (3D-перетин двох слів під кутом 90°)
 │       ├── physicsMechanics.js     # Модуль 3: Монолітна Пружинна Катапульта та Гравітаційний Балансир
 │       └── mobMutator.js           # Модуль 4: Процедурний Мутатор Воксельних Мобів та Босів
@@ -105,6 +117,8 @@
 - ⚙️ **[Довідник профілів слайсера (`docs/SLICER_PROFILES.md`)](docs/SLICER_PROFILES.md)**
 - 📘 **[Методичний посібник для викладача гуртка (`docs/TEACHER_GUIDE.md`)](docs/TEACHER_GUIDE.md)**
 - 📐 **[Технічна документація та архітектура (`docs/TECHNICAL_ARCHITECTURE.md`)](docs/TECHNICAL_ARCHITECTURE.md)**
+- [Architecture audit, evidence and limits](docs/ARCHITECTURE_AUDIT.md)
+- [Pack/generator extension recipes and state compatibility](docs/EXTENSIONS.md)
 
 ---
 
