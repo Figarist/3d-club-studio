@@ -1,0 +1,17 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const root=path.resolve(__dirname,'..');
+const read=file=>fs.readFileSync(path.join(root,file),'utf8');
+const changed=['src/app.js','src/contentRegistry.js','src/projectState.js','src/missionManager.js','src/sceneManager.js','src/passportPrintController.js','src/generators/minecraftForge.js','src/generators/dualIllusion.js','src/generators/mobMutator.js','src/generators/physicsMechanics.js','src/content/funReliefs.js','src/content/funDiscoveries.js','src/content/funEngineering.js'];
+changed.forEach(file=>new Function(read(file)));
+console.log('PASS static gate 1: changed application JavaScript parses.');
+const html=read('index.html');
+const scripts=Array.from(html.matchAll(/<script src="([^"]+)"/g),m=>m[1].split('?')[0]);
+scripts.forEach(file=>assert.ok(!/^(https?:)?\/\//.test(file)&&fs.existsSync(path.join(root,file)),'local script '+file));
+assert.equal(scripts.at(-1),'src/app.js');
+for(const [dependency,consumer]of [['src/contentRegistry.js','src/missionManager.js'],['src/generators/minecraftForge.js','src/content/funReliefs.js'],['src/generators/mobMutator.js','src/content/funDiscoveries.js'],['src/generators/physicsMechanics.js','src/content/funEngineering.js']])assert.ok(scripts.indexOf(dependency)<scripts.indexOf(consumer),'script dependency order');
+assert.ok(html.includes('styles.css?v=1.9.0')&&fs.existsSync(path.join(root,'styles.css')));
+console.log('PASS static gate 2: local assets and explicit dependency order.');
+assert.match(html,/id="app-version-pill"[^>]*>v1\.9\.0/);assert.match(html,/id="app-version-corner"[\s\S]*?⚒️ v1\.9\.0/);
+assert.match(read('src/app.js'),/version: '1\.9\.0'/);assert.match(read('src/passportPrintController.js'),/3D Кузня Чудес v1\.9\.0/);assert.match(read('README.md'),/v1\.9\.0/);
+assert.ok(read('styles.css').includes('.catalog-search-row')&&read('styles.css').includes('.demo-result'));
+console.log('PASS static gate 3: synchronized release version and new control styles.');

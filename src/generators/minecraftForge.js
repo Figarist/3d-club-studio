@@ -797,7 +797,7 @@
 
       // 4. Об'ємні воксельні цифри номіналу товщини картону на хребті: '1.5', '2.0', '2.5', '3.0'
       const labels = ['1.5', '2.0', '2.5', '3.0'];
-      const px = 0.7; // мм
+      const px = 0.4; // Keep three-digit labels within each slot's spacing.
       const textH = 1.0; // мм
       const lGeo = new THREE.BoxGeometry(px, textH, px);
 
@@ -823,6 +823,14 @@
           }
         });
       });
+
+      // The four calibrated gaps remain unchanged. The selected nominal width
+      // moves a raised comparison marker, which is readable without color.
+      const selectedSlot = [1.5, 2, 2.5, 3].indexOf(Number(params.slotWidth) || 2);
+      const marker = new THREE.Mesh(new THREE.ConeGeometry(1.2, 1.2, 3), materials[4]);
+      marker.name = 'calibratorSelectedSlot';
+      marker.position.set(slotCentersX[Math.max(0, selectedSlot)], 8.6, -11);
+      group.add(marker);
 
       return group;
     }

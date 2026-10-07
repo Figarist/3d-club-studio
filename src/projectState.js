@@ -118,9 +118,11 @@
     const controls = Object.assign({}, CONTROL_DEFAULTS);
     ['mobDesign', 'ilDesign', 'phDesign'].forEach(function (key) {
       const designs = ['classic'];
+      const generatorName = { mobDesign: 'MobMutatorGenerator', ilDesign: 'DualIllusionGenerator', phDesign: 'PhysicsMechanicsGenerator' }[key];
+      const implemented = root[generatorName] && root[generatorName].supportedDesignKeys;
       if (root.StudioContentRegistry) root.StudioContentRegistry.listModels().forEach(function (mission) {
         const design = mission.config.controls && mission.config.controls[key];
-        if (design && !designs.includes(design)) designs.push(design);
+        if (design && (!implemented || implemented.includes(design)) && !designs.includes(design)) designs.push(design);
       });
       controls[key] = enumValue(source[key], designs, 'controls.' + key, 'classic');
     });

@@ -49,6 +49,16 @@
             if (typeof mission[field] !== 'string' || !mission[field].trim()) throw new Error('Catalog model requires ' + field);
           });
           if (!mission.config || !mission.config.controls) throw new Error('Catalog models require a complete configuration.');
+          const designContract = {
+            mob: ['mobDesign', 'MobMutatorGenerator'],
+            illusion: ['ilDesign', 'DualIllusionGenerator'],
+            physics: ['phDesign', 'PhysicsMechanicsGenerator']
+          }[mission.targetTab];
+          if (designContract) {
+            const supported = window[designContract[1]] && window[designContract[1]].supportedDesignKeys;
+            const design = mission.config.controls[designContract[0]];
+            if (supported && !supported.includes(design)) throw new Error('Unsupported model design: ' + design);
+          }
           modelKeys.add(mission.modelKey);
         }
         ids.add(mission.id);

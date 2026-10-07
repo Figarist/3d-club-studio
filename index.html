@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>3D Кузня Чудес — Студія 3D-Моделювання (2–6 класи)</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=1.9.0" />
   <link rel="stylesheet" href="adventure-shelf.css" />
   <link rel="stylesheet" href="pixel-editor-tools.css" />
   <link rel="stylesheet" href="lesson-companion.css" />
@@ -18,7 +18,7 @@
       <div class="brand-title">
         <div class="brand-title-row">
           <h1>3D КУЗНЯ ЧУДЕС</h1>
-          <span id="app-version-pill" class="version-pill" title="Версія програми: v1.8.2">v1.8.2</span>
+          <span id="app-version-pill" class="version-pill" title="Версія програми: v1.9.0">v1.9.0</span>
         </div>
         <p class="brand-subtitle">Minecraft &amp; Print-Safe 3D Генератор • Tinkercad / Makers Empire / 3D-Принтер</p>
       </div>
@@ -316,8 +316,9 @@
            ВКЛАДКА 2: ОПТИЧНИЙ ПЕРЕВЕРТЕНЬ (ПОДВІЙНИЙ 3D-ТЕКСТ)
            =================================================================== -->
       <section id="panel-illusion" class="panel-section">
+        <div class="card"><label class="control-label" for="il-design">🔮 Оптична знахідка</label><select id="il-design"><option value="classic">Класичні слова й символи</option></select></div>
         <div class="printer-safe-tip">
-          🔮 <b>Оптичний силует 0° / 90°:</b> Для 1-годинного заняття обирайте короткі знаки (1–2 символи, ~28–32 мм), щоб модель швидко друкувалася і легко перевірялася!
+          🔮 <b>Оптичний силует 0° / 90°:</b> Передбач другий образ і відкрий його кнопкою ракурсу. Форму перевіряй одним пластиком; час і придатність друку — окремо у слайсері.
         </div>
 
         <div class="card">
@@ -330,6 +331,8 @@
             <button class="preset-btn preset-mini-btn" data-il-preset="cipher" data-w1="ОК" data-w2="⚔👑" data-voxel="2.2">🔮 ОК ↔ ⚔👑 (~28 мм)</button>
             <button class="preset-btn" data-il-preset="1" data-w1="МАКСИМ" data-w2="★BOSS★" data-voxel="2.6">👦 МАКСИМ ↔ BOSS</button>
             <button class="preset-btn" data-il-preset="2" data-w1="МАЙН!" data-w2="КРАФТ" data-voxel="2.6">⛏️ МАЙН! ↔ КРАФТ</button>
+            <button class="preset-btn" data-il-preset="3" data-w1="КРІПЕР" data-w2="⚔💀⛏♥👑★" data-voxel="2.6">💀 КРІПЕР ↔ Символи</button>
+            <button class="preset-btn" data-il-preset="4" data-w1="СОФІЯ" data-w2="★PRO★" data-voxel="2.6">👧 СОФІЯ ↔ Зірка</button>
           </div>
         </div>
 
@@ -399,7 +402,7 @@
            =================================================================== -->
       <section id="panel-physics" class="panel-section">
         <div class="printer-safe-tip">
-          🎯 <b>Демонстраційний експеримент:</b> Монолітна пружна ресора друкується пласко на боці. Перед друком обов'язково перевірте кількість периметрів (стінок) у слайсері!
+          🎯 <b>Екранний експеримент:</b> Змінюй форму й порівнюй результат на екрані. Силу, пружність і надійність надрукованої деталі ще не перевірено; перед друком потрібна перевірка у слайсері.
         </div>
 
         <div class="card">
@@ -408,6 +411,8 @@
           </div>
 
           <div class="control-row">
+            <label class="control-label" for="ph-design">🎯 Інженерна пригода</label>
+            <select id="ph-design"><option value="classic">Класичний механізм</option></select>
             <select id="ph-submode" aria-label="Оберіть фізичну модель">
               <option value="catapult" selected>🏹 Монолітна Пружинна Міні-Катапульта + TNT</option>
               <option value="balancer">🦅 Гравітаційний Балансир «Дракон на Пальці»</option>
@@ -417,7 +422,7 @@
 
         <div class="card">
           <div class="card-header">
-            <span>🔧 Параметри Міцності та Пружності</span>
+            <span>🔧 Геометрія для порівняння</span>
           </div>
 
           <div class="control-row">
@@ -430,10 +435,10 @@
 
           <div id="ph-spring-group" class="control-row">
             <div class="control-label">
-              <span>Товщина пластикової ресори (сила пострілу):</span>
+              <span>Товщина геометрії ресори:</span>
               <span id="val-ph-spring" class="control-val">2.4 мм</span>
             </div>
-            <input id="ph-spring-thickness" type="range" min="1.8" max="3.6" step="0.1" value="2.4" aria-label="Товщина пластикової ресори (сила пострілу), мм" />
+            <input id="ph-spring-thickness" type="range" min="1.8" max="3.6" step="0.1" value="2.4" aria-label="Товщина геометрії ресори, мм" />
           </div>
 
           <div id="ph-weight-group" class="control-row" style="display:none;">
@@ -453,13 +458,13 @@
           </div>
 
           <label class="checkbox-row">
-            <input id="ph-include-ammo" type="checkbox" checked aria-label="Додати снаряд TNT або пірамідку-п'єдестал поруч на стіл" />
-            <span>Додати снаряд TNT / Пірамідку-п'єдестал поруч на стіл</span>
+            <input id="ph-include-ammo" type="checkbox" checked aria-label="Додати комплектну заготовку снаряда або підставку" />
+            <span>Додати комплектну заготовку снаряда / підставку (окрема деталь для друку)</span>
           </label>
 
           <div class="control-row">
             <div class="control-label"><span>Напис на корпусі катапульти:</span></div>
-            <input id="ph-custom-text" type="text" maxlength="6" value="ТАНК" aria-label="Напис на корпусі катапульти" />
+            <input id="ph-custom-text" type="text" maxlength="6" value="" aria-label="Напис на корпусі катапульти" />
           </div>
         </div>
       </section>
@@ -468,6 +473,7 @@
            ВКЛАДКА 4: МУТАТОР ВОКСЕЛЬНИХ МОБІВ ТА БОСІВ
            =================================================================== -->
       <section id="panel-mob" class="panel-section">
+        <div class="card"><label class="control-label" for="mob-design">👾 Маленький супутник</label><select id="mob-design"><option value="classic">Класичний моб</option></select></div>
         <div class="printer-safe-tip">
           👾 <b>Демонстраційна фігурка:</b> Зброя та щит моба спираються на п'єдестал як колони. Через великий об'єм друк тривалий — перевірте час і шари у слайсері!
         </div>
@@ -615,14 +621,16 @@
 
         <!-- Спеціальна кнопка для пострілу з катапульти та тесту балансира -->
         <div id="physics-action-bar" class="context-action-bar" style="display:none;">
+          <button id="btn-physics-reset" class="cam-btn">↩️ Повторити</button>
           <button id="btn-physics-demo" class="btn-big-demo">
             🚀 ВИСТРІЛИТИ З КАТАПУЛЬТИ!
           </button>
+          <output id="physics-demo-result" class="demo-result" aria-live="polite">Екранна демонстрація — не прогноз сили або міцності.</output>
         </div>
 
         <!-- Кутовий бейдж версії програми -->
-        <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • v1.8.2: 24 місії, майстерня пригод, інструменти рельєфу, план заняття та крупний показ моделей">
-          ⚒️ v1.8.2
+        <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • v1.9.0: одноколірні пригоди, живі екранні досліди та пошук за темами">
+          ⚒️ v1.9.0
         </div>
       </div>
     </section>
@@ -651,6 +659,12 @@
         <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="useful">🏷️ Корисні дрібниці (2)</button>
         <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="cardboard">🏙️ Картонний мегаполіс (1)</button>
         <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="optical">🔮 Оптичний експеримент (1)</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="character">👾 Персонажі</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="engineering">🎯 Інженерні ігри</button>
+      </div>
+      <div class="catalog-search-row">
+        <label for="model-search">Знайти пригоду <input id="model-search" type="search" placeholder="Слід, робот, компас…" /></label>
+        <label for="model-theme">Тема <select id="model-theme"><option value="">Усі теми</option></select></label>
       </div>
 
       <!-- СІТКА 12 КАРТОК МІСІЙ -->
@@ -846,25 +860,28 @@
 
   <!-- ПІДКЛЮЧЕННЯ СКРИПТІВ (Працює 100% офлайн без інтернету та серверів!) -->
   <script src="lib/three.min.js"></script>
-  <script src="src/voxelFont.js"></script>
-  <script src="src/soundEffects.js"></script>
-  <script src="src/safeStorage.js"></script>
-  <script src="src/historyManager.js"></script>
-  <script src="src/contentRegistry.js"></script>
-  <script src="src/missionManager.js"></script>
-  <script src="src/projectState.js"></script>
-  <script src="src/modalFocus.js"></script>
-  <script src="src/snapshotCompareController.js"></script>
-  <script src="src/passportPrintController.js"></script>
-  <script src="src/generators/minecraftForge.js"></script>
-  <script src="src/generators/dualIllusion.js"></script>
-  <script src="src/generators/physicsMechanics.js"></script>
-  <script src="src/generators/mobMutator.js"></script>
-  <script src="src/content/adventurePack.js"></script>
-  <script src="src/adventureShelf.js"></script>
-  <script src="src/pixelEditorTools.js"></script>
-  <script src="src/lessonCompanion.js"></script>
-  <script src="src/sceneManager.js"></script>
-  <script src="src/app.js"></script>
+  <script src="src/voxelFont.js?v=1.9.0"></script>
+  <script src="src/soundEffects.js?v=1.9.0"></script>
+  <script src="src/safeStorage.js?v=1.9.0"></script>
+  <script src="src/historyManager.js?v=1.9.0"></script>
+  <script src="src/contentRegistry.js?v=1.9.0"></script>
+  <script src="src/missionManager.js?v=1.9.0"></script>
+  <script src="src/projectState.js?v=1.9.0"></script>
+  <script src="src/modalFocus.js?v=1.9.0"></script>
+  <script src="src/snapshotCompareController.js?v=1.9.0"></script>
+  <script src="src/passportPrintController.js?v=1.9.0"></script>
+  <script src="src/generators/minecraftForge.js?v=1.9.0"></script>
+  <script src="src/generators/dualIllusion.js?v=1.9.0"></script>
+  <script src="src/generators/physicsMechanics.js?v=1.9.0"></script>
+  <script src="src/generators/mobMutator.js?v=1.9.0"></script>
+  <script src="src/content/adventurePack.js?v=1.9.0"></script>
+  <script src="src/content/funReliefs.js?v=1.9.0"></script>
+  <script src="src/content/funDiscoveries.js?v=1.9.0"></script>
+  <script src="src/content/funEngineering.js?v=1.9.0"></script>
+  <script src="src/adventureShelf.js?v=1.9.0"></script>
+  <script src="src/pixelEditorTools.js?v=1.9.0"></script>
+  <script src="src/lessonCompanion.js?v=1.9.0"></script>
+  <script src="src/sceneManager.js?v=1.9.0"></script>
+  <script src="src/app.js?v=1.9.0"></script>
 </body>
 </html>
