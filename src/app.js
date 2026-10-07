@@ -172,6 +172,14 @@
         pCardChecklist: document.getElementById('p-card-checklist')
       };
 
+      if (window.StudioAdventurePack && window.AdventureShelf) {
+        this.adventureShelf = new window.AdventureShelf({
+          pack: window.StudioAdventurePack,
+          onSelectMission: (id) => this.startMission(id)
+        });
+        this.adventureShelf.mount(document.getElementById('adventure-shelf'));
+      }
+
       this.bindTabs();
       this.bindTopActions();
       this.bindMissionControls();
@@ -185,6 +193,7 @@
 
       // Відновлюємо автозбереження або рендеримо стартову модель
       const restored = this.restoreAutosave();
+      if (this.adventureShelf) this.adventureShelf.selectMission(this.missions.activeMissionId);
       this.missions.updateActiveMissionUI(this._domCache);
       this.missions.renderMissionsModal(this._domCache, (id) => this.startMission(id));
       if (!restored) {
@@ -202,7 +211,7 @@
       const savedPair = this.safeStorage.getItem('3d_kuznya_pair_code') || '';
       return {
         app: '3d-club-studio',
-        version: '1.5.4',
+        version: '1.6.0',
         savedAt: new Date().toISOString(),
         activeTab: this.activeTab,
         activeMissionId: this.missions.activeMissionId,
@@ -356,6 +365,7 @@
       const targetTab = state.activeTab || 'minecraft';
       this.switchTab(targetTab, true);
       this.rebuildCurrentModel(animatePop, true);
+      if (this.adventureShelf) this.adventureShelf.selectMission(this.missions.activeMissionId);
       this._isRestoring = false;
     }
 
@@ -750,6 +760,7 @@
     }
 
     onMissionSelected(m) {
+      if (this.adventureShelf) this.adventureShelf.selectMission(m.id);
       this.missions.updateActiveMissionUI(this._domCache);
       this.missions.renderMissionsModal(this._domCache, (id) => this.startMission(id));
       this.autosave();
