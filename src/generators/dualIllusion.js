@@ -12,6 +12,267 @@
     RIM_EXTRA: 1.0
   };
 
+  function rowsFromSpans(spans, width = 11) {
+    return Object.freeze(spans.map((row) => {
+      const cells = Array(width).fill('.');
+      row.forEach(([start, end]) => {
+        for (let column = start; column <= end; column += 1) cells[column] = '#';
+      });
+      return cells.join('');
+    }));
+  }
+
+  function mirrorRows(rows) {
+    return Object.freeze(rows.map((row) => Array.from(row).reverse().join('')));
+  }
+
+  const MOUNTAIN_BOAT_DIAGONAL = Object.freeze({
+    front: rowsFromSpans([
+      [[3, 3], [7, 7]], [[2, 4], [6, 8]], [[1, 4], [6, 9]], [[0, 10]],
+      [[0, 10]], [[0, 10]], [[0, 10]], [[0, 10]], [[0, 10]], [[0, 10]], [[0, 10]]
+    ]),
+    side: rowsFromSpans([
+      [[5, 5]], [[4, 5]], [[3, 5]], [[2, 5]], [[1, 5]], [[1, 6]],
+      [[1, 7]], [[1, 8]], [[0, 9]], [[0, 10]], [[1, 9]]
+    ]),
+    spineX: 3,
+    spineZ: 5
+  });
+
+  const MOUNTAIN_BOAT_LINE = Object.freeze({
+    front: rowsFromSpans([
+      [[4, 4], [8, 8]], [[3, 5], [7, 9]], [[2, 5], [7, 10]], [[1, 10]],
+      [[0, 10]], [[0, 10]], [[0, 10]], [[0, 10]], [[0, 10]], [[0, 10]], [[0, 10]]
+    ]),
+    side: mirrorRows(MOUNTAIN_BOAT_DIAGONAL.side),
+    spineX: 4,
+    spineZ: 5
+  });
+
+  function authoredDesign(front, side, spineX = 5, spineZ = 5) {
+    const frontRows = rowsFromSpans(front);
+    const sideRows = rowsFromSpans(side);
+    return Object.freeze({
+      diagonal: Object.freeze({ front: frontRows, side: sideRows, spineX, spineZ }),
+      line: Object.freeze({
+        front: mirrorRows(frontRows),
+        side: mirrorRows(sideRows),
+        spineX: 10 - spineX,
+        spineZ: 10 - spineZ
+      })
+    });
+  }
+
+  const IL_DESIGN_MASKS = Object.freeze({
+    mountain_boat: Object.freeze({ diagonal: MOUNTAIN_BOAT_DIAGONAL, line: MOUNTAIN_BOAT_LINE }),
+    pine_candle: authoredDesign(
+      [[[5, 5]], [[4, 6]], [[4, 6]], [[3, 7]], [[3, 7]], [[2, 8]], [[2, 8]], [[1, 9]], [[1, 9]], [[0, 10]], [[0, 10]]],
+      [[[3, 4]], [[3, 5]], [[4, 6]], [[4, 6]], [[4, 6]], [[4, 6]], [[3, 7]], [[3, 7]], [[3, 7]], [[2, 8]], [[2, 8]]],
+      5, 4
+    ),
+    mushroom_kite: authoredDesign(
+      [[[4, 6]], [[3, 7]], [[2, 8]], [[1, 9]], [[0, 10]], [[0, 10]], [[1, 9]], [[2, 8]], [[3, 7]], [[4, 6]], [[4, 6]]],
+      [[[5, 6]], [[4, 7]], [[3, 8]], [[2, 9]], [[1, 10]], [[0, 10]], [[1, 10]], [[2, 9]], [[3, 8]], [[4, 7]], [[4, 6]]]
+    ),
+    rocket_key: authoredDesign(
+      [[[5, 5]], [[4, 6]], [[3, 7]], [[3, 7]], [[3, 7]], [[3, 7]], [[2, 8]], [[1, 9]], [[0, 10]], [[0, 10]], [[1, 9]]],
+      [[[2, 6]], [[1, 7]], [[1, 8]], [[2, 8]], [[3, 7]], [[4, 6]], [[4, 6]], [[4, 6]], [[4, 6]], [[3, 7]], [[3, 7]]]
+    ),
+    coral_lighthouse: authoredDesign(
+      [[[1, 2], [5, 5], [8, 10]], [[1, 3], [4, 6], [7, 9]], [[1, 4], [5, 5], [6, 9]], [[2, 8]], [[2, 8]], [[1, 9]], [[1, 9]], [[0, 10]], [[0, 10]], [[1, 9]], [[1, 9]]],
+      [[[5, 5]], [[4, 6]], [[4, 6]], [[3, 7]], [[3, 7]], [[3, 7]], [[2, 8]], [[2, 8]], [[1, 9]], [[1, 9]], [[0, 10]]]
+    ),
+    moon_arch: authoredDesign(
+      [[[0, 2], [8, 10]], [[0, 3], [7, 10]], [[0, 4], [6, 10]], [[0, 10]], [[0, 10]], [[1, 9]], [[1, 8]], [[1, 7]], [[1, 7]], [[1, 8]], [[1, 9]]],
+      [[[5, 5]], [[4, 6]], [[3, 7]], [[2, 8]], [[1, 8]], [[1, 8]], [[2, 8]], [[3, 7]], [[4, 6]], [[4, 6]], [[3, 7]]],
+      1, 5
+    ),
+    leaf_vane: authoredDesign(
+      [[[4, 6]], [[3, 7]], [[2, 7]], [[1, 7]], [[1, 8]], [[1, 9]], [[2, 10]], [[3, 10]], [[4, 10]], [[5, 10]], [[6, 10]]],
+      [[[5, 5]], [[4, 6]], [[3, 7]], [[2, 8]], [[1, 9]], [[1, 9]], [[2, 8]], [[3, 7]], [[4, 6]], [[4, 6]], [[3, 7]]],
+      6, 5
+    ),
+    wave_tower: authoredDesign(
+      [[[2, 4], [7, 8]], [[1, 4], [6, 9]], [[0, 10]], [[1, 9]], [[2, 8]], [[3, 7]], [[3, 7]], [[2, 8]], [[1, 9]], [[0, 10]], [[0, 10]]],
+      [[[4, 6]], [[3, 7]], [[2, 8]], [[1, 9]], [[1, 9]], [[2, 8]], [[3, 7]], [[4, 6]], [[4, 6]], [[3, 7]], [[2, 8]]],
+      3, 5
+    )
+  });
+  const IL_SUPPORTED_DESIGN_KEYS = Object.freeze([
+    'classic', 'mountain_boat', 'pine_candle', 'mushroom_kite', 'rocket_key',
+    'coral_lighthouse', 'moon_arch', 'leaf_vane', 'wave_tower'
+  ]);
+
+  function rowsToMatrix(rows) {
+    return rows.map((row) => Array.from(row, (cell) => cell === '#' ? 1 : 0));
+  }
+
+  function activeColumns(row) {
+    const active = [];
+    row.forEach((cell, column) => {
+      if (cell === 1) active.push(column);
+    });
+    return active;
+  }
+
+  function activeRuns(row) {
+    const runs = [];
+    let start = -1;
+    row.forEach((cell, column) => {
+      if (cell === 1 && start < 0) start = column;
+      if (cell === 0 && start >= 0) {
+        runs.push([start, column - 1]);
+        start = -1;
+      }
+    });
+    if (start >= 0) runs.push([start, row.length - 1]);
+    return runs;
+  }
+
+  function assertMaskRows(rows, label) {
+    if (!Array.isArray(rows) || rows.length !== 11 || rows.some((row) => row.length !== 11 || !/^[.#]{11}$/.test(row))) {
+      throw new Error('Optical design mask must be an 11 by 11 authored silhouette: ' + label);
+    }
+    for (let row = 0; row < rows.length - 1; row += 1) {
+      const current = Array.from(rows[row]).flatMap((cell, column) => cell === '#' ? [column] : []);
+      const next = Array.from(rows[row + 1]).flatMap((cell, column) => cell === '#' ? [column] : []);
+      if (!current.length || !next.length || Math.abs(current[0] - next[0]) > 1 ||
+          Math.abs(current[current.length - 1] - next[next.length - 1]) > 1 ||
+          !current.some((column) => next.includes(column))) {
+        throw new Error('Optical design rows need an overlapping, one-cell taper: ' + label + ' row ' + row);
+      }
+    }
+  }
+
+  function assertProjection(grid, frontRows, sideRows) {
+    const rowCount = frontRows.length;
+    const xCount = frontRows[0].length;
+    const zCount = sideRows[0].length;
+    for (let row = 0; row < rowCount; row += 1) {
+      const y = rowCount - 1 - row;
+      const projectedFront = Array.from({ length: xCount }, (_, x) =>
+        grid[y][x].some((cell) => cell > 0) ? '#' : '.').join('');
+      const projectedSide = Array.from({ length: zCount }, (_, z) =>
+        grid[y].some((xRow) => xRow[z] > 0) ? '#' : '.').join('');
+      if (projectedFront !== frontRows[row] || projectedSide !== sideRows[row]) {
+        throw new Error('Optical design support changed an authored projection.');
+      }
+    }
+  }
+
+  function assertConnected(grid) {
+    const height = grid.length;
+    const width = grid[0].length;
+    const depth = grid[0][0].length;
+    let first = null;
+    let occupiedCount = 0;
+    for (let y = 0; y < height; y += 1) {
+      for (let x = 0; x < width; x += 1) {
+        for (let z = 0; z < depth; z += 1) {
+          if (grid[y][x][z] > 0) {
+            occupiedCount += 1;
+            if (!first) first = [y, x, z];
+          }
+        }
+      }
+    }
+
+    const queue = [first];
+    const visited = new Set([first.join(':')]);
+    for (let cursor = 0; cursor < queue.length; cursor += 1) {
+      const [y, x, z] = queue[cursor];
+      [[y - 1, x, z], [y + 1, x, z], [y, x - 1, z], [y, x + 1, z], [y, x, z - 1], [y, x, z + 1]]
+        .forEach(([nextY, nextX, nextZ]) => {
+          if (nextY < 0 || nextY >= height || nextX < 0 || nextX >= width || nextZ < 0 || nextZ >= depth ||
+              grid[nextY][nextX][nextZ] === 0) return;
+          const key = nextY + ':' + nextX + ':' + nextZ;
+          if (!visited.has(key)) {
+            visited.add(key);
+            queue.push([nextY, nextX, nextZ]);
+          }
+        });
+    }
+    if (visited.size !== occupiedCount) throw new Error('Optical design contains disconnected voxel components.');
+  }
+
+  function buildMaskDesign(params, mask) {
+    const group = new THREE.Group();
+    const frontRows = rowsToMatrix(mask.front);
+    const sideRows = rowsToMatrix(mask.side);
+    const rowCount = frontRows.length;
+    const xCount = frontRows[0].length;
+    const zCount = sideRows[0].length;
+    const voxelSizeValue = parseFloat(params.voxelSize);
+    const baseHeightValue = parseFloat(params.baseHeight);
+    const voxelSize = Number.isFinite(voxelSizeValue) && voxelSizeValue > 0 ? voxelSizeValue : IL_CONFIG.DEFAULT_VOXEL_SIZE;
+    const baseHeight = Number.isFinite(baseHeightValue) && baseHeightValue > 0 ? baseHeightValue : IL_CONFIG.DEFAULT_BASE_HEIGHT;
+    const safeSupports = params.safeSupports !== false;
+    const grid = Array.from({ length: rowCount }, () =>
+      Array.from({ length: xCount }, () => Array(zCount).fill(0))
+    );
+
+    assertMaskRows(mask.front, 'front');
+    assertMaskRows(mask.side, 'side');
+    for (let row = 0; row < rowCount; row += 1) {
+      const y = rowCount - 1 - row;
+      const xs = activeColumns(frontRows[row]);
+      const zs = activeColumns(sideRows[row]);
+      xs.forEach((x) => zs.forEach((z) => { grid[y][x][z] = 1; }));
+    }
+
+    // The two silhouettes share a continuous voxel column. Each authored row
+    // changes its outer edge by one cell, so no broad downward fill is needed;
+    // that fill widened the projections and made the earlier design look like towers.
+    if (safeSupports) {
+      for (let y = 0; y < rowCount; y += 1) {
+        if (grid[y][mask.spineX][mask.spineZ] === 0) {
+          throw new Error('Optical design is missing its shared print spine.');
+        }
+        grid[y][mask.spineX][mask.spineZ] = 2;
+      }
+    }
+    assertProjection(grid, mask.front, mask.side);
+    assertConnected(grid);
+
+    const matPrimary = new THREE.MeshStandardMaterial({ color: params.colorPrimary || 0x10b981, roughness: 0.4, metalness: 0.1 });
+    const matAccent = new THREE.MeshStandardMaterial({ color: params.colorAccent || 0xf59e0b, roughness: 0.45, metalness: 0.1 });
+    const matBase = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6, metalness: 0.1 });
+    const centerX = (xCount - 1) / 2;
+    const centerZ = (zCount - 1) / 2;
+
+    const bottomMaskRow = rowCount - 1;
+    const baseXRuns = activeRuns(frontRows[bottomMaskRow]);
+    const baseZRuns = activeRuns(sideRows[bottomMaskRow]);
+    baseXRuns.forEach(([xStart, xEnd]) => baseZRuns.forEach(([zStart, zEnd]) => {
+      const width = (xEnd - xStart + 1) * voxelSize;
+      const depth = (zEnd - zStart + 1) * voxelSize;
+      const tile = new THREE.Mesh(new THREE.BoxGeometry(width, baseHeight, depth), matBase);
+      tile.position.set(((xStart + xEnd) / 2 - centerX) * voxelSize, baseHeight / 2,
+        ((zStart + zEnd) / 2 - centerZ) * voxelSize);
+      group.add(tile);
+    }));
+
+    for (let y = 0; y < rowCount; y += 1) {
+      const maskRow = rowCount - 1 - y;
+      const xRuns = activeRuns(frontRows[maskRow]);
+      const zRuns = activeRuns(sideRows[maskRow]);
+      xRuns.forEach(([xStart, xEnd]) => zRuns.forEach(([zStart, zEnd]) => {
+        const width = (xEnd - xStart + 1) * voxelSize;
+        const depth = (zEnd - zStart + 1) * voxelSize;
+        // A small vertical overlap joins neighboring rows and the base despite
+        // floating-point placement at millimeter-scale boundaries.
+        const geo = new THREE.BoxGeometry(width, voxelSize + 0.05, depth);
+        const mesh = new THREE.Mesh(geo, y === rowCount - 1 ? matAccent : matPrimary);
+        mesh.position.set(((xStart + xEnd) / 2 - centerX) * voxelSize,
+          baseHeight + y * voxelSize + voxelSize / 2,
+          ((zStart + zEnd) / 2 - centerZ) * voxelSize);
+        group.add(mesh);
+      }));
+    }
+
+    return group;
+  }
+
   class DualIllusionGenerator {
     constructor() {
       this.presets = [
@@ -47,6 +308,12 @@
     }
 
     build3D(params) {
+      params = params || {};
+      const design = IL_DESIGN_MASKS[params.design];
+      if (design) {
+        return buildMaskDesign(params, design[params.layoutMode === 'line' ? 'line' : 'diagonal']);
+      }
+
       const group = new THREE.Group();
 
       const word1 = params.word1 || 'МАКСИМ';
@@ -224,5 +491,6 @@
     }
   }
 
+  DualIllusionGenerator.supportedDesignKeys = IL_SUPPORTED_DESIGN_KEYS;
   window.DualIllusionGenerator = DualIllusionGenerator;
 })();

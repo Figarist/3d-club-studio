@@ -42,6 +42,9 @@
     init() {
       this.sceneManager = new window.SceneManager('viewport-container');
       this.sceneManager.init();
+      this.sceneManager.onBeforeExport = () => {
+        if (this.activeTab === 'physics') this.physicsGen.resetInteractiveDemo?.(this.sceneManager);
+      };
       this.sceneManager.onDimensionsUpdated = () => {
         this.updateDiagnosticsUI();
       };
@@ -240,7 +243,7 @@
       const savedPair = this.safeStorage.getItem('3d_kuznya_pair_code') || '';
       return {
         app: '3d-club-studio',
-        version: '1.8.2',
+        version: '1.9.0',
         schemaVersion: 1,
         savedAt: new Date().toISOString(),
         activeTab: this.activeTab,
@@ -264,8 +267,8 @@
           mcMountType: dom.mcMountType?.value || 'keychain',
           mcSlotWidth: dom.mcSlotWidth?.value || '2.0',
           mcCustomLabel: dom.mcCustomLabel?.value || '',
-          ilWord1: dom.ilWord1?.value || '3D',
-          ilWord2: dom.ilWord2?.value || '★!',
+          ilWord1: dom.ilWord1 ? dom.ilWord1.value : '3D',
+          ilWord2: dom.ilWord2 ? dom.ilWord2.value : '★!',
           ilVoxelSize: dom.ilVoxelSize?.value || '2.2',
           ilSafeSupports: dom.ilSafeSupports ? !!dom.ilSafeSupports.checked : true,
           ilLayoutMode: dom.ilLayoutMode?.value || 'diagonal',
@@ -768,10 +771,10 @@
       });
     }
 
-    startMission(missionId) {
+    startMission(missionId, skipUndo = false) {
       const m = window.StudioContentRegistry.resolveMission(missionId);
       if (!m) return;
-      this.recordUndoSnapshot();
+      if (!skipUndo) this.recordUndoSnapshot();
       this._isRestoring = true;
       try {
         this.missions.setMission(m.id, true);
@@ -850,12 +853,20 @@
           control.appendChild(option);
         });
         control.addEventListener('change', () => {
+          this.history.recordSnapshot(this._designSelectionState || this.serializeState());
+          const selected = models.find(m => m.config.controls && m.config.controls[key] === control.value);
+          if (selected) {
+            this.startMission(selected.id, true);
+            this._designSelectionState = this.serializeState();
+            return;
+          }
           this.markModelModified();
           this.rebuildCurrentModel(true, true);
           this.sceneManager.fitModelView();
           this.autosave();
+          this._designSelectionState = this.serializeState();
         });
-        control.addEventListener('focus', () => this.recordUndoSnapshot());
+        control.addEventListener('focus', () => { this._designSelectionState = this.serializeState(); });
       });
       const search = document.getElementById('model-search');
       const theme = document.getElementById('model-theme');
@@ -1515,6 +1526,7 @@
         subSelect.addEventListener('focus', () => this.recordUndoSnapshot());
         subSelect.addEventListener('mousedown', () => this.recordUndoSnapshot());
         subSelect.addEventListener('change', () => {
+          if (this._domCache.phDesign) this._domCache.phDesign.value = 'classic';
           const isBalancer = subSelect.value === 'balancer';
           const springG = document.getElementById('ph-spring-group');
           const weightG = document.getElementById('ph-weight-group');
@@ -1583,6 +1595,7 @@
             this._playControlFeedback(el);
             this.updateValueLabels();
             const isArch = id === 'mob-archetype';
+            if (isArch && this._domCache.mobDesign) this._domCache.mobDesign.value = 'classic';
             this.markModelModified();
             this.rebuildCurrentModel(isArch, true);
             this.autosave();
@@ -1639,6 +1652,9 @@
                               this.mcGen?.currentPresetKey === 'slot_calibrator' ||
                               dom.mcMountType?.value === 'cardboard_stand';
         dom.mcSlotWidthGroup.style.display = isStandOrCalib ? 'flex' : 'none';
+        const label = dom.mcSlotWidthGroup.querySelector('.control-label span');
+        if (label) label.textContent = this.mcGen?.currentPresetKey === 'slot_calibrator'
+          ? 'Позначити паз калібратора для порівняння:' : 'Номінальна товщина картону:';
       }
     }
 
@@ -1691,6 +1707,7 @@
     }
 
     rebuildCurrentModel(animatePop = false, skipSound = false) {
+      this.syncCustomDesignControls();
       if (animatePop && !skipSound && window.StudioSound) {
         window.StudioSound.playMagicGenerate();
       }
@@ -1748,6 +1765,42 @@
       if (group) {
         this.sceneManager.setModel(group, animatePop);
       }
+    }
+
+    syncCustomDesignControls() {
+      const dom = this._domCache || {};
+      const customOptical = (dom.ilDesign?.value || 'classic') !== 'classic';
+      const wordCard = dom.ilWord1?.closest('.card');
+      if (wordCard) wordCard.hidden = customOptical;
+      const opticalSupports = dom.ilSafeSupports?.closest('label');
+      if (opticalSupports) opticalSupports.hidden = customOptical;
+      document.querySelectorAll('#illusion-camera-bar [data-camera-view]').forEach(button => {
+        const first = button.dataset.cameraView === 'front';
+        button.textContent = customOptical
+          ? (first ? '👁️ Відкрити силует 1 (0°)' : '🔄 Відкрити силует 2 (90°)')
+          : (first ? '👁️ Показати СЛОВО 1 (0°)' : '🔄 Показати СЛОВО 2 (90°)');
+      });
+      const customMob = (dom.mobDesign?.value || 'classic') !== 'classic';
+      ['mobHeadgear', 'mobBackgear', 'mobWeapon', 'mobName'].forEach(key => {
+        const row = dom[key]?.closest('.control-row');
+        if (row) row.hidden = customMob;
+      });
+      if (dom.mobArchetype) dom.mobArchetype.disabled = customMob;
+      const physicsDesign = dom.phDesign?.value || 'classic';
+      const bridge = physicsDesign === 'truss_bridge' || physicsDesign === 'arch_bridge';
+      const balance = dom.phSubmode?.value === 'balancer';
+      const classicLauncher = physicsDesign === 'classic' && !balance;
+      const visiblePhysics = {
+        phExtrudeHeight: !bridge, phSpringThickness: classicLauncher,
+        phWingWeight: balance, phCustomText: classicLauncher
+      };
+      Object.entries(visiblePhysics).forEach(([key, visible]) => {
+        const row = dom[key]?.closest('.control-row');
+        if (row) row.hidden = !visible;
+      });
+      const kit = dom.phIncludeAmmo?.closest('label');
+      if (kit) kit.hidden = bridge;
+      if (dom.phSubmode) dom.phSubmode.disabled = physicsDesign !== 'classic';
     }
   }
 
