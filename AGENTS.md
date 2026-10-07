@@ -57,7 +57,11 @@
 | `src/soundEffects.js` | `window.StudioSound` | **Інстанс** | Процедурний аудіо-синтезатор |
 | `src/safeStorage.js` | `window.SafeStorage` | Об'єкт | Безпечна обгортка `localStorage` |
 | `src/historyManager.js` | `window.HistoryManager` | Клас | Undo/Redo (до 35 кроків) |
-| `src/missionManager.js` | `window.MissionManager` | Клас | Каталог 12 навчальних місій |
+| `src/missionManager.js` | `window.MissionManager` | Клас | Базові 12 місій та розширюваний каталог |
+| `src/content/adventurePack.js` | `window.StudioAdventurePack` | Об'єкт | 12 додаткових місій і компактних рельєфів |
+| `src/adventureShelf.js` | `window.AdventureShelf` | Клас | Тематична полиця та автоматичні лічильники каталогу |
+| `src/pixelEditorTools.js` | `window.PixelEditorTools` | Клас | Віддзеркалення, поворот і зміна висот із Undo |
+| `src/lessonCompanion.js` | `window.LessonCompanion` | Клас | План години, таймер і творчі виклики |
 | `src/snapshotCompareController.js` | `window.SnapshotCompareController` | Клас | Порівняння V1 ↔ V2 знімків |
 | `src/passportPrintController.js` | `window.PassportPrintController` | Клас | Генератор паспорта деталі (Canvas → PNG) |
 | `src/generators/minecraftForge.js` | `window.MinecraftForgeGenerator` | Клас | ⛏️ Майнкрафт-Кузня |
@@ -72,9 +76,12 @@
 ```
 three.min.js → voxelFont → soundEffects → safeStorage → historyManager →
 missionManager → snapshotCompareController → passportPrintController →
-generators/* → sceneManager → app.js
+generators/* → content/adventurePack → adventureShelf → pixelEditorTools →
+lessonCompanion → sceneManager → app.js
 ```
 **Ніколи** не змінювати цей порядок без перевірки всіх `window.*` залежностей.
+
+Опис контрактів розширень і меж перевірки: `docs/EXTENSIONS.md`.
 
 ### 3.3. Контракт Генераторів
 Усі 4 генератори дотримуються спільного інтерфейсу:
