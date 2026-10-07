@@ -1,0 +1,10 @@
+{
+  "app": "3d-club-studio",
+  "schemaVersion": 99,
+  "activeTab": "minecraft",
+  "activeMissionId": 1,
+  "minecraft": {
+    "currentPresetKey": "sword",
+    "grid": []
+  }
+}

@@ -237,9 +237,11 @@
       return {
         app: '3d-club-studio',
         version: '1.8.1',
+        schemaVersion: 1,
         savedAt: new Date().toISOString(),
         activeTab: this.activeTab,
         activeMissionId: this.missions.activeMissionId,
+        activeMissionKey: this.missions.getActiveMission()?.key,
         activeMissionVisible: this.missions ? this.missions.cardVisible : true,
         activeMissionCollapsed: this.missions ? this.missions.bodyCollapsed : false,
         isOrthographic: this.sceneManager ? this.sceneManager.isOrthographic : false,
@@ -285,113 +287,115 @@
     }
 
     applyState(state, animatePop = false) {
-      if (!state || typeof state !== 'object') return;
+      state = window.ProjectState.normalize(state, {
+        missions: this.missions.missions,
+        presets: window.MINECRAFT_PRESETS
+      });
       this._isRestoring = true;
-      const dom = this._domCache || {};
-      const c = state.controls || {};
+      try {
+        const dom = this._domCache || {};
+        const c = state.controls || {};
 
-      if (state.activeMissionId) {
-        this.missions.activeMissionId = parseInt(state.activeMissionId, 10) || 1;
-      }
-      if (typeof state.activeMissionVisible === 'boolean') {
-        this.missions.setCardVisibility(state.activeMissionVisible);
-      }
-      if (typeof state.activeMissionCollapsed === 'boolean') {
-        this.missions.setBodyCollapse(state.activeMissionCollapsed);
-      }
-      if (typeof state.isOrthographic === 'boolean' && this.sceneManager) {
-        this.sceneManager.setProjectionMode(state.isOrthographic);
-        this.updateOrthoButtonUI(state.isOrthographic);
-      }
-      if (state.v1Snapshot) {
+        this.missions.applyState({ activeMissionId: state.activeMissionId, activeMissionKey: state.activeMissionKey });
+        if (typeof state.activeMissionVisible === 'boolean') {
+          this.missions.setCardVisibility(state.activeMissionVisible);
+        }
+        if (typeof state.activeMissionCollapsed === 'boolean') {
+          this.missions.setBodyCollapse(state.activeMissionCollapsed);
+        }
+        if (typeof state.isOrthographic === 'boolean' && this.sceneManager) {
+          this.sceneManager.setProjectionMode(state.isOrthographic);
+          this.updateOrthoButtonUI(state.isOrthographic);
+        }
         this.compare.setV1(state.v1Snapshot);
-        if (dom.btnCompareV1V2) dom.btnCompareV1V2.style.display = 'inline-block';
-        if (dom.btnSnapshotV1) dom.btnSnapshotV1.textContent = '📸 V1 збережено ✅';
-      }
-      if (state.studentPairCode) {
+        clearTimeout(this._snapshotLabelTimer);
+        if (dom.btnCompareV1V2) dom.btnCompareV1V2.style.display = state.v1Snapshot ? 'inline-block' : 'none';
+        if (dom.btnCompareV1V2) dom.btnCompareV1V2.classList.toggle('has-v1', !!state.v1Snapshot);
+        if (dom.btnSnapshotV1) dom.btnSnapshotV1.textContent = state.v1Snapshot ? '📸 V1 збережено ✅' : '📸 Фіксувати V1';
         this.safeStorage.setItem('3d_kuznya_pair_code', state.studentPairCode);
         if (dom.cardPairInput) dom.cardPairInput.value = state.studentPairCode;
-      }
-      if (state.missionChecks && typeof state.missionChecks === 'object') {
-        this.missions.applyState({ missionChecks: state.missionChecks });
-      }
-      this.missions.updateActiveMissionUI(this._domCache);
-
-      const setVal = (el, val, defaultVal = '') => {
-        if (el) el.value = val !== undefined && val !== null ? val : defaultVal;
-      };
-      const setChk = (el, val, defaultVal = false) => {
-        if (el) el.checked = typeof val === 'boolean' ? val : defaultVal;
-      };
-
-      setVal(dom.mcVoxelSize, c.mcVoxelSize, '2.0');
-      setVal(dom.mcHeightStep, c.mcHeightStep, '1.2');
-      setChk(dom.mcSolidBase, c.mcSolidBase, true);
-      setVal(dom.mcMountType, c.mcMountType, 'keychain');
-      setVal(dom.mcSlotWidth, c.mcSlotWidth, '2.0');
-      setVal(dom.mcCustomLabel, c.mcCustomLabel, '');
-
-      setVal(dom.ilWord1, c.ilWord1, '3D');
-      setVal(dom.ilWord2, c.ilWord2, '★!');
-      setVal(dom.ilVoxelSize, c.ilVoxelSize, '2.2');
-      setChk(dom.ilSafeSupports, c.ilSafeSupports, true);
-      setVal(dom.ilLayoutMode, c.ilLayoutMode, 'diagonal');
-      setVal(dom.ilColorPrimary, c.ilColorPrimary, '#10b981');
-
-      setVal(dom.phSubmode, c.phSubmode, 'catapult');
-      setVal(dom.phExtrudeHeight, c.phExtrudeHeight, '10.0');
-      setVal(dom.phSpringThickness, c.phSpringThickness, '2.0');
-      setVal(dom.phWingWeight, c.phWingWeight, '3.5');
-      setVal(dom.phArmLength, c.phArmLength, '50');
-      setChk(dom.phIncludeAmmo, c.phIncludeAmmo, true);
-      setVal(dom.phCustomText, c.phCustomText, '');
-
-      if (dom.phSubmode) {
-        const isBalancer = dom.phSubmode.value === 'balancer';
-        if (dom.phSpringGroup) dom.phSpringGroup.style.display = isBalancer ? 'none' : 'block';
-        if (dom.phWeightGroup) dom.phWeightGroup.style.display = isBalancer ? 'block' : 'none';
-        if (dom.btnPhysicsDemo) {
-          dom.btnPhysicsDemo.textContent = isBalancer
-            ? '👆 Протестувати Магічний Баланс!'
-            : '🚀 ВИСТРІЛИТИ З КАТАПУЛЬТИ!';
+        if (state.missionChecks && typeof state.missionChecks === 'object') {
+          this.missions.applyState({ missionChecks: state.missionChecks });
         }
+        this.missions.updateActiveMissionUI(this._domCache);
+
+        const setVal = (el, val, defaultVal = '') => {
+          if (el) el.value = val !== undefined && val !== null ? val : defaultVal;
+        };
+        const setChk = (el, val, defaultVal = false) => {
+          if (el) el.checked = typeof val === 'boolean' ? val : defaultVal;
+        };
+
+        setVal(dom.mcVoxelSize, c.mcVoxelSize, '2.0');
+        setVal(dom.mcHeightStep, c.mcHeightStep, '1.2');
+        setChk(dom.mcSolidBase, c.mcSolidBase, true);
+        setVal(dom.mcMountType, c.mcMountType, 'keychain');
+        setVal(dom.mcSlotWidth, c.mcSlotWidth, '2.0');
+        setVal(dom.mcCustomLabel, c.mcCustomLabel, '');
+
+        setVal(dom.ilWord1, c.ilWord1, '3D');
+        setVal(dom.ilWord2, c.ilWord2, '★!');
+        setVal(dom.ilVoxelSize, c.ilVoxelSize, '2.2');
+        setChk(dom.ilSafeSupports, c.ilSafeSupports, true);
+        setVal(dom.ilLayoutMode, c.ilLayoutMode, 'diagonal');
+        setVal(dom.ilColorPrimary, c.ilColorPrimary, '#10b981');
+
+        setVal(dom.phSubmode, c.phSubmode, 'catapult');
+        setVal(dom.phExtrudeHeight, c.phExtrudeHeight, '10.0');
+        setVal(dom.phSpringThickness, c.phSpringThickness, '2.0');
+        setVal(dom.phWingWeight, c.phWingWeight, '3.5');
+        setVal(dom.phArmLength, c.phArmLength, '50');
+        setChk(dom.phIncludeAmmo, c.phIncludeAmmo, true);
+        setVal(dom.phCustomText, c.phCustomText, '');
+
+        if (dom.phSubmode) {
+          const isBalancer = dom.phSubmode.value === 'balancer';
+          if (dom.phSpringGroup) dom.phSpringGroup.style.display = isBalancer ? 'none' : 'block';
+          if (dom.phWeightGroup) dom.phWeightGroup.style.display = isBalancer ? 'block' : 'none';
+          if (dom.btnPhysicsDemo) {
+            dom.btnPhysicsDemo.textContent = isBalancer
+              ? '👆 Протестувати Магічний Баланс!'
+              : '🚀 ВИСТРІЛИТИ З КАТАПУЛЬТИ!';
+          }
+        }
+
+        setVal(dom.mobArchetype, c.mobArchetype, 'creeper');
+        setVal(dom.mobHeadScale, c.mobHeadScale, '1.0');
+        setVal(dom.mobBodyBulk, c.mobBodyBulk, '1.0');
+        setVal(dom.mobEyeType, c.mobEyeType, 'two');
+        setVal(dom.mobHeadgear, c.mobHeadgear, 'none');
+        setVal(dom.mobBackgear, c.mobBackgear, 'none');
+        setVal(dom.mobWeapon, c.mobWeapon, 'sword');
+        setVal(dom.mobName, c.mobName, '');
+        setChk(dom.mobTinkercadBlank, c.mobTinkercadBlank, false);
+
+        if (state.minecraft) {
+          this.mcGen.setState(state.minecraft, false);
+          document.querySelectorAll('[data-mc-preset]').forEach((b) => {
+            b.classList.toggle('active', b.getAttribute('data-mc-preset') === this.mcGen.currentPresetKey);
+          });
+        }
+
+        setVal(dom.verificationSelect, state.verificationStatus, 'generated');
+        setVal(dom.slicerTimeInput, state.slicerNote, '');
+        this.syncVerificationBadgeUI();
+
+        if (state.monoColor && dom.monoColorPicker) {
+          dom.monoColorPicker.value = state.monoColor;
+          this.sceneManager.setMonochromeColor(parseInt(state.monoColor.replace('#', '0x'), 16));
+        }
+        if (typeof state.monochrome === 'boolean') {
+          this.setMonochromeMode(state.monochrome);
+        }
+
+        this.updateValueLabels();
+        const targetTab = state.activeTab || 'minecraft';
+        this.switchTab(targetTab, true);
+        this.rebuildCurrentModel(animatePop, true);
+        if (this.adventureShelf) this.adventureShelf.selectMission(this.missions.activeMissionId);
+      } finally {
+        this._isRestoring = false;
       }
-
-      setVal(dom.mobArchetype, c.mobArchetype, 'creeper');
-      setVal(dom.mobHeadScale, c.mobHeadScale, '1.0');
-      setVal(dom.mobBodyBulk, c.mobBodyBulk, '1.0');
-      setVal(dom.mobEyeType, c.mobEyeType, 'two');
-      setVal(dom.mobHeadgear, c.mobHeadgear, 'none');
-      setVal(dom.mobBackgear, c.mobBackgear, 'none');
-      setVal(dom.mobWeapon, c.mobWeapon, 'sword');
-      setVal(dom.mobName, c.mobName, '');
-      setChk(dom.mobTinkercadBlank, c.mobTinkercadBlank, false);
-
-      if (state.minecraft) {
-        this.mcGen.setState(state.minecraft, false);
-        document.querySelectorAll('[data-mc-preset]').forEach((b) => {
-          b.classList.toggle('active', b.getAttribute('data-mc-preset') === this.mcGen.currentPresetKey);
-        });
-      }
-
-      setVal(dom.verificationSelect, state.verificationStatus, 'generated');
-      setVal(dom.slicerTimeInput, state.slicerNote, '');
-      this.syncVerificationBadgeUI();
-
-      if (state.monoColor && dom.monoColorPicker) {
-        dom.monoColorPicker.value = state.monoColor;
-        this.sceneManager.setMonochromeColor(parseInt(state.monoColor.replace('#', '0x'), 16));
-      }
-      if (typeof state.monochrome === 'boolean') {
-        this.setMonochromeMode(state.monochrome);
-      }
-
-      this.updateValueLabels();
-      const targetTab = state.activeTab || 'minecraft';
-      this.switchTab(targetTab, true);
-      this.rebuildCurrentModel(animatePop, true);
-      if (this.adventureShelf) this.adventureShelf.selectMission(this.missions.activeMissionId);
-      this._isRestoring = false;
     }
 
     recordUndoSnapshot() {
@@ -482,12 +486,21 @@
             alert('Цей файл не є файлом проєкту «3D Кузня Чудес».');
             return;
           }
-          this.recordUndoSnapshot();
-          this.applyState(parsed, true);
+          const candidate = window.ProjectState.normalize(parsed, {
+            missions: this.missions.missions, presets: window.MINECRAFT_PRESETS
+          });
+          const previous = this.serializeState();
+          try {
+            this.applyState(candidate, true);
+          } catch (error) {
+            this.applyState(previous, false);
+            throw error;
+          }
+          this.history.recordSnapshot(previous);
           this.autosave();
           if (window.StudioSound) window.StudioSound.playMagicGenerate();
-        } catch (_) {
-          alert('Не вдалося прочитати файл проєкту. Перевірте цілісність .json файлу.');
+        } catch (error) {
+          alert('Не вдалося відкрити проєкт: ' + error.message);
         }
       };
       reader.readAsText(file);
@@ -496,10 +509,12 @@
     markModelModified() {
       if (this._isRestoring) return;
       const dom = this._domCache || {};
+      if (dom.slicerTimeInput) dom.slicerTimeInput.value = '';
       if (dom.verificationSelect && dom.verificationSelect.value !== 'generated') {
         dom.verificationSelect.value = 'generated';
         this.syncVerificationBadgeUI();
       }
+      this.updateDiagnosticsUI();
     }
 
     setMonochromeMode(enable) {
@@ -586,7 +601,7 @@
         pill.textContent = '⚠️ Є тонкі діагональні кутики: увімкніть підкладку для міцності!';
         pill.className = 'connectivity-pill warn';
       } else if (c.finalIslands === 1) {
-        pill.textContent = '✅ 1 суцільна деталь: усі частини надійно з\'єднані.';
+        pill.textContent = '✅ Піксельна зв’язність: 1 група; STL перевір у слайсері.';
         pill.className = 'connectivity-pill';
       } else {
         pill.textContent = `🚨 Розірвано на ${c.finalIslands} окремих частин! Увімкніть підкладку або домалюйте містки.`;
@@ -613,12 +628,12 @@
 
       if (tabName === 'illusion') {
         this.sceneManager.setCameraView('front');
-        if (this.missions && this.missions.getActiveMission()?.targetTab !== 'illusion') {
+        if (!this._isRestoring && this.missions && this.missions.getActiveMission()?.targetTab !== 'illusion') {
           this.missions.setMission(12, false);
         }
       } else {
         this.sceneManager.setCameraView('iso');
-        if (this.missions && this.missions.getActiveMission()?.targetTab === 'illusion') {
+        if (!this._isRestoring && this.missions && this.missions.getActiveMission()?.targetTab === 'illusion') {
           this.missions.setMission(1, false);
         }
       }
@@ -673,7 +688,8 @@
         }
         if (dom.btnSnapshotV1) {
           dom.btnSnapshotV1.textContent = '📸 V1 збережено ✅';
-          setTimeout(() => {
+          clearTimeout(this._snapshotLabelTimer);
+          this._snapshotLabelTimer = setTimeout(() => {
             if (dom.btnSnapshotV1) dom.btnSnapshotV1.textContent = '📸 Оновити V1';
           }, 2200);
         }
@@ -690,10 +706,12 @@
         this.missions.getActiveMission(),
         this._domCache?.slicerTimeInput
       );
+      window.ModalFocus.enter(this._domCache.compareModal);
     }
 
     closeCompareModal() {
       this.compare.closeCompareModal(this._domCache);
+      window.ModalFocus.leave(this._domCache.compareModal);
     }
 
     openPrintCardModal(version = 'V2') {
@@ -708,10 +726,12 @@
         v1Snapshot: this.compare.getV1(),
         filename: this.getSuggestedFilename()
       });
+      window.ModalFocus.enter(this._domCache.printCardModal);
     }
 
     closePrintCardModal() {
       this.passport.closeModal(this._domCache);
+      window.ModalFocus.leave(this._domCache.printCardModal);
     }
 
     downloadPassportPng() {
@@ -741,10 +761,15 @@
     }
 
     startMission(missionId) {
-      const m = this.missions.setMission(missionId, true);
+      const m = window.StudioContentRegistry.resolveMission(missionId);
       if (!m) return;
-
       this.recordUndoSnapshot();
+      this._isRestoring = true;
+      try {
+        this.missions.setMission(m.id, true);
+      } finally {
+        this._isRestoring = false;
+      }
       const dom = this._domCache || {};
       const cfg = m.config || {};
       const c = cfg.controls || {};
@@ -796,6 +821,7 @@
       if (!dom.missionsModal) return;
       this.missions.renderMissionsModal(this._domCache, (id) => this.startMission(id));
       dom.missionsModal.style.display = 'flex';
+      window.ModalFocus.enter(dom.missionsModal);
       const btnTop = document.getElementById('btn-open-missions');
       if (btnTop) btnTop.classList.add('active');
       if (window.StudioSound) window.StudioSound.playPop(540);
@@ -805,6 +831,7 @@
       const dom = this._domCache || {};
       if (!dom.missionsModal) return;
       dom.missionsModal.style.display = 'none';
+      window.ModalFocus.leave(dom.missionsModal);
       const btnTop = document.getElementById('btn-open-missions');
       if (btnTop) btnTop.classList.remove('active');
       if (window.StudioSound) window.StudioSound.playPop(360);
@@ -851,6 +878,9 @@
 
       // Гарячі клавіші (Undo, Redo, Save, Escape, Ортографія)
       window.addEventListener('keydown', (e) => {
+        window.ModalFocus.handleKey(e);
+        const editing = e.target?.closest?.('input, textarea, select, [contenteditable="true"]');
+        if (editing && e.key !== 'Escape') return;
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
           e.preventDefault();
           if (e.shiftKey) this.redo();
@@ -1112,6 +1142,7 @@
 
       if (btnPrev) {
         btnPrev.addEventListener('click', () => {
+          this.recordUndoSnapshot();
           this.missions.prevMission();
           if (window.StudioSound) window.StudioSound.playPop(420);
         });
@@ -1119,6 +1150,7 @@
 
       if (btnNext) {
         btnNext.addEventListener('click', () => {
+          this.recordUndoSnapshot();
           this.missions.nextMission();
           if (window.StudioSound) window.StudioSound.playPop(500);
         });
@@ -1150,6 +1182,7 @@
       checkMap.forEach(([chkEl, key]) => {
         if (chkEl) {
           chkEl.addEventListener('change', () => {
+            this.recordUndoSnapshot();
             this.missions.setCheck(key, chkEl.checked);
             if (window.StudioSound) window.StudioSound.playPop(chkEl.checked ? 620 : 340);
             this.autosave();
@@ -1393,6 +1426,7 @@
       ['il-voxel-size', 'il-safe-supports', 'il-layout-mode', 'il-color-primary'].forEach((id) => {
         const el = document.getElementById(id);
         if (el) {
+          el.addEventListener('focus', () => this.recordUndoSnapshot());
           el.addEventListener('mousedown', () => this.recordUndoSnapshot());
           const handleUpdate = () => {
             this._playControlFeedback(el);
@@ -1410,8 +1444,9 @@
     bindPhysicsControls() {
       const subSelect = document.getElementById('ph-submode');
       if (subSelect) {
+        subSelect.addEventListener('focus', () => this.recordUndoSnapshot());
+        subSelect.addEventListener('mousedown', () => this.recordUndoSnapshot());
         subSelect.addEventListener('change', () => {
-          this.recordUndoSnapshot();
           const isBalancer = subSelect.value === 'balancer';
           const springG = document.getElementById('ph-spring-group');
           const weightG = document.getElementById('ph-weight-group');
@@ -1438,6 +1473,7 @@
       ['ph-extrude-height', 'ph-spring-thickness', 'ph-wing-weight', 'ph-arm-length', 'ph-include-ammo', 'ph-custom-text'].forEach((id) => {
         const el = document.getElementById(id);
         if (el) {
+          el.addEventListener('focus', () => this.recordUndoSnapshot());
           el.addEventListener('mousedown', () => this.recordUndoSnapshot());
           const handleUpdate = () => {
             this._playControlFeedback(el);
@@ -1469,6 +1505,7 @@
       ids.forEach((id) => {
         const el = document.getElementById(id);
         if (el) {
+          el.addEventListener('focus', () => this.recordUndoSnapshot());
           el.addEventListener('mousedown', () => this.recordUndoSnapshot());
           const handleUpdate = () => {
             this._playControlFeedback(el);

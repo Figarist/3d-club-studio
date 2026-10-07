@@ -16,10 +16,16 @@
       return this.redoStack.length > 0;
     }
 
+    _serialize(state) {
+      const snapshot = Object.assign({}, state);
+      delete snapshot.savedAt;
+      return JSON.stringify(snapshot);
+    }
+
     recordSnapshot(state) {
       if (!state) return;
       try {
-        const serialized = JSON.stringify(state);
+        const serialized = this._serialize(state);
         // Не зберігаємо дублікат останнього стану
         if (this.undoStack.length > 0 && this.undoStack[this.undoStack.length - 1] === serialized) {
           return;
@@ -39,7 +45,7 @@
       if (!this.canUndo()) return null;
       try {
         if (currentState) {
-          this.redoStack.push(JSON.stringify(currentState));
+          this.redoStack.push(this._serialize(currentState));
           if (this.redoStack.length > this.maxHistory) {
             this.redoStack.shift();
           }
@@ -57,7 +63,7 @@
       if (!this.canRedo()) return null;
       try {
         if (currentState) {
-          this.undoStack.push(JSON.stringify(currentState));
+          this.undoStack.push(this._serialize(currentState));
           if (this.undoStack.length > this.maxHistory) {
             this.undoStack.shift();
           }
