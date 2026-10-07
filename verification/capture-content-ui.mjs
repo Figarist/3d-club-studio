@@ -1,7 +1,8 @@
 // Used only inside cua_repl with its documented tab/CDP APIs. No external runner.
-const fs=require('node:fs/promises');
-const path=require('node:path');
-const root=path.resolve(__dirname,'..');
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const numeric=key=>/(?:Scale|Bulk|VoxelSize|HeightStep|SlotWidth|ExtrudeHeight|SpringThickness|WingWeight|ArmLength)$/.test(key);
 const ids={mcVoxelSize:'mc-voxel-size',mcHeightStep:'mc-height-step',mcSolidBase:'mc-solid-base',mcMountType:'mc-mount-type',mcSlotWidth:'mc-slot-width',mcCustomLabel:'mc-custom-label',ilWord1:'il-word1',ilWord2:'il-word2',ilVoxelSize:'il-voxel-size',ilSafeSupports:'il-safe-supports',ilLayoutMode:'il-layout-mode',ilColorPrimary:'il-color-primary',ilDesign:'il-design',phSubmode:'ph-submode',phExtrudeHeight:'ph-extrude-height',phSpringThickness:'ph-spring-thickness',phWingWeight:'ph-wing-weight',phArmLength:'ph-arm-length',phIncludeAmmo:'ph-include-ammo',phCustomText:'ph-custom-text',phDesign:'ph-design',mobArchetype:'mob-archetype',mobHeadScale:'mob-head-scale',mobBodyBulk:'mob-body-bulk',mobEyeType:'mob-eye-type',mobHeadgear:'mob-headgear',mobBackgear:'mob-backgear',mobWeapon:'mob-weapon',mobName:'mob-name',mobTinkercadBlank:'mob-tinkercad-blank',mobDesign:'mob-design'};
 function ignoredControls(row){
@@ -81,8 +82,8 @@ async function captureRow(tab,cap,row,emitImage){
       const after=await state(cap);if(after.minecraft.grid[cell.r][cell.c]!==4)throw Error('Actual grid painting failed');record.interaction={action:'Actual brush and grid-cell click',cell,beforeHeight:cell.before,afterHeight:4,result:'Visible raised-cell edit in complementary top view.'};
     }
     await tab.playwright.locator('[data-view-mode="viewport"]').click();await angle(tab,cap,row.family==='mob'?'side90':'top');await save('action');await tab.playwright.locator('#btn-undo').click();await settle(cap);
-    const restored=await state(cap);if(row.family==='mob'&&restored.controls.mobHeadScale!==baseline.controls.mobHeadScale)throw Error('Head undo failed');if(row.family==='minecraft'&&row.config.mcPreset!=='slot_calibrator'&&JSON.stringify(restored.minecraft.grid)!==JSON.stringify(baseline.minecraft.grid))throw Error('Grid undo failed');if(row.config.mcPreset==='slot_calibrator'&&Number(restored.controls.mcSlotWidth)!==Number(baseline.controls.mcSlotWidth))throw Error('Slot undo failed');record.interaction.retry='Actual Undo restored the original editable model state.';
+    const restored=await state(cap);if(row.family==='mob'&&Number(restored.controls.mobHeadScale)!==Number(baseline.controls.mobHeadScale))throw Error('Head undo failed');if(row.family==='minecraft'&&row.config.mcPreset!=='slot_calibrator'&&JSON.stringify(restored.minecraft.grid)!==JSON.stringify(baseline.minecraft.grid))throw Error('Grid undo failed');if(row.config.mcPreset==='slot_calibrator'&&Number(restored.controls.mcSlotWidth)!==Number(baseline.controls.mcSlotWidth))throw Error('Slot undo failed');record.interaction.retry='Actual Undo restored the original editable model state.';
   }
   await fs.writeFile(path.join(directory,'capture.json'),JSON.stringify(record,null,2)+'\n');return record;
 }
-module.exports={captureRow,state,settle,select};
+export {captureRow,state,settle,select};
