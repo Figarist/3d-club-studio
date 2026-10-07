@@ -194,6 +194,17 @@
         this.pixelTools.mount(document.getElementById('pixel-editor-tools'));
       }
 
+      if (window.LessonCompanion) {
+        this.lessonCompanion = new window.LessonCompanion({
+          onSelectMission: (id) => {
+            this.startMission(id);
+            this.lessonCompanion.close();
+          }
+        });
+        this.lessonCompanion.init();
+        document.getElementById('btn-open-lesson')?.addEventListener('click', () => this.lessonCompanion.open());
+      }
+
       this.bindTabs();
       this.bindTopActions();
       this.bindMissionControls();
@@ -225,7 +236,7 @@
       const savedPair = this.safeStorage.getItem('3d_kuznya_pair_code') || '';
       return {
         app: '3d-club-studio',
-        version: '1.7.0',
+        version: '1.8.0',
         savedAt: new Date().toISOString(),
         activeTab: this.activeTab,
         activeMissionId: this.missions.activeMissionId,
