@@ -53,8 +53,8 @@
       this.monochromeColor = 0xcfd6df; // Нейтральний сіро-сріблястий PLA пластик
       this.monochromeMaterial = new THREE.MeshStandardMaterial({
         color: this.monochromeColor,
-        roughness: 0.52,
-        metalness: 0.08,
+        roughness: 0.9,
+        metalness: 0,
         clippingPlanes: [this.clipPlane],
         clipShadows: true
       });
@@ -97,6 +97,9 @@
       this.renderer.shadowMap.enabled = true;
       this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       this.renderer.localClippingEnabled = true;
+      // Preserve relief shading on light plastic instead of clipping highlights.
+      this.renderer.toneMapping = THREE.ReinhardToneMapping;
+      this.renderer.toneMappingExposure = 1;
 
       this.container.innerHTML = '';
       this.container.appendChild(this.renderer.domElement);
@@ -801,13 +804,15 @@
 
     animate() {
       requestAnimationFrame(() => this.animate());
-      const dt = Math.min(0.05, this.clock.getDelta());
+      const frameDelta = Math.min(0.25, this.clock.getDelta());
+      const dt = Math.min(0.05, frameDelta);
+      const cameraBlend = 1 - Math.exp(-9 * frameDelta);
 
       // Плавна інтерполяція камери
-      this.spherical.theta += (this.targetSpherical.theta - this.spherical.theta) * 0.14;
-      this.spherical.phi += (this.targetSpherical.phi - this.spherical.phi) * 0.14;
-      this.spherical.radius += (this.targetSpherical.radius - this.spherical.radius) * 0.14;
-      this.spherical.target.lerp(this.targetSpherical.target, 0.14);
+      this.spherical.theta += (this.targetSpherical.theta - this.spherical.theta) * cameraBlend;
+      this.spherical.phi += (this.targetSpherical.phi - this.spherical.phi) * cameraBlend;
+      this.spherical.radius += (this.targetSpherical.radius - this.spherical.radius) * cameraBlend;
+      this.spherical.target.lerp(this.targetSpherical.target, cameraBlend);
 
       const r = this.spherical.radius;
       const sinPhi = Math.sin(this.spherical.phi);
@@ -830,7 +835,7 @@
       if (this.popAnimBlocks.length > 0) {
         let anyActive = false;
         for (const item of this.popAnimBlocks) {
-          item.elapsed += dt;
+          item.elapsed += frameDelta;
           if (item.elapsed < item.delay) {
             anyActive = true;
             continue;

@@ -8,6 +8,7 @@
       this._missionsById = new Map();
       this._missionsByKey = new Map();
       this._packIds = new Set();
+      this._modelsByKey = new Map();
       this._baseRegistered = false;
     }
 
@@ -18,6 +19,7 @@
 
       const ids = new Set();
       const keys = new Set();
+      const modelKeys = new Set();
       candidateMissions.forEach((mission) => {
         if (!mission || typeof mission !== 'object' || Array.isArray(mission)) {
           throw new Error('Content registration contains an invalid mission.');
@@ -38,6 +40,17 @@
           throw new Error('Duplicate mission key: ' + mission.key);
         }
         this._validateMissionPresentation(mission);
+        if (mission.modelKey !== undefined) {
+          if (typeof mission.modelKey !== 'string' || !/^[a-z0-9][a-z0-9_-]*$/.test(mission.modelKey) ||
+              modelKeys.has(mission.modelKey) || this._modelsByKey.has(mission.modelKey)) {
+            throw new Error('Duplicate or unsafe model key: ' + mission.modelKey);
+          }
+          ['theme', 'feature', 'editableAction', 'interaction'].forEach(field => {
+            if (typeof mission[field] !== 'string' || !mission[field].trim()) throw new Error('Catalog model requires ' + field);
+          });
+          if (!mission.config || !mission.config.controls) throw new Error('Catalog models require a complete configuration.');
+          modelKeys.add(mission.modelKey);
+        }
         ids.add(mission.id);
         keys.add(mission.key);
       });
@@ -130,6 +143,7 @@
         this.missions.push(mission);
         this._missionsById.set(mission.id, mission);
         this._missionsByKey.set(mission.key, mission);
+        if (mission.modelKey) this._modelsByKey.set(mission.modelKey, mission);
       });
       this._baseRegistered = true;
       return this.missions;
@@ -196,6 +210,7 @@
         this.missions.push(mission);
         this._missionsById.set(mission.id, mission);
         this._missionsByKey.set(mission.key, mission);
+        if (mission.modelKey) this._modelsByKey.set(mission.modelKey, mission);
       });
       this._packIds.add(packId);
 
@@ -218,6 +233,14 @@
 
     listMissions() {
       return this.missions.slice();
+    }
+
+    listModels() {
+      return Array.from(this._modelsByKey.values());
+    }
+
+    resolveModel(key) {
+      return this._modelsByKey.get(key) || null;
     }
 
     getMissionId(key) {

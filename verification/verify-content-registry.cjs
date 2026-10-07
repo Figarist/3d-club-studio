@@ -79,6 +79,7 @@ function assertRejectedWithoutMutation(registry, presetTarget, pack, pattern, la
   const missionIds = Array.from(registry._missionsById.keys());
   const missionKeys = Array.from(registry._missionsByKey.keys());
   const packIds = Array.from(registry._packIds);
+  const modelKeys = Array.from(registry._modelsByKey.keys());
   const presetEntries = Object.keys(presetTarget).sort().map((key) => [key, presetTarget[key]]);
   const snapshot = JSON.stringify({ missions: registry.missions, presets: presetTarget });
 
@@ -89,6 +90,7 @@ function assertRejectedWithoutMutation(registry, presetTarget, pack, pattern, la
   assert.deepEqual(Array.from(registry._missionsById.keys()), missionIds, label + ' keeps the numeric index');
   assert.deepEqual(Array.from(registry._missionsByKey.keys()), missionKeys, label + ' keeps the stable-key index');
   assert.deepEqual(Array.from(registry._packIds), packIds, label + ' keeps registered pack IDs');
+  assert.deepEqual(Array.from(registry._modelsByKey.keys()), modelKeys, label + ' keeps model identities');
   assert.deepEqual(Object.keys(presetTarget).sort().map((key) => [key, presetTarget[key]]), presetEntries, label + ' keeps preset entries');
   assert.equal(JSON.stringify({ missions: registry.missions, presets: presetTarget }), snapshot, label + ' leaves all catalog arrays unchanged');
 }
@@ -155,6 +157,24 @@ assertRejectedWithoutMutation(
   /Duplicate or empty preset key/,
   'duplicate preset key'
 );
+
+const modelPack = makePack('pack-model', 40, 'model_grid');
+Object.assign(modelPack.missions[0], {
+  modelKey: 'authored_model', theme: 'Test theme', feature: 'Raised contour',
+  editableAction: 'Change the contour', interaction: 'draw'
+});
+modelPack.missions[0].config.controls = { mcVoxelSize: '2' };
+forward.registry.registerPack(modelPack, {presetTarget: forward.presetTarget});
+assert.equal(forward.registry.resolveModel('authored_model').id, 40);
+assert.equal(forward.registry.listModels().length, 1);
+const collision = makePack('pack-model-collision', 41, 'next_model_grid');
+Object.assign(collision.missions[0], modelPack.missions[0], {
+  id: 41, key: 'pack-model-collision:item', presetKey: 'next_model_grid',
+  config: { tab: 'minecraft', mcPreset: 'next_model_grid', controls: {} }
+});
+assertRejectedWithoutMutation(forward.registry, forward.presetTarget, collision, /model key/, 'duplicate model identity');
+collision.missions[0].modelKey = '../unsafe';
+assertRejectedWithoutMutation(forward.registry, forward.presetTarget, collision, /model key/, 'unsafe model identity');
 
 // The production core and Adventure Pack modules register without a DOM.
 const window = { MINECRAFT_PRESETS: {} };

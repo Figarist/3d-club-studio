@@ -102,10 +102,12 @@
         ilSafeSupports: document.getElementById('il-safe-supports'),
         ilLayoutMode: document.getElementById('il-layout-mode'),
         ilColorPrimary: document.getElementById('il-color-primary'),
+        ilDesign: document.getElementById('il-design'),
         valIlVoxel: document.getElementById('val-il-voxel'),
 
         // Контроли Фізики
         phSubmode: document.getElementById('ph-submode'),
+        phDesign: document.getElementById('ph-design'),
         phExtrudeHeight: document.getElementById('ph-extrude-height'),
         phSpringThickness: document.getElementById('ph-spring-thickness'),
         phWingWeight: document.getElementById('ph-wing-weight'),
@@ -122,6 +124,7 @@
 
         // Контроли Мобів
         mobArchetype: document.getElementById('mob-archetype'),
+        mobDesign: document.getElementById('mob-design'),
         mobHeadScale: document.getElementById('mob-head-scale'),
         mobBodyBulk: document.getElementById('mob-body-bulk'),
         mobEyeType: document.getElementById('mob-eye-type'),
@@ -206,6 +209,7 @@
       }
 
       this.bindTabs();
+      this.bindModelCatalog();
       this.bindTopActions();
       this.bindMissionControls();
       this.bindViewModeControls();
@@ -281,7 +285,10 @@
           mobBackgear: dom.mobBackgear?.value || 'none',
           mobWeapon: dom.mobWeapon?.value || 'sword',
           mobName: dom.mobName?.value || '',
-          mobTinkercadBlank: !!dom.mobTinkercadBlank?.checked
+          mobTinkercadBlank: !!dom.mobTinkercadBlank?.checked,
+          mobDesign: dom.mobDesign?.value || 'classic',
+          ilDesign: dom.ilDesign?.value || 'classic',
+          phDesign: dom.phDesign?.value || 'classic'
         }
       };
     }
@@ -368,6 +375,7 @@
         setVal(dom.mobWeapon, c.mobWeapon, 'sword');
         setVal(dom.mobName, c.mobName, '');
         setChk(dom.mobTinkercadBlank, c.mobTinkercadBlank, false);
+        ['mobDesign', 'ilDesign', 'phDesign'].forEach(key => setVal(dom[key], c[key], 'classic'));
 
         if (state.minecraft) {
           this.mcGen.setState(state.minecraft, false);
@@ -773,6 +781,21 @@
       const dom = this._domCache || {};
       const cfg = m.config || {};
       const c = cfg.controls || {};
+      const designKey = { mob: 'mobDesign', illusion: 'ilDesign', physics: 'phDesign' }[cfg.tab];
+      if (designKey && dom[designKey]) dom[designKey].value = c[designKey] || 'classic';
+      // The mission configuration is the sole adapter input for all four families.
+      Object.keys(c).forEach(key => {
+        const control = dom[key];
+        if (!control) return;
+        if (control.type === 'checkbox') control.checked = c[key];
+        else control.value = c[key];
+      });
+      if (dom.phSubmode) {
+        const balance = dom.phSubmode.value === 'balancer';
+        if (dom.phSpringGroup) dom.phSpringGroup.style.display = balance ? 'none' : 'block';
+        if (dom.phWeightGroup) dom.phWeightGroup.style.display = balance ? 'block' : 'none';
+        if (dom.btnPhysicsDemo) dom.btnPhysicsDemo.textContent = balance ? '👆 Перевірити баланс' : '🚀 Запустити';
+      }
 
       if (cfg.tab === 'minecraft') {
         if (c.mcVoxelSize && dom.mcVoxelSize) dom.mcVoxelSize.value = c.mcVoxelSize;
@@ -804,9 +827,52 @@
 
       const targetTab = cfg.tab || m.targetTab || 'minecraft';
       this.switchTab(targetTab, true);
+      if (m.modelKey) this.setMonochromeMode(true);
       this.markModelModified();
       this.rebuildCurrentModel(true, true);
+      this.sceneManager.fitModelView();
       this.autosave();
+    }
+
+    bindModelCatalog() {
+      const models = window.StudioContentRegistry.listModels();
+      ['mobDesign', 'ilDesign', 'phDesign'].forEach(key => {
+        const control = this._domCache[key];
+        if (!control) return;
+        const seen = new Set(['classic']);
+        models.forEach(m => {
+          const value = m.config.controls && m.config.controls[key];
+          if (!value || seen.has(value)) return;
+          seen.add(value);
+          const option = document.createElement('option');
+          option.value = value;
+          option.textContent = m.title;
+          control.appendChild(option);
+        });
+        control.addEventListener('change', () => {
+          this.markModelModified();
+          this.rebuildCurrentModel(true, true);
+          this.sceneManager.fitModelView();
+          this.autosave();
+        });
+        control.addEventListener('focus', () => this.recordUndoSnapshot());
+      });
+      const search = document.getElementById('model-search');
+      const theme = document.getElementById('model-theme');
+      if (theme) Array.from(new Set(models.map(m => m.theme))).forEach(value => {
+        const option = document.createElement('option');
+        option.value = value; option.textContent = value; theme.appendChild(option);
+      });
+      const render = () => {
+        this.missions.catalogQuery = search ? search.value : '';
+        this.missions.catalogTheme = theme ? theme.value : '';
+        this.missions.renderMissionsModal(this._domCache, id => this.startMission(id));
+      };
+      search?.addEventListener('input', render);
+      theme?.addEventListener('change', render);
+      document.getElementById('btn-physics-reset')?.addEventListener('click', () => {
+        this.physicsGen.resetInteractiveDemo(this.sceneManager);
+      });
     }
 
     onMissionSelected(m) {
@@ -910,14 +976,14 @@
       if (dom.btnToggleMono) {
         dom.btnToggleMono.addEventListener('click', () => {
           const act = this.setMonochromeMode();
-          if (window.StudioSound) window.StudioSound.playMonoSwitch(act);
+          window.StudioSound?.playPop?.(act ? 620 : 380);
           this.autosave();
         });
       }
       if (dom.btnHudMono) {
         dom.btnHudMono.addEventListener('click', () => {
           const act = this.setMonochromeMode();
-          if (window.StudioSound) window.StudioSound.playMonoSwitch(act);
+          window.StudioSound?.playPop?.(act ? 620 : 380);
           this.autosave();
         });
       }
@@ -1353,6 +1419,7 @@
           }
           const dom = this._domCache || {};
           if (dom.ilWord1) dom.ilWord1.value = '3D';
+          if (dom.ilDesign) dom.ilDesign.value = 'classic';
           if (dom.ilWord2) dom.ilWord2.value = '★!';
           if (dom.ilVoxelSize) dom.ilVoxelSize.value = '2.2';
           this.updateValueLabels();
@@ -1372,6 +1439,7 @@
           const w2 = btn.getAttribute('data-w2');
           const vox = btn.getAttribute('data-voxel');
           if (dom.ilWord1) dom.ilWord1.value = w1;
+          if (dom.ilDesign) dom.ilDesign.value = 'classic';
           if (dom.ilWord2) dom.ilWord2.value = w2;
           if (vox && dom.ilVoxelSize) dom.ilVoxelSize.value = vox;
           this.updateValueLabels();
@@ -1491,7 +1559,11 @@
       if (demoBtn) {
         demoBtn.addEventListener('click', () => {
           const sub = (this._domCache?.phSubmode || document.getElementById('ph-submode'))?.value || 'catapult';
-          this.physicsGen.triggerInteractiveDemo(this.sceneManager, sub);
+          this.physicsGen.triggerInteractiveDemo(this.sceneManager, sub, {
+            design: this._domCache.phDesign?.value || 'classic',
+            armLength: this._domCache.phArmLength?.value,
+            wingWeight: this._domCache.phWingWeight?.value
+          });
         });
       }
     }
@@ -1534,7 +1606,7 @@
           window.StudioSound.playSliderTick(pct);
         }
       } else if (el.type === 'checkbox') {
-        window.StudioSound.playToggle(el.checked);
+        window.StudioSound.playPop?.(el.checked ? 620 : 380);
       } else if (el.tagName === 'SELECT') {
         window.StudioSound.playPop(440);
       }
@@ -1639,6 +1711,7 @@
       } else if (this.activeTab === 'illusion') {
         const colorHex = dom.ilColorPrimary?.value || '#10b981';
         group = this.illusionGen.build3D({
+          design: dom.ilDesign?.value || 'classic',
           word1: dom.ilWord1?.value,
           word2: dom.ilWord2?.value,
           voxelSize: dom.ilVoxelSize?.value,
@@ -1648,6 +1721,7 @@
         });
       } else if (this.activeTab === 'physics') {
         group = this.physicsGen.build3D({
+          design: dom.phDesign?.value || 'classic',
           submode: dom.phSubmode?.value,
           extrudeHeight: dom.phExtrudeHeight?.value,
           springThickness: dom.phSpringThickness?.value,
@@ -1658,6 +1732,7 @@
         });
       } else if (this.activeTab === 'mob') {
         group = this.mobGen.build3D({
+          design: dom.mobDesign?.value || 'classic',
           archetype: dom.mobArchetype?.value,
           headScale: dom.mobHeadScale?.value,
           bodyBulk: dom.mobBodyBulk?.value,

@@ -15,7 +15,8 @@
     phWingWeight: '11.0', phArmLength: '68', phIncludeAmmo: true, phCustomText: '',
     mobArchetype: 'creeper', mobHeadScale: '1', mobBodyBulk: '1',
     mobEyeType: 'two', mobHeadgear: 'none', mobBackgear: 'none',
-    mobWeapon: 'sword', mobName: '', mobTinkercadBlank: false
+    mobWeapon: 'sword', mobName: '', mobTinkercadBlank: false,
+    mobDesign: 'classic', ilDesign: 'classic', phDesign: 'classic'
   };
   const NUMERIC_CONTROLS = {
     mcVoxelSize: { min: 1.8, max: 5.0, step: 0.1, places: 1 },
@@ -115,6 +116,14 @@
     if (value !== undefined && !isRecord(value)) fail('controls', 'must be an object');
     const source = value || {};
     const controls = Object.assign({}, CONTROL_DEFAULTS);
+    ['mobDesign', 'ilDesign', 'phDesign'].forEach(function (key) {
+      const designs = ['classic'];
+      if (root.StudioContentRegistry) root.StudioContentRegistry.listModels().forEach(function (mission) {
+        const design = mission.config.controls && mission.config.controls[key];
+        if (design && !designs.includes(design)) designs.push(design);
+      });
+      controls[key] = enumValue(source[key], designs, 'controls.' + key, 'classic');
+    });
 
     Object.keys(NUMERIC_CONTROLS).forEach(function (key) {
       if (hasOwn(source, key)) {
