@@ -665,7 +665,7 @@
         <div>
           <h2 id="compare-modal-title">⚖️ Інженерний поступ: Порівняння Версія 1 (Ескіз) ↔ Версія 2 (Фінал)</h2>
           <p class="modal-subtitle">
-            Порівняй свій початковий задум з оптимізованою моделлю. Чому V2 надійніша для друку на Anycubic i3 Mega?
+            Порівняй задум, габарити та зміни. Придатність STL і час друку перевір у слайсері.
           </p>
         </div>
         <button id="btn-close-compare" class="modal-close-btn" title="Закрити (Esc)" aria-label="Закрити вікно порівняння">✕</button>
@@ -689,7 +689,7 @@
 
         <div class="compare-col v2-col">
           <div class="compare-card-header">
-            <span class="version-tag v2-tag">Версія 2 (Готово до друку)</span>
+            <span class="version-tag v2-tag">Версія 2 (Поточна модель)</span>
             <span id="v2-timestamp" class="compare-time">Зараз</span>
           </div>
           <div class="compare-img-wrap">
@@ -703,9 +703,9 @@
       <div class="reflection-box">
         <h4>💡 Інженерна рефлексія пари (хвилини 52–60):</h4>
         <ul>
-          <li><b>Зв'язність:</b> чи немає деталей, які відпадуть після зняття зі столу принтера? (Острови = 1).</li>
+          <li><b>Зв'язність:</b> перевір суміжність клітинок у редакторі, а цілісність 3D-сітки — у слайсері.</li>
           <li><b>Силует і тінь:</b> чи достатньо контрастні сходинки висоти, коли колір пластику один?</li>
-          <li><b>Економія часу:</b> на скільки хвилин оптимізовано час у спільній черзі Anycubic i3 Mega?</li>
+          <li><b>Час друку:</b> порівняй фактичні записи зі слайсера для двох версій, якщо вони є.</li>
         </ul>
       </div>
 
@@ -852,6 +852,8 @@
   <script src="src/historyManager.js"></script>
   <script src="src/contentRegistry.js"></script>
   <script src="src/missionManager.js"></script>
+  <script src="src/projectState.js"></script>
+  <script src="src/modalFocus.js"></script>
   <script src="src/snapshotCompareController.js"></script>
   <script src="src/passportPrintController.js"></script>
   <script src="src/generators/minecraftForge.js"></script>
