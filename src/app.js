@@ -180,6 +180,20 @@
         this.adventureShelf.mount(document.getElementById('adventure-shelf'));
       }
 
+      if (window.PixelEditorTools) {
+        this.pixelTools = new window.PixelEditorTools({
+          generator: this.mcGen,
+          onBeforeChange: () => this.recordUndoSnapshot(),
+          onAfterChange: () => {
+            this.markModelModified();
+            this.rebuildCurrentModel(false, true);
+            this.updateMinecraftConnectivityUI();
+            this.autosave();
+          }
+        });
+        this.pixelTools.mount(document.getElementById('pixel-editor-tools'));
+      }
+
       this.bindTabs();
       this.bindTopActions();
       this.bindMissionControls();
@@ -211,7 +225,7 @@
       const savedPair = this.safeStorage.getItem('3d_kuznya_pair_code') || '';
       return {
         app: '3d-club-studio',
-        version: '1.6.0',
+        version: '1.7.0',
         savedAt: new Date().toISOString(),
         activeTab: this.activeTab,
         activeMissionId: this.missions.activeMissionId,
