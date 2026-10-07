@@ -552,7 +552,7 @@
         estMinutes: roughMinutes,
         fitsBed: dx <= 200 && dy <= 200,
         safeBed: dx <= 190 && dy <= 190,
-        isMini: dx <= 38 && dy <= 38
+        isMini: dx <= 35 && dy <= 35
       };
 
       this.slicerMaxY = Math.max(10, size.y + 2);
@@ -599,10 +599,9 @@
             ? '🌟 Міні-формат (≤35 мм)'
             : '📐 У межах норми (Anycubic)';
 
-      const plaGrams = Math.round(d.volumeCm3 * 1.24 * 10) / 10;
       const timeText = slicerNote
-        ? `⏱️ Слайсер: ${slicerNote}`
-        : `⏱️ Слайсер: ~${d.roughMinutes} хв (PLA ~${plaGrams} г)`;
+        ? `⏱️ Запис зі слайсера: ${slicerNote}`
+        : '⏱️ Час і витрати: додай запис зі слайсера';
 
       dimEl.innerHTML = `
         <div class="hud-dim-header">
@@ -613,9 +612,10 @@
           <b>${d.x} × ${d.y} × ${d.z}</b> <span class="hud-dim-unit">мм</span>
         </div>
         <div class="hud-dim-meta num-tabular">
-          ${timeText}
         </div>
       `;
+      // Notes are editable project data, so render them as text rather than HTML.
+      dimEl.querySelector('.hud-dim-meta').textContent = timeText;
       dimEl.classList.toggle('badge-warn', !d.safeBed && d.fitsBed);
       dimEl.classList.toggle('badge-danger', !d.fitsBed);
       dimEl.classList.toggle('badge-good', d.safeBed);
