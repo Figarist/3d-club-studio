@@ -511,6 +511,8 @@
     clearModel() {
       this.stopSlicerSimulation();
       this.physicsUpdateFn = null;
+      const demoResult = document.getElementById('physics-demo-result');
+      if (demoResult) demoResult.textContent = 'Екранна демонстрація — не прогноз сили або міцності.';
       this.finishPopAnimation();
 
       const disposedGeoms = new Set();
@@ -675,6 +677,7 @@
 
     // Експорт поточної моделі у бінарний .STL файл (100% сумісний з Tinkercad, Makers Empire, Cura, PrusaSlicer)
     exportBinarySTL(filename = '3d_model_for_printer.stl') {
+      if (this.onBeforeExport) this.onBeforeExport();
       this.stopSlicerSimulation();
       this.finishPopAnimation();
       this.modelGroup.updateMatrixWorld(true);

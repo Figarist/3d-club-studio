@@ -2333,6 +2333,15 @@ select:focus, input[type="text"]:focus {
 /* ==========================================================================
    ДРУК (PRINT STYLES FOR WINDOW.PRINT)
    ========================================================================== */
+.catalog-search-row { display: flex; gap: 12px; flex-wrap: wrap; padding: 8px 0; }
+[hidden] { display: none !important; }
+.catalog-search-row label { flex: 1; min-width: 180px; }
+.catalog-search-row input, .catalog-search-row select { width: 100%; margin-top: 4px; }
+.demo-result { max-width: 240px; font-size: 11px; color: #e2e8f0; }
+#physics-action-bar { flex-wrap: wrap; max-width: 100%; }
+#il-design, #ph-design, #mob-design { width: 100%; margin: 6px 0; }
+.catalog-search-row input:focus-visible, .catalog-search-row select:focus-visible,
+#il-design:focus-visible, #ph-design:focus-visible, #mob-design:focus-visible { outline: 2px solid #34d399; outline-offset: 2px; }
 @media print {
   body {
     background: #ffffff !important;
