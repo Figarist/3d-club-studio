@@ -666,7 +666,7 @@
             cell.style.backgroundColor = hexStr(this.colors[val] || 0x38bdf8);
             cell.textContent = val;
           } else {
-            cell.style.backgroundColor = '#0b1322';
+            cell.style.backgroundColor = 'var(--bg2)';
             cell.textContent = '';
           }
 
@@ -682,7 +682,7 @@
                 cell.style.backgroundColor = hexStr(this.colors[this.activeBrush]);
                 cell.textContent = this.activeBrush;
               } else {
-                cell.style.backgroundColor = '#0b1322';
+                cell.style.backgroundColor = 'var(--bg2)';
                 cell.textContent = '';
               }
               if (window.StudioSound) window.StudioSound.playPaintNote(r, c, this.activeBrush);

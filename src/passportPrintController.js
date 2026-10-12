@@ -191,7 +191,7 @@
       ctx.fillRect(0, 0, logicalW, logicalH);
 
       // Зовнішня прецизійна рамка креслення
-      ctx.strokeStyle = '#0f172a';
+      ctx.strokeStyle = '#1a1a2e';
       ctx.lineWidth = 2;
       ctx.strokeRect(20, 20, 760, 1060);
 
@@ -200,8 +200,8 @@
       ctx.lineWidth = 1;
       ctx.strokeRect(24, 24, 752, 1052);
 
-      // Шапка технічного паспорта (Dark Obsidian)
-      ctx.fillStyle = '#0f172a';
+      // Шапка технічного паспорта (Midnight Surface)
+      ctx.fillStyle = '#1a1a2e';
       ctx.fillRect(25, 25, 750, 70);
 
       ctx.fillStyle = '#f8fafc';
@@ -313,16 +313,16 @@
         // Блок 3: Службовий контроль викладача та черга друку
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(40, 564, 720, 460);
-        ctx.strokeStyle = '#0f172a';
+        ctx.strokeStyle = '#0f3460';
         ctx.lineWidth = 1.5;
         ctx.strokeRect(40, 564, 720, 460);
 
-        ctx.fillStyle = '#0f172a';
+        ctx.fillStyle = '#0f3460';
         ctx.font = 'bold 15px system-ui, -apple-system, sans-serif';
         ctx.fillText('📋 КОНТРОЛЬ ВИКЛАДАЧА ТА ВІДМІТКА СЛАЙСЕРА (ЧЕРГА ДРУКУ)', 56, 594);
 
         ctx.font = '13.5px system-ui, -apple-system, sans-serif';
-        ctx.fillStyle = '#1e293b';
+        ctx.fillStyle = '#0f3460';
 
         ctx.fillText('1. Слайсер (Cura / PrusaSlicer / OrcaSlicer):', 56, 630);
         ctx.fillText('   • Час друку: ____________________ хв', 56, 658);
