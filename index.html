@@ -3,7 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>3D Кузня Чудес — Студія 3D-Моделювання (2–6 класи)</title>
+  <title>3D Кузня Чудес — Безкоштовний 3D-Генератор для Шкільних Принтерів (Tinkercad & Minecraft STL)</title>
+  <meta name="description" content="3D Кузня Чудес — безкоштовна браузерна веб-студія процедурного 3D-моделювання для шкільних гуртків (2–6 класи). Створення піксельних мечів Minecraft, 3D-ілюзій та катапульт. 100% друк без підтримок для FDM 3D-принтерів і Tinkercad. Автор: Ігор Сівочка." />
+  <meta name="keywords" content="3D моделювання для дітей, 3D принтер школа, генератор STL, tinkercad заготовки, майнкрафт меч 3D друк, друк без підтримок, 3D кузня чудес, Ігор Сівочка, уроки 3d моделювання, 3d club studio" />
+  <meta name="author" content="Ігор Сівочка (Ihor Sivochka)" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0d131a" />
+  <link rel="canonical" href="https://sivochka.com/3d-club-studio/" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://sivochka.com/3d-club-studio/" />
+  <meta property="og:title" content="3D Кузня Чудес — Безкоштовний 3D-Генератор для Шкільних Принтерів" />
+  <meta property="og:description" content="Браузерна студія процедурного 3D-моделювання для шкільних гуртків. Моделі без підтримок для FDM 3D-принтерів та Tinkercad. Автор: Ігор Сівочка." />
+  <meta property="og:site_name" content="3D Кузня Чудес" />
+  <meta property="og:locale" content="uk_UA" />
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:url" content="https://sivochka.com/3d-club-studio/" />
+  <meta name="twitter:title" content="3D Кузня Чудес — Студія 3D-Моделювання для Школи" />
+  <meta name="twitter:description" content="Створення піксельних моделей Minecraft, 3D-ілюзій та катапульт. Друк без підтримок та експорт у бінарний STL." />
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "3D Кузня Чудес",
+    "alternateName": "3D Club Studio",
+    "url": "https://sivochka.com/3d-club-studio/",
+    "description": "Безкоштовна інтерактивна браузерна веб-студія процедурного 3D-моделювання для шкільних гуртків (2–6 класи) та FDM 3D-принтерів без підтримок.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires WebGL and JavaScript",
+    "inLanguage": "uk",
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "UAH"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Ігор Сівочка",
+      "url": "https://sivochka.com",
+      "jobTitle": "Викладач програмування та 3D-моделювання",
+      "sameAs": [
+        "https://github.com/Figarist",
+        "https://t.me/Figarist"
+      ]
+    }
+  }
+  </script>
+
   <link rel="stylesheet" href="styles.css?v=1.9.0" />
   <link rel="stylesheet" href="adventure-shelf.css" />
   <link rel="stylesheet" href="pixel-editor-tools.css" />
@@ -19,6 +72,7 @@
         <div class="brand-title-row">
           <h1>3D КУЗНЯ ЧУДЕС</h1>
           <span id="app-version-pill" class="version-pill" title="Версія програми: v1.9.0">v1.9.0</span>
+          <button id="btn-open-about" class="about-pill-btn" title="Про автора, відкритий проєкт та уроки 3D / IT (Ігор Сівочка)">👨‍🏫 Про автора</button>
         </div>
         <p class="brand-subtitle">Minecraft &amp; Print-Safe 3D Генератор • Tinkercad / Makers Empire / 3D-Принтер</p>
       </div>
@@ -105,6 +159,13 @@
         </button>
         <button id="btn-export-stl" class="btn-action btn-export" title="Експортувати бінарний .STL для слайсера">
           💾 .STL
+        </button>
+      </div>
+
+      <!-- Група: Автор та Інфо -->
+      <div class="top-action-group" aria-label="Про автора">
+        <button id="btn-open-about" class="btn-action btn-about" title="Про автора, відкритий проєкт та уроки програмування/3D" aria-label="Про проєкт та автора">
+          ℹ️ Автор
         </button>
       </div>
     </div>
@@ -628,14 +689,81 @@
           <output id="physics-demo-result" class="demo-result" aria-live="polite">Екранна демонстрація — не прогноз сили або міцності.</output>
         </div>
 
-        <!-- Кутовий бейдж версії програми -->
-        <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • v1.9.0: одноколірні пригоди, живі екранні досліди та пошук за темами">
-          ⚒️ v1.9.0
+        <!-- Кутовий бейдж версії програми та автора -->
+        <div class="version-corner-group">
+          <a id="author-badge-link" class="author-corner-badge" href="https://sivochka.com/" target="_blank" rel="noopener" title="Автор: Ігор Сівочка (sivochka.com) — уроки 3D-моделювання та програмування">
+            👨‍🏫 Ігор Сівочка • sivochka.com ↗
+          </a>
+          <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • v1.9.0: одноколірні пригоди, живі екранні досліди та пошук за темами">
+            ⚒️ v1.9.0
+          </div>
         </div>
       </div>
     </section>
 
   </main>
+
+  <!-- МОДАЛЬНЕ ВІКНО: ПРО ПРОЄКТ ТА АВТОРА -->
+  <div id="about-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="about-modal-title" style="display:none;">
+    <div class="modal-window about-modal-window">
+      <div class="modal-header">
+        <div>
+          <h2 id="about-modal-title">⚒️ Про проєкт «3D Кузня Чудес»</h2>
+          <p class="modal-subtitle">
+            Безкоштовна веб-студія процедурного 3D-моделювання для шкільних гуртків (2–6 класи)
+          </p>
+        </div>
+        <button id="btn-close-about" class="modal-close-btn" title="Закрити (Esc)" aria-label="Закрити вікно про проєкт">✕</button>
+      </div>
+
+      <div class="modal-body about-modal-body">
+        <section class="about-section">
+          <h3>🎯 Чому виникла «3D Кузня Чудес»?</h3>
+          <p>
+            На шкільних гуртках 3D-моделювання діти обожнюють <b>Minecraft</b>, рухомі іграшки та оптичні ілюзії. Проте на простих або старих шкільних FDM-принтерах моделі з нависаннями потребують складних підтримок, які ламають вироби при відриванні, а дрібні шарніри сплавляються в моноліт.
+          </p>
+          <p>
+            <b>«3D Кузня Чудес»</b> вирішує це процедурно: генерує 100% бронебійну геометрію <b>без підтримок (No-Supports)</b>, експортує готові бінарні <code>.STL</code> для слайсерів <b>Cura / PrusaSlicer</b> або заготовки для творчого моделювання в <b>Tinkercad</b> і <b>Makers Empire</b>.
+          </p>
+        </section>
+
+        <section class="about-section author-card">
+          <div class="author-card-header">
+            <div class="author-avatar-badge" aria-hidden="true">👨‍💻</div>
+            <div>
+              <h3 class="author-name">Ігор Сівочка (Figarist)</h3>
+              <p class="author-tagline">Розробник ігор • Викладач 3D-моделювання, Unity та програмування</p>
+            </div>
+          </div>
+          <p class="author-bio">
+            Практикуючий викладач IT для дітей та підлітків. Навчаю створювати власні ігри на Unity &amp; C#, програмувати на Python та моделювати для 3D-принтера. Кожен інструмент розробляю з урахуванням реальних потреб учнів на заняттях.
+          </p>
+          <div class="about-links-grid">
+            <a href="https://sivochka.com/" target="_blank" rel="noopener" class="about-card-link about-card-link--primary">
+              <span class="link-icon">🌐</span>
+              <span class="link-text"><strong>sivochka.com</strong><small>Особистий сайт викладача</small></span>
+              <span class="link-arrow">↗</span>
+            </a>
+            <a href="https://sivochka.com/tutoring/" target="_blank" rel="noopener" class="about-card-link about-card-link--accent">
+              <span class="link-icon">🎓</span>
+              <span class="link-text"><strong>Індивідуальні заняття</strong><small>Уроки 3D та програмування</small></span>
+              <span class="link-arrow">↗</span>
+            </a>
+            <a href="https://t.me/Figarist" target="_blank" rel="noopener" class="about-card-link">
+              <span class="link-icon">💬</span>
+              <span class="link-text"><strong>Telegram: @Figarist</strong><small>Зв'язок для запису та запитань</small></span>
+              <span class="link-arrow">↗</span>
+            </a>
+            <a href="https://github.com/Figarist/3d-club-studio" target="_blank" rel="noopener" class="about-card-link">
+              <span class="link-icon">⭐️</span>
+              <span class="link-text"><strong>GitHub Репозиторій</strong><small>Відкритий код проєкту</small></span>
+              <span class="link-arrow">↗</span>
+            </a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
 
   <!-- МОДАЛЬНЕ ВІКНО: КАТАЛОГ «🗺️ МІСІЇ ГУРТКА (12)» -->
   <div id="missions-modal" class="modal-backdrop missions-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="missions-modal-title" style="display:none;">

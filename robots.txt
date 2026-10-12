@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sivochka.com/3d-club-studio/sitemap.xml
