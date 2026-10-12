@@ -83,8 +83,8 @@
       this.cachedHeight = h;
 
       this.scene = new THREE.Scene();
-      this.scene.background = new THREE.Color(0x0b1320);
-      this.scene.fog = new THREE.FogExp2(0x0b1320, 0.0018);
+      this.scene.background = new THREE.Color(0x1a1a2e);
+      this.scene.fog = new THREE.FogExp2(0x1a1a2e, 0.0018);
 
       this.perspCamera = new THREE.PerspectiveCamera(42, w / h, 1, 1500);
       this.orthoCamera = new THREE.OrthographicCamera(-w / 2, w / 2, h / 2, -h / 2, 1, 1500);
@@ -117,11 +117,23 @@
       this.setupControls();
 
       window.addEventListener('resize', () => this.onResize());
+      window.addEventListener('orientationchange', () => {
+        requestAnimationFrame(() => this.onResize());
+        setTimeout(() => this.onResize(), 100);
+        setTimeout(() => this.onResize(), 300);
+      });
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => this.onResize());
+      }
+      if (window.ResizeObserver && this.container) {
+        this._resizeObserver = new ResizeObserver(() => this.onResize());
+        this._resizeObserver.observe(this.container);
+      }
       this.animate();
     }
 
     setupLights() {
-      const hemi = new THREE.HemisphereLight(0xdbeafe, 0x1e293b, 0.75);
+      const hemi = new THREE.HemisphereLight(0xdbeafe, 0x16213e, 0.75);
       hemi.position.set(0, 200, 0);
       this.scene.add(hemi);
 
@@ -161,7 +173,7 @@
       bedGroup.add(bedMesh);
 
       // Основна сітка 200x200 мм (крок 10 мм)
-      const grid = new THREE.GridHelper(200, 20, 0x334155, 0x1e293b);
+      const grid = new THREE.GridHelper(200, 20, 0x334155, 0x0f3460);
       grid.position.y = 0.02;
       bedGroup.add(grid);
 
@@ -193,7 +205,7 @@
 
       // Передній індикатор орієнтації "ПЕРЕД (FRONT) • ANYCUBIC 200×200"
       const frontBarGeo = new THREE.BoxGeometry(72, 1.4, 2.4);
-      const frontBarMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 });
+      const frontBarMat = new THREE.MeshStandardMaterial({ color: 0x16213e, roughness: 0.6 });
       const frontBar = new THREE.Mesh(frontBarGeo, frontBarMat);
       frontBar.position.set(0, 0.1, 100);
       bedGroup.add(frontBar);
@@ -795,6 +807,7 @@
       if (!this.container || !this.renderer) return;
       const w = this.container.clientWidth;
       const h = this.container.clientHeight;
+      if (!w || !h) return;
       this.cachedWidth = w;
       this.cachedHeight = h;
       if (this.perspCamera) {
