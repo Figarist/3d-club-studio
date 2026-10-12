@@ -578,40 +578,62 @@
       const list = categoryList.filter(m => (!this.catalogTheme || m.theme === this.catalogTheme) &&
         (!query || [m.title, m.riddle, m.theme || '', m.generatorLabel].join(' ').toLocaleLowerCase('uk').includes(query)));
 
+      const countBadge = document.getElementById('missions-count-badge');
+      if (countBadge) {
+        countBadge.textContent = `Знайдено: ${list.length}`;
+      }
+
       container.innerHTML = '';
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="missions-empty-state">
+            <span class="empty-icon">🔍</span>
+            <p>За цим запитом пригод не знайдено. Спробуй інше слово або обери іншу категорію.</p>
+          </div>
+        `;
+        return;
+      }
+
       list.forEach((m) => {
         const card = document.createElement('article');
         card.className = 'mission-card' + (m.id === this.activeMissionId ? ' active-mission' : '');
         if (m.modelKey) card.dataset.modelKey = m.modelKey;
+
+        const stars = m.id <= 12 ? '⭐ 2–3 кл' : (m.id <= 30 ? '⭐⭐ 3–5 кл' : '⭐⭐⭐ 4–6 кл');
+
         card.innerHTML = `
           <div class="mission-card-inner">
             <div class="mission-card-header">
-              <span class="mission-card-num">Місія #${m.id} • ${m.categoryLabel}</span>
-              <span class="mission-card-size">📐 ${m.targetSize}</span>
+              <span class="mission-card-num">#${m.id} • ${m.categoryLabel}</span>
+              <span class="mission-card-difficulty" title="Рекомендований вік">${stars}</span>
+              <span class="mission-card-size">📏 ${m.targetSize}</span>
             </div>
             <h3 class="mission-card-title">${m.title}</h3>
-            <div class="mission-riddle-box">${m.riddle}</div>
+            <div class="mission-riddle-box">💡 <b>Загадка:</b> ${m.riddle}</div>
             <div class="mission-grades-row">
-              <div class="mission-grade-item"><span class="grade-tag grade-23">2–3 класи</span>${m.grade23}</div>
-              <div class="mission-grade-item"><span class="grade-tag grade-46">4–6 класи</span>${m.grade46}</div>
+              <div class="mission-grade-item"><span class="grade-tag grade-23">👶 2–3 кл</span><span>${m.grade23}</span></div>
+              <div class="mission-grade-item"><span class="grade-tag grade-46">🧑 4–6 кл</span><span>${m.grade46}</span></div>
             </div>
-            <div class="mission-card-steps">
-              <div><b>1. Загадка →</b> ${m.steps.riddle}</div>
-              <div><b>2. Власний дизайн →</b> ${m.steps.design}</div>
-              <div><b>3. Огляд в 1 кольорі →</b> ${m.steps.mono}</div>
-              <div><b>4. Вдосконалення →</b> ${m.steps.improve}</div>
-              <div><b>5. Результат →</b> ${m.steps.result}</div>
-            </div>
-            <div class="mission-card-checklist">
-              <div class="checklist-title">✅ Чек-лист самоперевірки:</div>
-              <div>• ${m.checklist[0]}</div>
-              <div>• ${m.checklist[1]}</div>
-              <div>• ${m.checklist[2]}</div>
-            </div>
+            <details class="mission-card-details">
+              <summary class="mission-details-summary">📖 Кроки місії та чек-лист ▾</summary>
+              <div class="mission-card-steps">
+                <div><b>1. Загадка →</b> ${m.steps.riddle}</div>
+                <div><b>2. Власний дизайн →</b> ${m.steps.design}</div>
+                <div><b>3. Огляд в 1 кольорі →</b> ${m.steps.mono}</div>
+                <div><b>4. Вдосконалення →</b> ${m.steps.improve}</div>
+                <div><b>5. Результат →</b> ${m.steps.result}</div>
+              </div>
+              <div class="mission-card-checklist">
+                <div class="checklist-title">✅ Чек-лист:</div>
+                <div>• ${m.checklist[0]}</div>
+                <div>• ${m.checklist[1]}</div>
+                <div>• ${m.checklist[2]}</div>
+              </div>
+            </details>
           </div>
           <div class="mission-card-footer">
             <span class="mission-gen-label">${m.generatorLabel}</span>
-            <button class="btn-start-mission" data-start-mission="${m.id}">🚀 Почати місію</button>
+            <button class="btn-start-mission" data-start-mission="${m.id}">🚀 Обрати цю місію</button>
           </div>
         `;
         const startBtn = card.querySelector('[data-start-mission]');
