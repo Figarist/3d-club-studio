@@ -72,20 +72,14 @@
         <div class="brand-title-row">
           <h1>3D КУЗНЯ ЧУДЕС</h1>
           <span id="app-version-pill" class="version-pill" title="Версія програми: v1.9.0">v1.9.0</span>
-          <button id="btn-open-about" class="about-pill-btn" title="Про автора, відкритий проєкт та уроки 3D / IT (Ігор Сівочка)">👨‍🏫 Про автора</button>
+          <button class="about-pill-btn" title="Про автора, відкритий проєкт та уроки 3D / IT (Ігор Сівочка)">👨‍🏫 Про автора</button>
         </div>
         <p class="brand-subtitle">Minecraft &amp; Print-Safe 3D Генератор • Tinkercad / Makers Empire / 3D-Принтер</p>
       </div>
     </div>
 
-    <!-- ПЕРЕМИКАЧ МІСІЙ ТА 4 ГЕНЕРАТОРІВ -->
-    <nav class="gen-tabs">
-      <button id="btn-open-missions" class="gen-tab-btn btn-missions-tab" title="Відкрити каталог із 12 навчальних місій гуртка (2–6 класи)">
-        🗺️ Місії гуртка (12)
-      </button>
-      <button id="btn-open-lesson" class="gen-tab-btn btn-missions-tab" title="План години, таймер та творчі виклики для гуртка">
-        ⏱️ Заняття
-      </button>
+    <!-- ПЕРЕМИКАЧ 4 ГЕНЕРАТОРІВ -->
+    <nav class="gen-tabs" aria-label="3D Генератори">
       <button class="gen-tab-btn active" data-tab="minecraft">
         ⛏️ Майнкрафт-Кузня
       </button>
@@ -102,20 +96,13 @@
 
     <!-- ДІЇ: ГРУПОВАНІ ЗА ПРИЗНАЧЕННЯМ -->
     <div class="top-actions">
-      <!-- Група: Історія -->
+      <!-- Група: Історія дій -->
       <div class="top-action-group" aria-label="Історія дій">
         <button id="btn-undo" class="btn-action btn-history" title="Скасувати останню дію (Ctrl+Z)" aria-label="Скасувати останню дію">
           ↩️
         </button>
         <button id="btn-redo" class="btn-action btn-history" title="Повернути скасовану дію (Ctrl+Y)" aria-label="Повернути скасовану дію">
           ↪️
-        </button>
-      </div>
-
-      <!-- Група: Відображення -->
-      <div class="top-action-group" aria-label="Режим перегляду">
-        <button id="btn-toggle-mono" class="btn-action btn-mono" title="Перемкнути: кольори прев'ю чи реальний вигляд одним пластиком">
-          🪨 1 Пластик
         </button>
       </div>
 
@@ -130,56 +117,84 @@
         <input id="input-load-project" type="file" accept=".json" style="display:none;" aria-hidden="true" />
       </div>
 
-      <!-- Група: Контроль якості та паспорт -->
-      <div class="top-action-group" aria-label="Контроль якості">
-        <button id="btn-snapshot-v1" class="btn-action btn-v1" title="Зафіксувати поточну модель як Версію 1 (Ескіз)">
-          📸 Фіксувати V1
-        </button>
-        <button id="btn-compare-v1v2" class="btn-action btn-v1" title="Порівняння поступу: V1 (Ескіз) ↔ V2 (Фінал)" style="display:none;">
-          ⚖️ V1 ↔ V2
-        </button>
-        <button id="btn-print-card" class="btn-action btn-card" title="Створити картку для черги 3D-друку (Паспорт деталі)">
-          📋 Паспорт
-        </button>
-      </div>
-
-      <!-- Група: Системні дії -->
-      <div class="top-action-group" aria-label="Системні дії">
-        <button id="btn-toggle-sound" class="btn-action btn-sound" title="Увімкнути/вимкнути звукові ефекти" aria-label="Звукові ефекти">
-          🔊 Звук
-        </button>
-        <button id="btn-toggle-music" class="btn-action btn-music" title="Увімкнути/вимкнути фонову мелодію кузні" aria-label="Фонова музика">
-          🎵 Музика
-        </button>
-        <button id="btn-random-wow" class="btn-action btn-random" title="Випадкова генерація / Мутація!">
-          🎲 ВАУ!
-        </button>
-        <button id="btn-simulate-print" class="btn-action btn-sim" title="Симуляція пошарового друку">
-          🔥 Симуляція
-        </button>
-        <button id="btn-export-stl" class="btn-action btn-export" title="Експортувати бінарний .STL для слайсера">
+      <!-- Група: Головний експорт для 3D-друку -->
+      <div class="top-action-group" aria-label="Головний експорт">
+        <button id="btn-export-stl" class="btn-action btn-export" title="Експортувати бінарний .STL для слайсера 3D-принтера">
           💾 .STL
         </button>
       </div>
 
-      <!-- Група: Автор та Інфо -->
-      <div class="top-action-group" aria-label="Про автора">
-        <button id="btn-open-about" class="btn-action btn-about" title="Про автора, відкритий проєкт та уроки програмування/3D" aria-label="Про проєкт та автора">
-          ℹ️ Автор
+      <!-- Група: Меню опцій (звук, музика, мутація, інформація) -->
+      <div class="top-action-group menu-dropdown-wrapper">
+        <button id="btn-top-menu" class="btn-action btn-menu-toggle" aria-haspopup="true" aria-expanded="false" title="Додаткові опції: Звук, Музика, Мутація, Інформація">
+          ⚙️ Опції ▾
         </button>
+        <div id="top-dropdown-menu" class="top-dropdown-menu" role="menu" aria-label="Додаткові опції студії">
+          <button id="btn-random-wow" class="dropdown-item btn-action btn-random" role="menuitem" title="Випадкова генерація / Мутація!">
+            🎲 ВАУ! Мутація
+          </button>
+          <button id="btn-toggle-sound" class="dropdown-item btn-action btn-sound" role="menuitem" title="Увімкнути/вимкнути звукові ефекти" aria-label="Звукові ефекти">
+            🔊 Звук
+          </button>
+          <button id="btn-toggle-music" class="dropdown-item btn-action btn-music" role="menuitem" title="Увімкнути/вимкнути фонову мелодію кузні" aria-label="Фонова музика">
+            🎵 Музика
+          </button>
+          <div class="dropdown-divider"></div>
+          <button id="btn-open-about" class="dropdown-item btn-action btn-about" role="menuitem" title="Про автора, відкритий проєкт та уроки 3D / IT (Ігор Сівочка)">
+            👨‍🏫 Про автора
+          </button>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- СМУГА АДАПТАЦІЇ ДЛЯ ВУЗЬКИХ ЕКРАНІВ ТА РЕЖИМУ ПРОЄКТОРА -->
+  <!-- РОБОЧА ПАНЕЛЬ СТУДІЇ (МІСІЇ, ЗАНЯТТЯ, РЕЖИМИ РОЗКЛАДКИ ТА ІНСТРУМЕНТИ ПЕРЕВІРКИ ДРУКУ) -->
   <div id="view-mode-bar" class="view-mode-bar">
-    <div class="view-mode-group">
-      <button class="view-btn" data-view-mode="editor">🛠️ Редактор</button>
-      <button class="view-btn active" data-view-mode="split">🌗 Редактор + 3D</button>
-      <button class="view-btn" data-view-mode="viewport">🧊 Тільки 3D (Проєктор)</button>
+    <!-- Ліва частина: Навчання та режими вікна -->
+    <div class="workspace-bar-left">
+      <div class="workspace-bar-group" aria-label="Навчання в гуртку">
+        <button id="btn-open-missions" class="view-btn btn-missions-tab" title="Відкрити каталог навчальних місій гуртка (2–6 класи)">
+          🗺️ Місії гуртка (72)
+        </button>
+        <button id="btn-open-lesson" class="view-btn btn-missions-tab" title="План години, таймер та творчі виклики для гуртка">
+          ⏱️ Заняття
+        </button>
+      </div>
+
+      <div class="bar-separator" aria-hidden="true"></div>
+
+      <div class="view-mode-group" aria-label="Режим робочого простору">
+        <button class="view-btn" data-view-mode="editor" title="Лише панель параметрів">🛠️ Редактор</button>
+        <button class="view-btn active" data-view-mode="split" title="Редактор ліворуч, 3D сцена праворуч">🌗 Редактор + 3D</button>
+        <button class="view-btn" data-view-mode="viewport" title="Тільки 3D сцена для проєктора або демонстрації">🧊 Тільки 3D</button>
+      </div>
     </div>
-    <div id="autosave-tag" class="autosave-tag" title="Стан автоматично зберігається у пам'яті браузера">
-      💾 Автозбережено
+
+    <!-- Права частина: Контроль якості, підготовка друку та автозбереження -->
+    <div class="workspace-bar-right">
+      <div class="workspace-bar-group" aria-label="Перевірка та підготовка до 3D-друку">
+        <button id="btn-toggle-mono" class="view-btn btn-action btn-mono" title="Перемкнути: кольори прев'ю чи реальний вигляд одним пластиком">
+          🪨 1 Пластик
+        </button>
+        <button id="btn-snapshot-v1" class="view-btn btn-action btn-v1" title="Зафіксувати поточну модель як Версію 1 (Ескіз)">
+          📸 Фіксувати V1
+        </button>
+        <button id="btn-compare-v1v2" class="view-btn btn-action btn-v1" title="Порівняння поступу: V1 (Ескіз) ↔ V2 (Фінал)" style="display:none;">
+          ⚖️ V1 ↔ V2
+        </button>
+        <button id="btn-print-card" class="view-btn btn-action btn-card" title="Створити картку для черги 3D-друку (Паспорт деталі)">
+          📋 Паспорт
+        </button>
+        <button id="btn-simulate-print" class="view-btn btn-action btn-sim" title="Симуляція пошарового друку для FDM-принтера">
+          🔥 Симуляція
+        </button>
+      </div>
+
+      <div class="bar-separator" aria-hidden="true"></div>
+
+      <div id="autosave-tag" class="autosave-tag" title="Стан автоматично зберігається у пам'яті браузера">
+        💾 Автозбережено
+      </div>
     </div>
   </div>
 
@@ -196,7 +211,7 @@
           <div class="mission-compact-actions">
             <button id="btn-prev-mission" class="mission-nav-btn" title="Попередня місія">◀</button>
             <button id="btn-next-mission" class="mission-nav-btn" title="Наступна місія">▶</button>
-            <button id="btn-open-missions-inline" class="mission-small-btn highlight" title="Відкрити всі 12 місій гуртка">🗺️ Усі 12</button>
+            <button id="btn-open-missions-inline" class="mission-small-btn highlight" title="Відкрити всі навчальні місії гуртка">🗺️ Усі місії</button>
             <button id="btn-toggle-mission-body" class="mission-small-btn" title="Згорнути або розгорнути опис місії">🔼 Згорнути</button>
             <button id="btn-close-active-mission" class="mission-nav-btn mission-close-btn" title="Сховати панель місії" aria-label="Сховати панель місії">✕</button>
           </div>

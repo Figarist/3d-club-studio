@@ -930,6 +930,12 @@
     openAboutModal() {
       const dom = this._domCache || {};
       if (!dom.aboutModal) return;
+      document.getElementById('top-dropdown-menu')?.classList.remove('show');
+      const btnMenu = document.getElementById('btn-top-menu');
+      if (btnMenu) {
+        btnMenu.setAttribute('aria-expanded', 'false');
+        btnMenu.classList.remove('active');
+      }
       dom.aboutModal.style.display = 'flex';
       if (window.ModalFocus) window.ModalFocus.enter(dom.aboutModal);
       const btnTop = document.getElementById('btn-open-about');
@@ -1060,6 +1066,37 @@
       if (dom.btnCompareV1V2) dom.btnCompareV1V2.addEventListener('click', () => this.openCompareModal());
       if (dom.btnPrintCard) dom.btnPrintCard.addEventListener('click', () => this.openPrintCardModal());
 
+      // Керування меню додаткових опцій у шапці
+      const btnMenu = document.getElementById('btn-top-menu');
+      const menuDropdown = document.getElementById('top-dropdown-menu');
+      if (btnMenu && menuDropdown) {
+        const toggleMenu = (open) => {
+          const isOpen = open !== undefined ? open : !menuDropdown.classList.contains('show');
+          menuDropdown.classList.toggle('show', isOpen);
+          btnMenu.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          btnMenu.classList.toggle('active', isOpen);
+          if (isOpen && window.StudioSound) window.StudioSound.playPop?.(480);
+        };
+
+        btnMenu.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleMenu();
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!menuDropdown.contains(e.target) && e.target !== btnMenu) {
+            toggleMenu(false);
+          }
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && menuDropdown.classList.contains('show')) {
+            toggleMenu(false);
+            btnMenu.focus();
+          }
+        });
+      }
+
       const btnSound = document.getElementById('btn-toggle-sound');
       const btnMusic = document.getElementById('btn-toggle-music');
       if (btnSound) {
@@ -1100,6 +1137,11 @@
           this.randomizeCurrentTab();
           this.markModelModified();
           this.autosave();
+          if (menuDropdown) {
+            menuDropdown.classList.remove('show');
+            btnMenu?.setAttribute('aria-expanded', 'false');
+            btnMenu?.classList.remove('active');
+          }
         });
       }
 
