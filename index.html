@@ -72,7 +72,6 @@
         <div class="brand-title-row">
           <h1>3D КУЗНЯ ЧУДЕС</h1>
           <span id="app-version-pill" class="version-pill" title="Версія програми: v1.9.0">v1.9.0</span>
-          <button class="about-pill-btn" title="Про автора, відкритий проєкт та уроки 3D / IT (Ігор Сівочка)">👨‍🏫 Про автора</button>
         </div>
         <p class="brand-subtitle">Minecraft &amp; Print-Safe 3D Генератор • Tinkercad / Makers Empire / 3D-Принтер</p>
       </div>
@@ -265,7 +264,7 @@
            =================================================================== -->
       <section id="panel-minecraft" class="panel-section active">
         <div class="printer-safe-tip">
-          🛡️ <b>Рельєф і силует для одного пластику:</b> Кожен рівень має власну висоту (мм). Модель лежить на столі (Z=0). Перевіряй виразність рельєфу кнопкою «🪨 1 Пластик»!
+          🛡️ <b>Порада:</b> Кожен шар має свою висоту. Перевіряй виразність рельєфу кнопкою «🪨 1 Пластик»!
         </div>
 
         <div class="card">
@@ -332,60 +331,62 @@
           <div id="pixel-editor-tools"></div>
         </div>
 
-        <div class="card">
-          <div class="card-header">
-            <span>⚙️ Налаштування друку та габаритів</span>
-            <button id="btn-mc-mini-preset" class="btn-subtle" title="Встановити воксель 2.0 мм для швидкого міні-значка 28–32 мм">🎯 Міні-значок (~30 мм)</button>
-          </div>
+        <details class="card collapsible-card">
+          <summary class="card-header">
+            <span>⚙️ Додаткові налаштування друку</span>
+            <button id="btn-mc-mini-preset" class="btn-subtle" title="Встановити воксель 2.0 мм для швидкого міні-значка 28–32 мм">🎯 Міні (~30 мм)</button>
+          </summary>
 
-          <div class="control-row">
-            <div class="control-label">
-              <span>Розмір 1 кубика (вокселя):</span>
-              <span id="val-mc-voxel" class="control-val">3.5 мм</span>
+          <div class="collapsible-card-content">
+            <div class="control-row">
+              <div class="control-label">
+                <span>Розмір 1 кубика (вокселя):</span>
+                <span id="val-mc-voxel" class="control-val">3.5 мм</span>
+              </div>
+              <input id="mc-voxel-size" type="range" min="1.8" max="5.0" step="0.1" value="3.5" aria-label="Розмір 1 кубика (вокселя), мм" />
             </div>
-            <input id="mc-voxel-size" type="range" min="1.8" max="5.0" step="0.1" value="3.5" aria-label="Розмір 1 кубика (вокселя), мм" />
-          </div>
 
-          <div class="control-row">
-            <div class="control-label">
-              <span>Сходинка висоти між шарами:</span>
-              <span id="val-mc-step" class="control-val">1.5 мм</span>
+            <div class="control-row">
+              <div class="control-label">
+                <span>Сходинка висоти між шарами:</span>
+                <span id="val-mc-step" class="control-val">1.5 мм</span>
+              </div>
+              <input id="mc-height-step" type="range" min="0.8" max="2.8" step="0.1" value="1.5" aria-label="Сходинка висоти між шарами, мм" />
             </div>
-            <input id="mc-height-step" type="range" min="0.8" max="2.8" step="0.1" value="1.5" aria-label="Сходинка висоти між шарами, мм" />
-          </div>
 
-          <label class="checkbox-row" title="Створює спільну підошву 2 мм та автоматичні містки між віддаленими островами">
-            <input id="mc-solid-base" type="checkbox" checked aria-label="Суцільна підкладка 2 мм та авто-містки" />
-            <span>Суцільна підкладка 2 мм + авто-містки (1 суцільна деталь)</span>
-          </label>
+            <label class="checkbox-row" title="Створює спільну підошву 2 мм та автоматичні містки між віддаленими островами">
+              <input id="mc-solid-base" type="checkbox" checked aria-label="Суцільна підкладка 2 мм та авто-містки" />
+              <span>Суцільна підкладка 2 мм + авто-містки (1 суцільна деталь)</span>
+            </label>
 
-          <div class="control-row">
-            <div class="control-label"><span>Тип кріплення / підставки:</span></div>
-            <select id="mc-mount-type" aria-label="Тип кріплення або підставки">
-              <option value="keychain" selected>🔑 Міцне вушко для брелока (отвір 6 мм)</option>
-              <option value="none">🧱 Чиста фігурка / Плитка (для Tinkercad / жетона)</option>
-              <option value="stand">🏆 З іменною табличкою внизу</option>
-            </select>
-          </div>
-
-          <div id="mc-slot-width-group" class="control-row" style="display:none;">
-            <div class="control-label">
-              <span>Ширина паза під картон:</span>
-              <span id="val-mc-slot" class="control-val">2.0 мм (+0.2 допуск)</span>
+            <div class="control-row">
+              <div class="control-label"><span>Тип кріплення / підставки:</span></div>
+              <select id="mc-mount-type" aria-label="Тип кріплення або підставки">
+                <option value="keychain" selected>🔑 Міцне вушко для брелока (отвір 6 мм)</option>
+                <option value="none">🧱 Чиста фігурка / Плитка (для Tinkercad / жетона)</option>
+                <option value="stand">🏆 З іменною табличкою внизу</option>
+              </select>
             </div>
-            <select id="mc-slot-width" aria-label="Ширина паза під картон">
-              <option value="1.5">1.5 мм (допуск +0.2 = 1.7 мм) — тонкий картон</option>
-              <option value="2.0" selected>2.0 мм (допуск +0.2 = 2.2 мм) — палітурний картон</option>
-              <option value="2.5">2.5 мм (допуск +0.2 = 2.7 мм) — гофрокартон мікро-E</option>
-              <option value="3.0">3.0 мм (допуск +0.2 = 3.2 мм) — щільний гофрокартон-B</option>
-            </select>
-          </div>
 
-          <div class="control-row">
-            <div class="control-label"><span>Ім'я учня (об'ємні літери внизу):</span></div>
-            <input id="mc-custom-label" type="text" maxlength="9" placeholder="Напр.: МАКСИМ (необов'язково)" aria-label="Ім'я учня (об'ємні літери внизу)" />
+            <div id="mc-slot-width-group" class="control-row" style="display:none;">
+              <div class="control-label">
+                <span>Ширина паза під картон:</span>
+                <span id="val-mc-slot" class="control-val">2.0 мм (+0.2 допуск)</span>
+              </div>
+              <select id="mc-slot-width" aria-label="Ширина паза під картон">
+                <option value="1.5">1.5 мм (допуск +0.2 = 1.7 мм) — тонкий картон</option>
+                <option value="2.0" selected>2.0 мм (допуск +0.2 = 2.2 мм) — палітурний картон</option>
+                <option value="2.5">2.5 мм (допуск +0.2 = 2.7 мм) — гофрокартон мікро-E</option>
+                <option value="3.0">3.0 мм (допуск +0.2 = 3.2 мм) — щільний гофрокартон-B</option>
+              </select>
+            </div>
+
+            <div class="control-row">
+              <div class="control-label"><span>Ім'я учня (об'ємні літери внизу):</span></div>
+              <input id="mc-custom-label" type="text" maxlength="9" placeholder="Напр.: МАКСИМ (необов'язково)" aria-label="Ім'я учня (об'ємні літери внизу)" />
+            </div>
           </div>
-        </div>
+        </details>
       </section>
 
       <!-- ===================================================================
@@ -394,7 +395,7 @@
       <section id="panel-illusion" class="panel-section">
         <div class="card"><label class="control-label" for="il-design">🔮 Оптична знахідка</label><select id="il-design"><option value="classic">Класичні слова й символи</option></select></div>
         <div class="printer-safe-tip">
-          🔮 <b>Оптичний силует 0° / 90°:</b> Передбач другий образ і відкрий його кнопкою ракурсу. Форму перевіряй одним пластиком; час і придатність друку — окремо у слайсері.
+          🔮 <b>Порада:</b> Дивись на слово спереду (0°), а потім поверни збоку (90°), щоб відкрити секретний напис!
         </div>
 
         <div class="card">
@@ -440,37 +441,39 @@
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-header">
-            <span>🛡️ Параметри Друку Ілюзії</span>
-          </div>
+        <details class="card collapsible-card">
+          <summary class="card-header">
+            <span>🛡️ Налаштування друку та опор</span>
+          </summary>
 
-          <div class="control-row">
-            <div class="control-label">
-              <span>Товщина вокселя літер:</span>
-              <span id="val-il-voxel" class="control-val">2.6 мм</span>
+          <div class="collapsible-card-content">
+            <div class="control-row">
+              <div class="control-label">
+                <span>Товщина вокселя літер:</span>
+                <span id="val-il-voxel" class="control-val">2.6 мм</span>
+              </div>
+              <input id="il-voxel-size" type="range" min="2.0" max="4.0" step="0.1" value="2.6" aria-label="Товщина вокселя літер, мм" />
             </div>
-            <input id="il-voxel-size" type="range" min="2.0" max="4.0" step="0.1" value="2.6" aria-label="Товщина вокселя літер, мм" />
-          </div>
 
-          <label class="checkbox-row">
-            <input id="il-safe-supports" type="checkbox" checked aria-label="Авто-опори під нависаючими частинами літер" />
-            <span>Внутрішні стовпчики під нависаючими вокселями літер</span>
-          </label>
+            <label class="checkbox-row">
+              <input id="il-safe-supports" type="checkbox" checked aria-label="Авто-опори під нависаючими частинами літер" />
+              <span>Внутрішні стовпчики під нависаючими вокселями літер</span>
+            </label>
 
-          <div class="control-row">
-            <div class="control-label"><span>Розташування літер на подіумі:</span></div>
-            <select id="il-layout-mode" aria-label="Розташування літер на подіумі">
-              <option value="diagonal" selected>📐 По діагоналі (обидва слова видно без перекриття)</option>
-              <option value="line">📏 В одну лінію (компактна підставка)</option>
-            </select>
-          </div>
+            <div class="control-row">
+              <div class="control-label"><span>Розташування літер на подіумі:</span></div>
+              <select id="il-layout-mode" aria-label="Розташування літер на подіумі">
+                <option value="diagonal" selected>📐 По діагоналі (обидва слова видно без перекриття)</option>
+                <option value="line">📏 В одну лінію (компактна підставка)</option>
+              </select>
+            </div>
 
-          <div class="control-row">
-            <div class="control-label"><span>Колір моделі на екрані:</span></div>
-            <input id="il-color-primary" type="color" value="#10b981" aria-label="Колір моделі на екрані" style="height:36px; width:100%; background:#0f172a; border:1px solid #334155; border-radius:8px; cursor:pointer;" />
+            <div class="control-row">
+              <div class="control-label"><span>Колір моделі на екрані:</span></div>
+              <input id="il-color-primary" type="color" value="#10b981" aria-label="Колір моделі на екрані" style="height:36px; width:100%; background:#0f172a; border:1px solid #334155; border-radius:8px; cursor:pointer;" />
+            </div>
           </div>
-        </div>
+        </details>
       </section>
 
       <!-- ===================================================================
@@ -478,7 +481,7 @@
            =================================================================== -->
       <section id="panel-physics" class="panel-section">
         <div class="printer-safe-tip">
-          🎯 <b>Екранний експеримент:</b> Змінюй форму й порівнюй результат на екрані. Силу, пружність і надійність надрукованої деталі ще не перевірено; перед друком потрібна перевірка у слайсері.
+          🎯 <b>Порада:</b> Експериментуй з формою важеля та тисни «Постріл», щоб перевірити дальність на екрані!
         </div>
 
         <div class="card">
@@ -496,53 +499,55 @@
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-header">
-            <span>🔧 Геометрія для порівняння</span>
-          </div>
+        <details class="card collapsible-card" open>
+          <summary class="card-header">
+            <span>🔧 Налаштування розмірів та важеля</span>
+          </summary>
 
-          <div class="control-row">
-            <div class="control-label">
-              <span>Висота екструзії (товщина моделі):</span>
-              <span id="val-ph-height" class="control-val">10.0 мм</span>
+          <div class="collapsible-card-content">
+            <div class="control-row">
+              <div class="control-label">
+                <span>Висота екструзії (товщина моделі):</span>
+                <span id="val-ph-height" class="control-val">10.0 мм</span>
+              </div>
+              <input id="ph-extrude-height" type="range" min="5.0" max="15.0" step="0.5" value="10.0" aria-label="Висота екструзії (товщина моделі), мм" />
             </div>
-            <input id="ph-extrude-height" type="range" min="5.0" max="15.0" step="0.5" value="10.0" aria-label="Висота екструзії (товщина моделі), мм" />
-          </div>
 
-          <div id="ph-spring-group" class="control-row">
-            <div class="control-label">
-              <span>Товщина геометрії ресори:</span>
-              <span id="val-ph-spring" class="control-val">2.4 мм</span>
+            <div id="ph-spring-group" class="control-row">
+              <div class="control-label">
+                <span>Товщина геометрії ресори:</span>
+                <span id="val-ph-spring" class="control-val">2.4 мм</span>
+              </div>
+              <input id="ph-spring-thickness" type="range" min="1.8" max="3.6" step="0.1" value="2.4" aria-label="Товщина геометрії ресори, мм" />
             </div>
-            <input id="ph-spring-thickness" type="range" min="1.8" max="3.6" step="0.1" value="2.4" aria-label="Товщина геометрії ресори, мм" />
-          </div>
 
-          <div id="ph-weight-group" class="control-row" style="display:none;">
-            <div class="control-label">
-              <span>Вага баласту на кінцях крил:</span>
-              <span id="val-ph-weight" class="control-val">11.0 мм</span>
+            <div id="ph-weight-group" class="control-row" style="display:none;">
+              <div class="control-label">
+                <span>Вага баласту на кінцях крил:</span>
+                <span id="val-ph-weight" class="control-val">11.0 мм</span>
+              </div>
+              <input id="ph-wing-weight" type="range" min="7.0" max="16.0" step="0.5" value="11.0" aria-label="Вага баласту на кінцях крил, мм" />
             </div>
-            <input id="ph-wing-weight" type="range" min="7.0" max="16.0" step="0.5" value="11.0" aria-label="Вага баласту на кінцях крил, мм" />
-          </div>
 
-          <div class="control-row">
-            <div class="control-label">
-              <span>Довжина важеля / Розмах крил:</span>
-              <span id="val-ph-arm" class="control-val">68 мм</span>
+            <div class="control-row">
+              <div class="control-label">
+                <span>Довжина важеля / Розмах крил:</span>
+                <span id="val-ph-arm" class="control-val">68 мм</span>
+              </div>
+              <input id="ph-arm-length" type="range" min="52" max="85" step="1" value="68" aria-label="Довжина важеля або розмах крил, мм" />
             </div>
-            <input id="ph-arm-length" type="range" min="52" max="85" step="1" value="68" aria-label="Довжина важеля або розмах крил, мм" />
-          </div>
 
-          <label class="checkbox-row">
-            <input id="ph-include-ammo" type="checkbox" checked aria-label="Додати комплектну заготовку снаряда або підставку" />
-            <span>Додати комплектну заготовку снаряда / підставку (окрема деталь для друку)</span>
-          </label>
+            <label class="checkbox-row">
+              <input id="ph-include-ammo" type="checkbox" checked aria-label="Додати комплектну заготовку снаряда або підставку" />
+              <span>Додати комплектну заготовку снаряда / підставку (окрема деталь для друку)</span>
+            </label>
 
-          <div class="control-row">
-            <div class="control-label"><span>Напис на корпусі катапульти:</span></div>
-            <input id="ph-custom-text" type="text" maxlength="6" value="" aria-label="Напис на корпусі катапульти" />
+            <div class="control-row">
+              <div class="control-label"><span>Напис на корпусі катапульти:</span></div>
+              <input id="ph-custom-text" type="text" maxlength="6" value="" aria-label="Напис на корпусі катапульти" />
+            </div>
           </div>
-        </div>
+        </details>
       </section>
 
       <!-- ===================================================================
@@ -551,7 +556,7 @@
       <section id="panel-mob" class="panel-section">
         <div class="card"><label class="control-label" for="mob-design">👾 Маленький супутник</label><select id="mob-design"><option value="classic">Класичний моб</option></select></div>
         <div class="printer-safe-tip">
-          👾 <b>Демонстраційна фігурка:</b> Зброя та щит моба спираються на п'єдестал як колони. Через великий об'єм друк тривалий — перевірте час і шари у слайсері!
+          👾 <b>Порада:</b> Обери архетип монстра, налаштуй броню та зброю і перевір міцність на екрані!
         </div>
 
         <div class="card">
@@ -587,63 +592,65 @@
           </div>
         </div>
 
-        <div class="card">
-          <div class="card-header">
+        <details class="card collapsible-card" open>
+          <summary class="card-header">
             <span>⚔️ Спорядження та Мутації</span>
-          </div>
+          </summary>
 
-          <div class="control-row">
-            <div class="control-label"><span>Тип очей / Візора:</span></div>
-            <select id="mob-eye-type" aria-label="Тип очей або візора">
-              <option value="two" selected>👀 Два бойові ока</option>
-              <option value="creeper">💀 Обличчя Кріпера</option>
-              <option value="visor">🕶️ Лазерний Кібер-Візор</option>
-              <option value="one">👁️ Око Циклопа</option>
-              <option value="three">👽 Три ока Мутанта</option>
-            </select>
-          </div>
+          <div class="collapsible-card-content">
+            <div class="control-row">
+              <div class="control-label"><span>Тип очей / Візора:</span></div>
+              <select id="mob-eye-type" aria-label="Тип очей або візора">
+                <option value="two" selected>👀 Два бойові ока</option>
+                <option value="creeper">💀 Обличчя Кріпера</option>
+                <option value="visor">🕶️ Лазерний Кібер-Візор</option>
+                <option value="one">👁️ Око Циклопа</option>
+                <option value="three">👽 Три ока Мутанта</option>
+              </select>
+            </div>
 
-          <div class="control-row">
-            <div class="control-label"><span>Шолом / Роги / Корона:</span></div>
-            <select id="mob-headgear" aria-label="Шолом, роги або корона">
-              <option value="crown" selected>👑 Золота Корона Боса</option>
-              <option value="horns">🐂 Роги Вікінга / Дракона</option>
-              <option value="antenna">📡 Антена Робота</option>
-              <option value="ears">🐺 Бойові Вуха</option>
-              <option value="none">Немає</option>
-            </select>
-          </div>
+            <div class="control-row">
+              <div class="control-label"><span>Шолом / Роги / Корона:</span></div>
+              <select id="mob-headgear" aria-label="Шолом, роги або корона">
+                <option value="crown" selected>👑 Золота Корона Боса</option>
+                <option value="horns">🐂 Роги Вікінга / Дракона</option>
+                <option value="antenna">📡 Антена Робота</option>
+                <option value="ears">🐺 Бойові Вуха</option>
+                <option value="none">Немає</option>
+              </select>
+            </div>
 
-          <div class="control-row">
-            <div class="control-label"><span>Спина (Крила / Ранець):</span></div>
-            <select id="mob-backgear" aria-label="Спорядження на спині (крила, ранець або плащ)">
-              <option value="wings" selected>🦇 Ступінчасті Крила Дракона</option>
-              <option value="jetpack">🚀 Турбо-Джетпак</option>
-              <option value="cape">🧣 Лицарський Плащ</option>
-              <option value="none">Немає</option>
-            </select>
-          </div>
+            <div class="control-row">
+              <div class="control-label"><span>Спина (Крила / Ранець):</span></div>
+              <select id="mob-backgear" aria-label="Спорядження на спині (крила, ранець або плащ)">
+                <option value="wings" selected>🦇 Ступінчасті Крила Дракона</option>
+                <option value="jetpack">🚀 Турбо-Джетпак</option>
+                <option value="cape">🧣 Лицарський Плащ</option>
+                <option value="none">Немає</option>
+              </select>
+            </div>
 
-          <div class="control-row">
-            <div class="control-label"><span>Зброя (спирається на базу):</span></div>
-            <select id="mob-weapon" aria-label="Зброя моба">
-              <option value="sword" selected>⚔️ Дворучний Алмазний Меч</option>
-              <option value="hammer">🔨 Громовий Молот Тора</option>
-              <option value="shield">🛡️ Бастіонний Щит</option>
-              <option value="dual_axes">🪓 Подвійні Бойові Сокири</option>
-            </select>
-          </div>
+            <div class="control-row">
+              <div class="control-label"><span>Зброя (спирається на базу):</span></div>
+              <select id="mob-weapon" aria-label="Зброя моба">
+                <option value="sword" selected>⚔️ Дворучний Алмазний Меч</option>
+                <option value="hammer">🔨 Громовий Молот Тора</option>
+                <option value="shield">🛡️ Бастіонний Щит</option>
+                <option value="dual_axes">🪓 Подвійні Бойові Сокири</option>
+              </select>
+            </div>
 
-          <div class="control-row">
-            <div class="control-label"><span>Ім'я на п'єдесталі:</span></div>
-            <input id="mob-name" type="text" maxlength="7" value="ТИТАН" aria-label="Ім'я на п'єдесталі" />
-          </div>
+            <div class="control-row">
+              <div class="control-label"><span>Ім'я на п'єдесталі:</span></div>
+              <input id="mob-name" type="text" maxlength="7" value="ТИТАН" aria-label="Ім'я на п'єдесталі" />
+            </div>
 
-          <label class="checkbox-row">
-            <input id="mob-tinkercad-blank" type="checkbox" aria-label="Режим заготовки для Tinkercad" />
-            <span>🧩 Режим «Заготовка для Tinkercad» (без дрібних деталей, щоб діти самі доробили обличчя в Tinkercad!)</span>
-          </label>
-        </div>
+            <label class="checkbox-row">
+              <input id="mob-tinkercad-blank" type="checkbox" aria-label="Режим заготовки для Tinkercad" />
+              <span>🧩 Режим «Заготовка для Tinkercad» (без дрібних деталей, щоб діти самі доробили обличчя в Tinkercad!)</span>
+            </label>
+          </div>
+        </details>
       </section>
 
     </aside>
@@ -660,28 +667,32 @@
         <div id="print-verification-badge" class="hud-badge verification-badge status-generated">
           <div class="verification-row">
             <span id="geom-check-pill" class="geom-check-pill">🔍 Перевірка геометрії...</span>
-            <select id="verification-status-select" class="hud-select" aria-label="Статус перевірки моделі для друку">
-              <option value="generated" selected>🧪 Статус: Згенеровано (не перевірено)</option>
-              <option value="sliced">🔍 Статус: Перевірено у слайсері</option>
-              <option value="printed">🖨️ Статус: Надруковано на принтері</option>
-            </select>
+            <button id="btn-toggle-slicer-notes" class="hud-notes-toggle" type="button" title="Показати/сховати статус друку та нотатки слайсера">🧾 Нотатки друку ▾</button>
           </div>
-          <div class="verification-row slicer-note-row">
-            <input id="slicer-time-input" class="hud-input" type="text" maxlength="28" placeholder="Запис зі слайсера (напр.: 14 хв, PLA 0.2)" aria-label="Запис фактичного часу та профілю зі слайсера" />
+          <div id="slicer-notes-panel" class="slicer-notes-panel" style="display:none;">
+            <div class="verification-row">
+              <select id="verification-status-select" class="hud-select" aria-label="Статус перевірки моделі для друку">
+                <option value="generated" selected>🧪 Статус: Згенеровано (не перевірено)</option>
+                <option value="sliced">🔍 Статус: Перевірено у слайсері</option>
+                <option value="printed">🖨️ Статус: Надруковано на принтері</option>
+              </select>
+            </div>
+            <div class="verification-row slicer-note-row">
+              <input id="slicer-time-input" class="hud-input" type="text" maxlength="28" placeholder="Запис зі слайсера (напр.: 14 хв, PLA 0.2)" aria-label="Запис фактичного часу та профілю зі слайсера" />
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- НИЖНІ ПАНЕЛІ КЕРУВАННЯ КАМЕРОЮ, ПЛАСТИКОМ ТА ДЕМО-ЕФЕКТАМИ -->
+      <!-- НИЖНІ ПАНЕЛІ КЕРУВАННЯ КАМЕРОЮ ТА ДЕМО-ЕФЕКТАМИ -->
       <div class="viewport-hud-bottom">
         <div class="camera-bar" role="toolbar" aria-label="Ракурси камери 3D-сцени">
-          <button class="cam-btn" data-cam-view="front" data-camera-view="front" title="Ракурс спереду (0°)">👁️ 0°</button>
-          <button class="cam-btn" data-cam-view="side90" data-camera-view="side90" title="Ракурс збоку (90°)">🔄 90°</button>
+          <button class="cam-btn" data-cam-view="front" data-camera-view="front" title="Ракурс спереду (0°)">👁️ 0° Спереду</button>
+          <button class="cam-btn" data-cam-view="side90" data-camera-view="side90" title="Ракурс збоку (90°)">🔄 90° Збоку</button>
           <button class="cam-btn" data-cam-view="top" data-camera-view="top" title="Ракурс зверху">🔝 Зверху</button>
           <button class="cam-btn active-cam" data-cam-view="iso" data-camera-view="iso" title="Ізометричний 3D ракурс">🧊 Ізометрія</button>
-          <button id="btn-toggle-ortho" class="cam-btn btn-ortho-toggle" title="Перемкнути між Ортографічною (без перспективних спотворень) та Перспективною проєкцією (Клавіша O)">📐 Орто</button>
           <button id="btn-fit-model" class="cam-btn" title="Показати модель крупно, зберігши поточний ракурс">🔍 Крупно</button>
-          <button id="btn-hud-mono" class="cam-btn mono-hud-btn" title="Як виглядатиме одним пластиком без кольору">🪨 1 Пластик</button>
+          <button id="btn-toggle-ortho" class="cam-btn btn-ortho-toggle" title="Перемкнути між Ортографічною та Перспективною проєкцією (Клавіша O)">📐 Орто</button>
           <input id="mono-color-picker" type="color" value="#cfd6df" title="Колір пластику для одноколірного прев'ю" aria-label="Колір пластику для одноколірного прев'ю" class="mono-color-input" />
         </div>
 

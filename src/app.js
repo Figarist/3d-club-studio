@@ -1066,6 +1066,18 @@
       if (dom.btnCompareV1V2) dom.btnCompareV1V2.addEventListener('click', () => this.openCompareModal());
       if (dom.btnPrintCard) dom.btnPrintCard.addEventListener('click', () => this.openPrintCardModal());
 
+      const btnToggleSlicer = document.getElementById('btn-toggle-slicer-notes');
+      const slicerPanel = document.getElementById('slicer-notes-panel');
+      if (btnToggleSlicer && slicerPanel) {
+        btnToggleSlicer.addEventListener('click', () => {
+          const isHidden = slicerPanel.style.display === 'none' || !slicerPanel.style.display;
+          slicerPanel.style.display = isHidden ? 'flex' : 'none';
+          btnToggleSlicer.textContent = isHidden ? '🧾 Нотатки друку ▴' : '🧾 Нотатки друку ▾';
+          btnToggleSlicer.classList.toggle('active', isHidden);
+          window.StudioSound?.playPop?.(isHidden ? 520 : 360);
+        });
+      }
+
       // Керування меню додаткових опцій у шапці
       const btnMenu = document.getElementById('btn-top-menu');
       const menuDropdown = document.getElementById('top-dropdown-menu');
