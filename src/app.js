@@ -52,6 +52,8 @@
       // Кеш DOM-елементів (єдина точка правди)
       this._domCache = {
         workspace: document.getElementById('main-workspace'),
+        workflowStepper: document.getElementById('workflow-stepper'),
+        btnExportStl: document.getElementById('btn-export-stl'),
         autosaveTag: document.getElementById('autosave-tag'),
         btnUndo: document.getElementById('btn-undo'),
         btnRedo: document.getElementById('btn-redo'),
@@ -223,6 +225,7 @@
       this.bindPhysicsControls();
       this.bindMobControls();
       this.bindCameraControls();
+      this.bindWorkflowStepper();
 
       // Відновлюємо автозбереження або рендеримо стартову модель
       const restored = this.restoreAutosave();
@@ -542,6 +545,9 @@
       if (dom.btnHudMono) {
         dom.btnHudMono.classList.toggle('active', active);
         dom.btnHudMono.textContent = active ? '🪨 1 Пластик: УВІМК' : '🪨 Одним пластиком';
+      }
+      if (active) {
+        this.setWorkflowStep(3);
       }
       return active;
     }
@@ -1220,6 +1226,7 @@
         btnExport.addEventListener('click', () => {
           const fname = this.getSuggestedFilename();
           this.sceneManager.exportBinarySTL(fname);
+          this.setWorkflowStep(4);
         });
       }
 
@@ -1478,6 +1485,59 @@
         : 'Перспективна проєкція. Натисніть для переходу на Ортографічну проєкцію (Клавіша O)';
     }
 
+    // -------------------------------------------------------------------------
+    // 4-КРОКОВИЙ НАВІГАТОР РОБОЧОГО ПРОЦЕСУ ДЛЯ ДІТЕЙ
+    // -------------------------------------------------------------------------
+    setWorkflowStep(stepNum, triggerAction = false) {
+      this.currentWorkflowStep = stepNum;
+      document.querySelectorAll('.step-btn').forEach((btn) => {
+        const num = parseInt(btn.getAttribute('data-step'), 10);
+        btn.classList.toggle('active', num === stepNum);
+        btn.classList.toggle('completed', num < stepNum);
+      });
+
+      if (!triggerAction) return;
+
+      const dom = this._domCache || {};
+      if (stepNum === 1) {
+        if (window.StudioSound) window.StudioSound.playPop(380);
+        const target = document.querySelector('.panel-section.active .card') || document.getElementById('adventure-shelf');
+        target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else if (stepNum === 2) {
+        if (window.StudioSound) window.StudioSound.playPop(440);
+        const target = document.querySelector('.panel-section.active .pixel-grid-wrapper') ||
+                       document.querySelector('.panel-section.active .card:nth-of-type(2)');
+        target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else if (stepNum === 3) {
+        if (window.StudioSound) window.StudioSound.playPop(520);
+        this.setMonochromeMode(true);
+        const target = dom.mcConnectivityStatus || dom.geomCheckPill;
+        target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        this.showToast('🔍 Перевірка: поглянь чи деталі з\'єднані та як модель виглядає одним пластиком.');
+      } else if (stepNum === 4) {
+        if (window.StudioSound) window.StudioSound.playPop(620);
+        const btnExport = dom.btnExportStl || document.getElementById('btn-export-stl');
+        if (btnExport) {
+          btnExport.classList.remove('pulse-highlight');
+          void btnExport.offsetWidth;
+          btnExport.classList.add('pulse-highlight');
+          setTimeout(() => btnExport.classList.remove('pulse-highlight'), 2600);
+        }
+        this.showToast('🚀 Модель готова! Натисни зелену кнопку «Експорт STL» угорі.');
+      }
+    }
+
+    bindWorkflowStepper() {
+      document.querySelectorAll('.step-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const step = parseInt(btn.getAttribute('data-step'), 10);
+          if (step >= 1 && step <= 4) {
+            this.setWorkflowStep(step, true);
+          }
+        });
+      });
+    }
+
     bindMinecraftControls() {
       document.querySelectorAll('[data-mc-preset]').forEach((btn) => {
         btn.addEventListener('click', () => {
@@ -1502,6 +1562,7 @@
           this.mcGen.loadPreset(key, false, false);
           this.markModelModified();
           this.rebuildCurrentModel(true, true);
+          this.setWorkflowStep(2);
           this.autosave();
         });
       });
@@ -1610,6 +1671,7 @@
           this.updateValueLabels();
           this.markModelModified();
           this.rebuildCurrentModel(true);
+          this.setWorkflowStep(2);
           this.autosave();
         });
       });
