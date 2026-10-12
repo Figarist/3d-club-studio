@@ -819,29 +819,30 @@
     <div class="modal-window missions-modal-window">
       <div class="modal-header missions-modal-header">
         <div>
-          <h2 id="missions-modal-title">🗺️ Місії гуртка «3D Кузня Чудес» (12 проєктів для 2–6 класів)</h2>
+          <h2 id="missions-modal-title">🗺️ Каталог пригод та місій (72 місії для 2–6 класів)</h2>
           <p class="modal-subtitle missions-modal-subtitle">
-            Обери місію, прочитай легенду-загадку та натисни <b>«🚀 Почати місію»</b> — студія сама увімкне потрібний генератор, стартовий міні-шаблон (25–35 мм) і рекомендовані параметри!
+            Обери місію, прочитай загадку та натисни <b>«🚀 Обрати цю місію»</b> — студія сама відкриє потрібний генератор, заготовку та рекомендовані параметри!
           </p>
         </div>
         <button id="btn-close-missions" class="modal-close-btn missions-close-btn" title="Закрити каталог місій (Esc)" aria-label="Закрити каталог місій">✕</button>
       </div>
 
-      <!-- ФІЛЬТР ЗА КАТЕГОРІЯМИ (4 рельєфи, 2 фактури, 2 настільні ігри, 2 корисні дрібниці, 1 картонний мегаполіс, 1 оптичний експеримент) -->
+      <!-- ФІЛЬТР ЗА КАТЕГОРІЯМИ -->
       <div class="missions-filter-bar" role="tablist" aria-label="Категорії місій">
-        <button class="missions-filter-btn mission-filter-btn filter-chip active" data-mission-filter="all">🌟 Усі місії (12)</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="relief">🛡️ Рельєфи (4)</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="texture">🐾 Фактури і сліди (2)</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="boardgame">🎲 Настільні ігри (2)</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="useful">🏷️ Корисні дрібниці (2)</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="cardboard">🏙️ Картонний мегаполіс (1)</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="optical">🔮 Оптичний експеримент (1)</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip active" data-mission-filter="all">🌟 Усі місії</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="relief">🛡️ Рельєфи</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="texture">🐾 Фактури і сліди</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="boardgame">🎲 Настільні ігри</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="useful">🏷️ Корисні дрібниці</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="cardboard">🏙️ Картонний мегаполіс</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="optical">🔮 Оптичні ілюзії</button>
         <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="character">👾 Персонажі</button>
         <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="engineering">🎯 Інженерні ігри</button>
       </div>
       <div class="catalog-search-row">
         <label for="model-search">Знайти пригоду <input id="model-search" type="search" placeholder="Слід, робот, компас…" /></label>
         <label for="model-theme">Тема <select id="model-theme"><option value="">Усі теми</option></select></label>
+        <span id="missions-count-badge" class="missions-count-badge">72 місії</span>
       </div>
 
       <!-- СІТКА 12 КАРТОК МІСІЙ -->
