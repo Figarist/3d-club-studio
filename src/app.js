@@ -69,6 +69,7 @@
 
         // Модалка місій
         missionsModal: document.getElementById('missions-modal'),
+        aboutModal: document.getElementById('about-modal'),
         missionsGrid: document.getElementById('missions-grid-container'),
         activeMissionCard: document.getElementById('active-mission-card'),
         btnCloseActiveMission: document.getElementById('btn-close-active-mission'),
@@ -233,6 +234,9 @@
         this.rebuildCurrentModel(true);
       }
       this.history.updateUI(this._domCache.btnUndo, this._domCache.btnRedo, this._domCache.btnMcUndo);
+      if (window.location.hash === '#about') {
+        setTimeout(() => this.openAboutModal(), 150);
+      }
     }
 
     // -------------------------------------------------------------------------
@@ -923,6 +927,35 @@
       }
     }
 
+    openAboutModal() {
+      const dom = this._domCache || {};
+      if (!dom.aboutModal) return;
+      dom.aboutModal.style.display = 'flex';
+      if (window.ModalFocus) window.ModalFocus.enter(dom.aboutModal);
+      const btnTop = document.getElementById('btn-open-about');
+      if (btnTop) btnTop.classList.add('active');
+      if (window.StudioSound) window.StudioSound.playPop(520);
+    }
+
+    closeAboutModal() {
+      const dom = this._domCache || {};
+      if (!dom.aboutModal) return;
+      dom.aboutModal.style.display = 'none';
+      if (window.ModalFocus) window.ModalFocus.leave(dom.aboutModal);
+      const btnTop = document.getElementById('btn-open-about');
+      if (btnTop) btnTop.classList.remove('active');
+      if (window.StudioSound) window.StudioSound.playPop(340);
+    }
+
+    toggleAboutModal() {
+      const dom = this._domCache || {};
+      if (dom.aboutModal && dom.aboutModal.style.display === 'flex') {
+        this.closeAboutModal();
+      } else {
+        this.openAboutModal();
+      }
+    }
+
     // -------------------------------------------------------------------------
     // ПРИВ'ЯЗКА ПОДІЙ ТА ІНТЕРФЕЙСУ
     // -------------------------------------------------------------------------
@@ -969,6 +1002,7 @@
           e.preventDefault();
           this.saveProjectToFile();
         } else if (e.key === 'Escape') {
+          if (dom.aboutModal && dom.aboutModal.style.display !== 'none') this.closeAboutModal();
           if (dom.missionsModal && dom.missionsModal.style.display !== 'none') this.closeMissionsModal();
           if (dom.compareModal && dom.compareModal.style.display !== 'none') this.closeCompareModal();
           if (dom.printCardModal && dom.printCardModal.style.display !== 'none') this.closePrintCardModal();
@@ -1205,6 +1239,17 @@
       if (dom.missionsModal) {
         dom.missionsModal.addEventListener('click', (e) => {
           if (e.target === dom.missionsModal) this.closeMissionsModal();
+        });
+      }
+
+      document.querySelectorAll('#btn-open-about, .btn-about, .about-pill-btn').forEach(btn => {
+        btn.addEventListener('click', () => this.toggleAboutModal());
+      });
+      const btnCloseAbout = document.getElementById('btn-close-about');
+      if (btnCloseAbout) btnCloseAbout.addEventListener('click', () => this.closeAboutModal());
+      if (dom.aboutModal) {
+        dom.aboutModal.addEventListener('click', (e) => {
+          if (e.target === dom.aboutModal) this.closeAboutModal();
         });
       }
 
