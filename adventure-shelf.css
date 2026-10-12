@@ -2,23 +2,27 @@
   font-size: var(--text-sm);
   color: var(--text-muted);
   line-height: 1.5;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 .adventure-shelf-group {
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  background: var(--bg-input);
+  border: 2px solid var(--surface2);
+  border-radius: var(--r-md);
+  background: var(--bg2);
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
 }
-.adventure-shelf-group + .adventure-shelf-group { margin-top: 6px; }
+.adventure-shelf-group + .adventure-shelf-group { margin-top: 8px; }
 .adventure-shelf-group > summary {
-  padding: 9px;
+  padding: 10px 14px;
   color: var(--text-main);
   font-size: var(--text-sm);
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
+  user-select: none;
+  transition: background var(--transition-fast);
 }
-.adventure-shelf-group > summary:hover { background: var(--bg-card-hover); }
-.adventure-shelf-group > summary:active { color: var(--accent-gold); }
-.adventure-shelf-group > summary:focus-visible { outline: 2px solid var(--border-focus); outline-offset: -2px; }
-.adventure-shelf-group[open] > summary { color: var(--accent-gold); }
-.adventure-shelf-grid { padding: 0 8px 8px; }
+.adventure-shelf-group > summary:hover { background: var(--surface); }
+.adventure-shelf-group > summary:active { color: var(--yellow); }
+.adventure-shelf-group > summary:focus-visible { outline: 3px solid var(--cyan); outline-offset: -2px; }
+.adventure-shelf-group[open] > summary { color: var(--yellow); border-bottom: 1px solid var(--surface2); }
+.adventure-shelf-grid { padding: 10px; }
