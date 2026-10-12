@@ -22,11 +22,11 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  color: #e9f5ef;
-  background: linear-gradient(145deg, #15241f, #101916 70%);
-  border: 1px solid rgba(146, 219, 172, .32);
-  border-radius: 20px;
-  box-shadow: 0 24px 90px rgba(0, 0, 0, .48), 0 0 0 1px rgba(255, 255, 255, .035) inset;
+  color: var(--text);
+  background: var(--surface);
+  border: 3px solid var(--surface2);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-modal);
   font-family: inherit;
 }
 
@@ -45,7 +45,8 @@
   justify-content: space-between;
   gap: 20px;
   padding: 24px 28px 18px;
-  border-bottom: 1px solid rgba(202, 237, 213, .1);
+  border-bottom: 2px solid var(--surface2);
+  background: var(--bg2);
 }
 
 .lesson-header h2,
@@ -56,7 +57,7 @@
 
 .lesson-header h2 {
   margin-bottom: 6px;
-  color: #f5fff8;
+  color: var(--text);
   font-size: clamp(23px, 2.4vw, 31px);
   line-height: 1.12;
   letter-spacing: -.035em;
@@ -64,13 +65,13 @@
 
 .lesson-intro {
   margin-bottom: 0;
-  color: #afc3b7;
+  color: var(--text2);
   font-size: 14px;
 }
 
 .lesson-eyebrow {
   margin-bottom: 7px;
-  color: #82dba4;
+  color: var(--yellow);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: .12em;
@@ -79,30 +80,34 @@
 }
 
 .lesson-close {
-  width: 40px;
-  height: 40px;
-  flex: 0 0 40px;
-  color: #d4e7da;
-  background: rgba(255, 255, 255, .06);
-  border: 1px solid rgba(255, 255, 255, .11);
-  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  color: #fff;
+  background: var(--surface2);
+  border: 2px solid var(--surface2);
+  border-radius: var(--r-pill);
   cursor: pointer;
-  font-size: 20px !important;
+  font-size: 18px !important;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast, .15s);
 }
 
-.lesson-close:hover,
-.lesson-button:hover,
-.lesson-grade-switch button:hover,
-.lesson-scenario-card:hover {
-  filter: brightness(1.12);
+.lesson-close:hover {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  transform: scale(1.1);
 }
 
 .lesson-dialog button:focus-visible,
 .lesson-dialog textarea:focus-visible,
 .lesson-dialog:focus-visible {
-  outline: 3px solid #a6efbd;
-  outline-offset: 3px;
+  outline: 3px solid var(--cyan) !important;
+  outline-offset: 2px !important;
 }
 
 .lesson-body {
@@ -119,9 +124,9 @@
 .lesson-panel {
   min-width: 0;
   padding: 18px;
-  background: rgba(4, 13, 10, .42);
-  border: 1px solid rgba(203, 236, 211, .1);
-  border-radius: 16px;
+  background: var(--card);
+  border: 2px solid var(--surface2);
+  border-radius: var(--r-md);
 }
 
 .lesson-panel-heading {
@@ -217,45 +222,58 @@
 
 .lesson-button {
   min-height: 36px;
-  padding: 8px 12px;
-  color: #eaf5ed;
-  border: 1px solid transparent;
-  border-radius: 10px;
+  padding: 8px 16px;
+  color: var(--text);
+  border: 2px solid var(--surface2);
+  border-radius: var(--r-pill);
   cursor: pointer;
   font-size: 12px !important;
-  font-weight: 750;
+  font-weight: 800;
   line-height: 1.2;
-  transition: filter .15s ease, background .15s ease, border-color .15s ease;
+  transition: all var(--transition-fast, .15s);
+}
+
+.lesson-button:hover {
+  transform: translateY(-2px);
+  border-color: var(--yellow);
 }
 
 .lesson-button:active,
 .lesson-close:active,
 .lesson-grade-switch button:active,
 .lesson-scenario-card:active {
-  transform: translateY(1px);
+  transform: scale(0.96);
 }
 
 .lesson-button:disabled {
   cursor: not-allowed;
   opacity: .45;
+  transform: none !important;
 }
 
 .lesson-button-primary {
-  color: #092011;
-  background: #90e6a7;
-  border-color: #a4edb6;
+  color: var(--on-green);
+  background: var(--green);
+  border-color: transparent;
+  box-shadow: var(--shadow-glow-green);
+}
+
+.lesson-button-primary:hover {
+  background: var(--green-dark);
+  color: var(--on-green);
+  border-color: transparent;
 }
 
 .lesson-button-quiet {
-  color: #c0d1c6;
-  background: rgba(255, 255, 255, .045);
-  border-color: rgba(255, 255, 255, .11);
+  color: var(--text2);
+  background: var(--bg2);
+  border-color: var(--surface2);
 }
 
 .lesson-button-outline {
-  color: #a5e9b7;
-  background: rgba(72, 161, 97, .08);
-  border-color: rgba(139, 219, 158, .31);
+  color: var(--text);
+  background: transparent;
+  border-color: var(--surface2);
 }
 
 .lesson-timer-status {
@@ -332,26 +350,34 @@
   gap: 4px;
   margin: 0 0 13px;
   padding: 4px;
-  background: rgba(0, 0, 0, .19);
-  border: 1px solid rgba(255, 255, 255, .08);
-  border-radius: 12px;
+  background: var(--bg2);
+  border: 2px solid var(--surface2);
+  border-radius: var(--r-pill);
 }
 
 .lesson-grade-switch button {
   min-height: 32px;
-  padding: 6px 11px;
-  color: #a9beb0;
+  padding: 6px 14px;
+  color: var(--text-muted);
   background: transparent;
-  border: 0;
-  border-radius: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
   cursor: pointer;
   font-size: 11px;
-  font-weight: 750;
+  font-weight: 800;
+  transition: all var(--transition-fast, .15s);
+}
+
+.lesson-grade-switch button:hover {
+  color: var(--text);
+  background: var(--surface);
 }
 
 .lesson-grade-switch button[aria-pressed="true"] {
-  color: #102619;
-  background: #9ae8ad;
+  color: #fff;
+  background: var(--surface2);
+  border-color: var(--cyan);
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.25);
 }
 
 .lesson-scenarios {
@@ -367,20 +393,27 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
-  padding: 10px 11px;
+  padding: 10px 12px;
   text-align: left;
-  color: #d7e8dc;
-  background: rgba(255, 255, 255, .035);
-  border: 1px solid rgba(196, 225, 204, .1);
-  border-radius: 11px;
+  color: var(--text2);
+  background: var(--bg2);
+  border: 2px solid var(--surface2);
+  border-radius: var(--r-md);
   cursor: pointer;
-  transition: filter .15s ease, border-color .15s ease, background .15s ease;
+  transition: all var(--transition-fast, .15s);
+}
+
+.lesson-scenario-card:hover {
+  border-color: var(--yellow);
+  color: #fff;
+  transform: translateY(-2px);
 }
 
 .lesson-scenario-card.is-selected,
 .lesson-scenario-card[aria-pressed="true"] {
-  background: rgba(87, 179, 110, .12);
-  border-color: rgba(143, 226, 161, .47);
+  background: var(--surface2);
+  border-color: var(--green);
+  box-shadow: 0 0 12px rgba(0, 210, 106, 0.25);
 }
 
 .lesson-scenario-card strong {
@@ -472,11 +505,11 @@
   width: 100%;
   min-height: 58px;
   resize: vertical;
-  padding: 10px 11px;
-  color: #edf8f0;
-  background: rgba(0, 0, 0, .2);
-  border: 1px solid rgba(196, 225, 204, .14);
-  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  background: var(--bg2);
+  border: 2px solid var(--surface2);
+  border-radius: var(--r-md);
   font-size: 12px !important;
   line-height: 1.4;
 }
@@ -498,10 +531,10 @@
   justify-content: space-between;
   gap: 16px;
   padding: 12px 24px;
-  color: #91a99a;
-  background: rgba(0, 0, 0, .15);
-  border-top: 1px solid rgba(202, 237, 213, .1);
-  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--bg2);
+  border-top: 2px solid var(--surface2);
+  font-size: 11px;
 }
 
 @media (max-width: 900px) {
