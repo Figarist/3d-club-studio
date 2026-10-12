@@ -219,7 +219,7 @@
       ctx.lineWidth = 1;
       ctx.strokeRect(25, 96, 750, 48);
 
-      ctx.fillStyle = '#0f172a';
+      ctx.fillStyle = '#1a1a2e';
       ctx.font = 'bold 16px system-ui, -apple-system, sans-serif';
       ctx.fillText(`👤 Пара: ${pairCode}`, 44, 126);
 
@@ -254,7 +254,7 @@
         ctx.lineWidth = 1;
         ctx.strokeRect(366, 160, 394, 240);
 
-        ctx.fillStyle = '#0f172a';
+        ctx.fillStyle = '#1a1a2e';
         ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
         ctx.fillText('📐 ТЕХНІЧНІ ХАРАКТЕРИСТИКИ ГЕОМЕТРІЇ', 382, 188);
 
@@ -292,7 +292,7 @@
         ctx.lineWidth = 1;
         ctx.strokeRect(40, 416, 720, 134);
 
-        ctx.fillStyle = '#0f172a';
+        ctx.fillStyle = '#1a1a2e';
         ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
         ctx.fillText('✅ ЧЕК-ЛИСТ ВЗАЄМОПЕРЕВІРКИ (ПАРА: ДИЗАЙНЕР + КОНТРОЛЕР ЯКОСТІ)', 56, 442);
 

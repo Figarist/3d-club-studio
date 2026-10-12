@@ -2470,10 +2470,10 @@ select:focus, input[type="text"]:focus {
 
 .passport-card-paper {
   background: #ffffff;
-  color: #0f172a;
+  color: #1a1a2e;
   padding: 24px;
   overflow-y: auto;
-  border: 2px solid #0f172a;
+  border: 2px solid #1a1a2e;
   margin: 16px 20px;
   border-radius: var(--radius-sm);
   display: flex;
@@ -2486,7 +2486,7 @@ select:focus, input[type="text"]:focus {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 2px solid #0f172a;
+  border-bottom: 2px solid #1a1a2e;
   padding-bottom: 12px;
 }
 
@@ -2510,7 +2510,7 @@ select:focus, input[type="text"]:focus {
 .passport-doc-title {
   font-size: 17px;
   font-weight: 900;
-  color: #0f172a;
+  color: #1a1a2e;
   letter-spacing: -0.2px;
 }
 
@@ -2656,7 +2656,7 @@ select:focus, input[type="text"]:focus {
 }
 
 .t-line {
-  color: #0f172a;
+  color: #1a1a2e;
 }
 
 .passport-cut-line {
@@ -3092,7 +3092,14 @@ select:focus, input[type="text"]:focus {
 }
 
 @media (hover: none) and (pointer: coarse) {
-  .view-btn, .btn-start-mission, .lesson-button, .pixel-tools-button {
+  .view-btn, .btn-start-mission, .lesson-button, .pixel-tools-button,
+  .gen-tab-btn, .missions-filter-btn, .btn-mission-apply, .step-btn {
+    min-height: 44px;
+  }
+  .modal-close-btn, .missions-close-btn, .lesson-close {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
     min-height: 44px;
   }
 }
