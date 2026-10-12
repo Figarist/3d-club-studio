@@ -763,6 +763,107 @@
       }
     }
 
+    launchConfetti() {
+      let canvas = document.getElementById('confetti-canvas');
+      if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvas.id = 'confetti-canvas';
+        canvas.className = 'confetti-canvas';
+        document.body.appendChild(canvas);
+      }
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.style.display = 'block';
+
+      const colors = ['#f59e0b', '#fbbf24', '#10b981', '#38bdf8', '#c084fc', '#f43f5e'];
+      const particles = [];
+      const particleCount = 65;
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: canvas.width * 0.5 + (Math.random() - 0.5) * 260,
+          y: canvas.height * 0.35,
+          vx: (Math.random() - 0.5) * 14,
+          vy: -Math.random() * 12 - 4,
+          size: Math.random() * 8 + 5,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          rotationSpeed: (Math.random() - 0.5) * 10,
+          opacity: 1
+        });
+      }
+
+      let startTime = null;
+      const duration = 2400;
+
+      const render = (timestamp) => {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        if (elapsed > duration) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          canvas.style.display = 'none';
+          return;
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const progress = elapsed / duration;
+
+        particles.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.38;
+          p.vx *= 0.98;
+          p.rotation += p.rotationSpeed;
+          p.opacity = Math.max(0, 1 - progress * 1.2);
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.globalAlpha = p.opacity;
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+          ctx.restore();
+        });
+
+        requestAnimationFrame(render);
+      };
+
+      requestAnimationFrame(render);
+    }
+
+    recordAccomplishment() {
+      try {
+        const key = '3d_kuznya_stl_exports_count';
+        const currentCount = parseInt(this.safeStorage?.getItem?.(key) || '0', 10);
+        this.safeStorage?.setItem?.(key, String(currentCount + 1));
+
+        const activeMission = this.missions?.getActiveMission?.();
+        if (activeMission && activeMission.id) {
+          const compKey = '3d_kuznya_completed_missions';
+          const completed = JSON.parse(this.safeStorage?.getItem?.(compKey) || '[]');
+          if (!completed.includes(activeMission.id)) {
+            completed.push(activeMission.id);
+            this.safeStorage?.setItem?.(compKey, JSON.stringify(completed));
+          }
+        }
+      } catch (err) {
+        console.warn('Accomplishment storage error:', err);
+      }
+    }
+
+    triggerCelebration(message = '🎉 STL-файл завантажено і готовий до друку!') {
+      this.launchConfetti();
+      this.recordAccomplishment();
+      this.showToast(message, {
+        duration: 6000,
+        actionText: '📋 Паспорт друку',
+        onAction: () => this.openPrintCardModal('V2')
+      });
+    }
+
     openCompareModal() {
       this.compare.openCompareModal(
         this._domCache,
@@ -1227,6 +1328,7 @@
           const fname = this.getSuggestedFilename();
           this.sceneManager.exportBinarySTL(fname);
           this.setWorkflowStep(4);
+          this.triggerCelebration('🎉 Ура! Твій STL-файл завантажено і готовий до друку!');
         });
       }
 
