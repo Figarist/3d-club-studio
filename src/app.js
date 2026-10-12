@@ -537,11 +537,11 @@
       const dom = this._domCache || {};
       if (dom.btnToggleMono) {
         dom.btnToggleMono.classList.toggle('active', active);
-        dom.btnToggleMono.textContent = active ? '🪨 1 Пластик: ВКЛ' : '🪨 1 Пластик';
+        dom.btnToggleMono.textContent = active ? '🪨 1 Пластик: УВІМК' : '🪨 1 Пластик';
       }
       if (dom.btnHudMono) {
         dom.btnHudMono.classList.toggle('active', active);
-        dom.btnHudMono.textContent = active ? '🪨 1 Пластик: ВКЛ' : '🪨 Одним пластиком';
+        dom.btnHudMono.textContent = active ? '🪨 1 Пластик: УВІМК' : '🪨 Одним пластиком';
       }
       return active;
     }
@@ -592,10 +592,10 @@
         pill.textContent = `⚠️ Деталь розірвана на ${conn.finalIslands} частини!`;
         pill.className = 'geom-check-pill danger';
       } else if (d.isMini) {
-        pill.textContent = '🌟 Міні-формат (≤35 мм) • Плоске дно Z=0';
+        pill.textContent = '🌟 Міні-формат (≤35 мм) • Стоїть рівно на столі (Z=0)';
         pill.className = 'geom-check-pill';
       } else {
-        pill.textContent = '📐 У межах столу • Плоске дно Z=0';
+        pill.textContent = '📐 Поміщається на столі • Стоїть рівно на столі (Z=0)';
         pill.className = 'geom-check-pill';
       }
     }
@@ -607,19 +607,19 @@
 
       const c = this.mcGen.lastConnectivity;
       if (!c || c.activeCount === 0) {
-        pill.textContent = '✏️ Полотно порожнє: намалюй власний знак або обери шаблон.';
+        pill.textContent = '✏️ Полотно порожнє: намалюй власний знак або обери зразок вище.';
         pill.className = 'connectivity-pill warn';
       } else if (c.finalIslands === 1 && c.bridgedCount > 0) {
-        pill.textContent = `🔗 Суцільна підкладка з'єднала ${c.rawIslands} острови в 1 деталь!`;
+        pill.textContent = `🔗 Суцільна підкладка з'єднала ${c.rawIslands} деталі в 1 міцну фігурку!`;
         pill.className = 'connectivity-pill bridged';
       } else if (c.finalIslands === 1 && c.hasDiagonalOnly && !dom.mcSolidBase?.checked) {
-        pill.textContent = '⚠️ Є тонкі діагональні кутики: увімкніть підкладку для міцності!';
+        pill.textContent = '⚠️ Є тонкі діагональні кутики: увімкни підкладку для міцності!';
         pill.className = 'connectivity-pill warn';
       } else if (c.finalIslands === 1) {
-        pill.textContent = '✅ Піксельна зв’язність: 1 група; STL перевір у слайсері.';
+        pill.textContent = '✅ Чудово! Усі деталі з’єднані в одну міцну фігурку.';
         pill.className = 'connectivity-pill';
       } else {
-        pill.textContent = `🚨 Розірвано на ${c.finalIslands} окремих частин! Увімкніть підкладку або домалюйте містки.`;
+        pill.textContent = `🚨 Розірвано на ${c.finalIslands} окремі частини! Вони розпадуться при друці. Додай підкладку або з'єднай їх.`;
         pill.className = 'connectivity-pill danger';
       }
     }
@@ -708,7 +708,52 @@
             if (dom.btnSnapshotV1) dom.btnSnapshotV1.textContent = '📸 Оновити V1';
           }, 2200);
         }
+        this.showToast('📸 V1 (Ескіз) зафіксовано для порівняння!');
         this.autosave();
+      }
+    }
+
+    showToast(message, { duration = 4000, actionText = null, onAction = null } = {}) {
+      let toast = document.getElementById('app-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'app-toast';
+        toast.className = 'app-toast';
+        document.body.appendChild(toast);
+      }
+      toast.innerHTML = '';
+
+      const textSpan = document.createElement('span');
+      textSpan.className = 'toast-text';
+      textSpan.textContent = message;
+      toast.appendChild(textSpan);
+
+      if (actionText && typeof onAction === 'function') {
+        const actBtn = document.createElement('button');
+        actBtn.className = 'toast-action-btn';
+        actBtn.textContent = actionText;
+        actBtn.addEventListener('click', () => {
+          try { onAction(); } catch (err) { console.warn(err); }
+          toast.classList.remove('visible');
+        });
+        toast.appendChild(actBtn);
+      }
+
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'toast-close-btn';
+      closeBtn.textContent = '✕';
+      closeBtn.setAttribute('aria-label', 'Закрити сповіщення');
+      closeBtn.addEventListener('click', () => {
+        toast.classList.remove('visible');
+      });
+      toast.appendChild(closeBtn);
+
+      toast.classList.add('visible');
+      clearTimeout(this._toastTimer);
+      if (duration > 0) {
+        this._toastTimer = setTimeout(() => {
+          toast.classList.remove('visible');
+        }, duration);
       }
     }
 
@@ -1427,7 +1472,7 @@
       const btn = this._domCache?.btnToggleOrtho || document.getElementById('btn-toggle-ortho');
       if (!btn) return;
       btn.classList.toggle('active-cam', !!isOrtho);
-      btn.textContent = isOrtho ? '📐 Орто: Вкл' : '📐 Орто';
+      btn.textContent = isOrtho ? '📐 Орто: УВІМК' : '📐 Орто';
       btn.title = isOrtho
         ? 'Ортографічна проєкція активна (паралельні лінії без спотворень). Натисніть для переходу на Перспективу (Клавіша O)'
         : 'Перспективна проєкція. Натисніть для переходу на Ортографічну проєкцію (Клавіша O)';
@@ -1494,7 +1539,17 @@
       const btnClear = document.getElementById('btn-mc-clear');
       if (btnClear) {
         btnClear.addEventListener('click', () => {
+          const hadPixels = Boolean(
+            this.mcGen?.grid && this.mcGen.grid.some(row => row.some(v => v > 0))
+          );
           this.mcGen.clearGrid();
+          if (hadPixels) {
+            this.showToast('🧽 Полотно очищено', {
+              duration: 5000,
+              actionText: '↩️ Скасувати',
+              onAction: () => this.undo()
+            });
+          }
         });
       }
 
