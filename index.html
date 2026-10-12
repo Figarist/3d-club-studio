@@ -313,16 +313,16 @@
           </div>
 
           <div class="brush-bar">
-            <button class="brush-btn" data-mc-brush="0">🧽 Гумка (0)</button>
-            <button class="brush-btn" data-mc-brush="1">🟫 Шар 1 (Низ)</button>
-            <button class="brush-btn" data-mc-brush="2">🟦 Шар 2 (Сер)</button>
-            <button class="brush-btn active" data-mc-brush="3">💎 Шар 3 (Вис)</button>
-            <button class="brush-btn" data-mc-brush="4">✨ Шар 4 (Пік)</button>
+            <button class="brush-btn" data-mc-brush="0" title="Гумка: видаляє кубик (висота 0 мм)">🧽 Гумка</button>
+            <button class="brush-btn" data-mc-brush="1" title="Шар 1: найнижчий шар (1 мм)">🟫 Шар 1 (Низько)</button>
+            <button class="brush-btn" data-mc-brush="2" title="Шар 2: середній шар (2 мм)">🟦 Шар 2 (Середнє)</button>
+            <button class="brush-btn active" data-mc-brush="3" title="Шар 3: високий шар (3 мм)">💎 Шар 3 (Високо)</button>
+            <button class="brush-btn" data-mc-brush="4" title="Шар 4: найвищий пік (4 мм)">✨ Шар 4 (Найвище)</button>
           </div>
 
           <!-- Індикатор фізичної зв'язності деталей -->
           <div id="mc-connectivity-status" class="connectivity-pill">
-            🔍 Перевірка зв'язності деталей...
+            ✏️ Намалюй свій візерунок або обери зразок вище.
           </div>
 
           <div class="pixel-grid-wrapper">
@@ -1011,6 +1011,9 @@
       </div>
     </div>
   </div>
+
+  <!-- ШВИДКЕ СПОВІЩЕННЯ / ПІДКАЗКА (TOAST) ДЛЯ ЗРУЧНОСТІ ТА ЗАХИСТУ ДІЙ ДИТИНИ -->
+  <div id="app-toast" class="app-toast" aria-live="polite"></div>
 
   <!-- ПІДКЛЮЧЕННЯ СКРИПТІВ (Працює 100% офлайн без інтернету та серверів!) -->
   <script src="lib/three.min.js"></script>
