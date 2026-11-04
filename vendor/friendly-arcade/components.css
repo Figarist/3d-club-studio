@@ -1,0 +1,580 @@
+/* Friendly Arcade UI — components.css: кнопки, пігулки, чіпи, бейджі, картки, сітка, шапка, поля, модалки, тости. Автор: Ігор Сівочка (sivochka.com). MIT. */
+/* ==========================================================================
+   4. КНОПКИ (.btn)
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: var(--r-pill);
+  border: var(--border-width-control) solid var(--surface2);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: all var(--duration-fast) var(--ease-smooth);
+}
+
+.btn:hover {
+  background: var(--card-hover);
+  border-color: var(--yellow);
+  color: var(--text);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn:disabled, .btn.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  transform: none !important;
+}
+
+/* Модифікатор --primary (Головний зелений CTA) */
+.btn--primary {
+  background: var(--green);
+  color: var(--on-green);
+  border-color: var(--green);
+  box-shadow: var(--shadow-glow-green);
+}
+.btn--primary:hover {
+  background: var(--green-dark);
+  color: var(--on-green);
+  border-color: var(--green-dark);
+  box-shadow: var(--shadow-glow-green-strong);
+  transform: translateY(-2px);
+}
+
+/* Модифікатор --accent (Золотий / Рандом / Нагорода) */
+.btn--accent {
+  background: var(--yellow);
+  color: var(--on-yellow);
+  border-color: var(--yellow);
+  box-shadow: var(--shadow-glow-yellow);
+}
+.btn--accent:hover {
+  background: var(--yellow-hover);
+  color: var(--on-yellow);
+  border-color: var(--yellow-hover);
+  transform: translateY(-2px);
+}
+
+/* Модифікатор --ghost (Прозора з рамкою) */
+.btn--ghost {
+  background: transparent;
+  border-color: var(--surface2);
+  color: var(--text2);
+}
+.btn--ghost:hover {
+  background: var(--ghost-hover);
+  border-color: var(--cyan);
+  color: var(--text);
+}
+
+/* Модифікатор --danger (Червона) */
+.btn--danger {
+  background: var(--red);
+  color: var(--on-red);
+  border-color: var(--red);
+}
+.btn--danger:hover {
+  background: var(--red-hover);
+  border-color: var(--red-hover);
+  box-shadow: var(--shadow-glow-red);
+}
+
+/* Розміри */
+.btn--sm {
+  padding: 5px 12px;
+  font-size: var(--text-xs);
+}
+.btn--lg {
+  padding: 12px 24px;
+  font-size: var(--text-base);
+}
+.btn--icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: var(--r-pill);
+}
+
+/* ==========================================================================
+   5. ПІГУЛКИ (.pill) ТА ЧІПИ (.chip)
+   ========================================================================== */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--r-pill);
+  border: var(--border-width-control) solid var(--surface2);
+  background: var(--surface);
+  color: var(--text2);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  user-select: none;
+}
+
+.pill--ok {
+  background: var(--ok-bg);
+  border-color: var(--green);
+  color: var(--ok-text);
+}
+.pill--warn {
+  background: var(--warn-bg);
+  border-color: var(--yellow);
+  color: var(--warn-text);
+}
+.pill--danger {
+  background: var(--danger-bg);
+  border-color: var(--red);
+  color: var(--danger-text);
+}
+.pill--info {
+  background: var(--info-bg);
+  border-color: var(--blue);
+  color: var(--info-text);
+}
+
+/* Чіпи фільтрів (.chip) */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--r-pill);
+  border: var(--border-width-control) solid var(--surface2);
+  background: var(--surface);
+  color: var(--text2);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--duration-fast) var(--ease-smooth);
+}
+.chip:hover {
+  background: var(--card-hover);
+  color: var(--text);
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+.chip.active {
+  background: var(--green);
+  color: var(--on-green);
+  border-color: var(--green);
+  box-shadow: var(--shadow-glow-green);
+  font-weight: 900;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   6. БЕЙДЖІ (.badge)
+   ========================================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--r-sm);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.badge--new {
+  background: linear-gradient(135deg, var(--cyan), var(--blue));
+  color: var(--on-cyan);
+}
+.badge--hot {
+  background: linear-gradient(135deg, var(--red), var(--orange));
+  color: var(--on-red);
+}
+.badge--gold {
+  background: var(--warn-bg);
+  border: 1px solid var(--yellow);
+  color: var(--warn-text);
+}
+.badge--ok {
+  background: var(--ok-bg);
+  border: 1px solid var(--green);
+  color: var(--ok-text);
+}
+
+/* ==========================================================================
+   7. КАРТКИ (.card, .card-tile) — ROBLOX-TILE STYLE
+   ========================================================================== */
+.card {
+  background: var(--card);
+  border: var(--border-width-card) solid transparent;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s var(--ease-smooth);
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card:hover {
+  border-color: var(--green);
+  background: var(--card-hover);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.card:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+/* Статична панель (не стрибає) */
+.card-static {
+  background: var(--card);
+  border: var(--border-width-control) solid var(--surface2);
+  border-radius: var(--r-md);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-img-wrap {
+  width: 100%;
+  height: 180px;
+  background: var(--card-img-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  padding: 10px;
+}
+.card-img-wrap img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  transition: transform 0.4s var(--ease-smooth);
+  filter: drop-shadow(var(--shadow-img));
+}
+.card:hover .card-img-wrap img {
+  transform: scale(1.15);
+}
+
+.card-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.card-title {
+  font-size: var(--text-base);
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.card-desc {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.card-footer {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ==========================================================================
+   8. АДАПТИВНА СІТКА (.arcade-grid)
+   ========================================================================== */
+.arcade-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.arcade-grid--wide {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+/* ==========================================================================
+   9. ШАПКА (.arcade-header)
+   ========================================================================== */
+.arcade-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 72px;
+  background: var(--header-bg);
+  border-bottom: 3px solid var(--green);
+  padding: 0 20px;
+  box-shadow: var(--shadow-glow-green);
+}
+
+.arcade-header-inner {
+  max-width: 1440px;
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.arcade-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: transform var(--duration-fast);
+}
+.arcade-logo:hover {
+  transform: scale(1.05);
+}
+
+.lego-dots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.lego-dots span {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: var(--shadow-stud);
+}
+
+.arcade-logo-text strong {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: var(--text);
+}
+.arcade-logo-text small {
+  font-size: 0.72rem;
+  color: var(--green);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* ==========================================================================
+   10. ПОЛЯ ВВОДУ ТА ПОШУК
+   ========================================================================== */
+.search-wrap {
+  position: relative;
+  flex: 1;
+  max-width: 380px;
+}
+
+.search-wrap input,
+.arcade-input {
+  width: 100%;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: var(--border-width-control) solid var(--surface2);
+  border-radius: var(--r-pill);
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  outline: none;
+  transition: all var(--duration-fast);
+}
+
+.search-wrap input {
+  padding-left: 42px;
+  padding-right: 40px;
+}
+
+.search-wrap input::placeholder,
+.arcade-input::placeholder {
+  color: var(--placeholder);
+}
+
+.search-wrap input:focus,
+.arcade-input:focus {
+  border-color: var(--green);
+  background: var(--bg2);
+  box-shadow: var(--shadow-glow-green);
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text2);
+  pointer-events: none;
+}
+
+.clear-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--red);
+  border: none;
+  color: var(--on-red);
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 14px;
+  transition: transform var(--duration-fast);
+}
+.clear-btn:hover {
+  transform: translateY(-50%) scale(1.15);
+}
+
+/* ==========================================================================
+   11. МОДАЛЬНІ ВІКНА (.arcade-modal)
+   ========================================================================== */
+.arcade-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s var(--ease-smooth);
+}
+
+.arcade-modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.arcade-modal {
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  background: var(--surface);
+  border: 3px solid var(--surface2);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-modal);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: scale(0.95) translateY(10px);
+  transition: transform 0.2s var(--ease-spring);
+}
+
+.arcade-modal-backdrop.open .arcade-modal {
+  transform: scale(1) translateY(0);
+}
+
+.arcade-modal-header {
+  padding: 16px 20px;
+  background: var(--bg2);
+  border-bottom: 2px solid var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.arcade-modal-title {
+  font-size: var(--text-lg);
+  font-weight: 900;
+  color: var(--text);
+}
+
+.arcade-modal-close {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-pill);
+  background: var(--surface2);
+  border: none;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-fast);
+}
+.arcade-modal-close:hover {
+  background: var(--red);
+  transform: scale(1.1);
+}
+
+.arcade-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+  color: var(--text2);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.arcade-modal-footer {
+  padding: 14px 20px;
+  background: var(--bg2);
+  border-top: 2px solid var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* ==========================================================================
+   12. СПОВІЩЕННЯ ТА ТОСТИ (.arcade-toast)
+   ========================================================================== */
+.arcade-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2000;
+  padding: 12px 20px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  border: 2px solid var(--green);
+  color: var(--text);
+  font-weight: 800;
+  font-size: var(--text-sm);
+  box-shadow: var(--shadow-glow-green);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s var(--ease-spring);
+  pointer-events: none;
+}
+
+.arcade-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
