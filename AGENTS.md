@@ -58,6 +58,8 @@ StudioApp керує вкладками, історією проєкту, міс
 
 Дизайн-система базується на єдиному відкритому стандарті [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) («Friendly Arcade» — спільний дитячий дрескод з LEGO WeDo 2.0 Catalog, репозиторій: [github.com/Figarist/friendly-arcade](https://github.com/Figarist/friendly-arcade)). Усі UI-елементи оформлюються виключно через CSS-токени (`:root`): `--bg`, `--surface`, `--card`, `--green`, `--on-green`, `--yellow`, `--border-width-control` (2px), `--border-width-card` (3px), `--r-md`, `--r-pill`. Жодного хардкоду кольорів чи неконтрольованих рамок. Обов'язкова підтримка :focus-visible (контур --cyan) та prefers-reduced-motion.
 
+Базові токени не живуть у `styles.css`: `vendor/friendly-arcade/` — побайтова копія тегованого релізу (див. `VERSION`), `tokens.css` підключено в `index.html` перед `styles.css`. Не редагуйте vendor і не копіюйте значення палітри в `:root` студії — там лише відмінності (щільніша шкала `--text-*`, `--shadow-modal`) та аліаси (`--radius: var(--r-md)`). Оновлення: `scripts/update-friendly-arcade.sh vX.Y.Z`. CI `.github/workflows/friendly-arcade.yml` падає, якщо копія розійшлася з релізом. У Friendly Arcade `--red` — темний червоний для кнопок з білим текстом, яскравий червоний (сердечка, рамки небезпеки) — `--red-bright`.
+
 Основні стилі у styles.css; додаткові модулі мають adventure-shelf.css, pixel-editor-tools.css і lesson-companion.css. Перевіряйте наявні селектори та обробники перед додаванням нових класів або DOM-зв'язків. Для елементів використовуйте чинні data-* атрибути:
 
 | Атрибут | Призначення |
