@@ -1,0 +1,160 @@
+/* Friendly Arcade UI — tokens.css: усі кольори, радіуси, тіні, шрифти й анімації (темна тема за замовчуванням + світла). Автор: Ігор Сівочка (sivochka.com). MIT.
+   Кольори живуть тільки тут: base.css і components.css посилаються лише на var(--…). */
+
+/* ==========================================================================
+   1. ДИЗАЙН-ТОКЕНИ (:root)
+   ========================================================================== */
+:root {
+  /* --- 1.1 Поверхні та фони (Deep Midnight Arcade) --- */
+  --bg: #1a1a2e;                 /* Головне нічне тло сторінки */
+  --bg2: #16213e;                /* Поглиблені блоки, поля вводу, сайдбари */
+  --surface: #0f3460;            /* Панелі, шапка, картки інструментів */
+  --surface2: #1a4080;           /* Рамки контролів, розділювачі */
+  --card: #1e3a5f;               /* Тло карток контенту (Roblox-tile) */
+  --card-hover: #264d73;         /* Тло картки при наведенні */
+
+  /* --- 1.2 Мікро-контури та рамки --- */
+  --border: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.24);
+  --border-focus: #00d2ff;
+  --border-width-control: 2px;
+  --border-width-card: 3px;
+
+  /* --- 1.3 Аркадні та LEGO-акценти з перевіреним контрастом --- */
+  --green: #00d26a;              /* Головний CTA / Успіх / Готово */
+  --green2: #00b85c;
+  --green-dark: #00b85c;
+  --on-green: #06210f;           /* Контраст 8.46:1 на зеленому (WCAG AAA) */
+
+  --yellow: #ffc312;             /* Золото / Нагороди / Випадковий вибір */
+  --on-yellow: #261b00;          /* Контраст 10.54:1 на жовтому (WCAG AAA) */
+
+  --red: #c02937;                /* Червоний для кнопок / бейджів з білим текстом (5.8:1 AA) */
+  --red-bright: #ff4757;         /* Яскравий червоний для сердечок та іконок */
+  --on-red: #ffffff;
+
+  --blue: #1e90ff;               /* Інженерний інфо-синій */
+  --on-blue: #ffffff;
+
+  --cyan: #00d2ff;               /* Фокус і небесний контур */
+  --on-cyan: #061e38;            /* Контраст 8.85:1 на блакитному (WCAG AAA) */
+
+  --purple: #a855f7;             /* Магія / Рідкісні предмети */
+  --on-purple: #ffffff;
+
+  --orange: #ff6b35;             /* Тренди / Вогонь */
+  --on-orange: #ffffff;
+
+  --pink: #ff6b9d;               /* Святковий рожевий */
+  --on-pink: #ffffff;
+
+  --accent-forge: #f59e0b;       /* Теплий бурштин (3D-Кузня / Майстерня) */
+  --accent-gold: #fbbf24;
+
+  /* --- 1.4 Типографіка та текст (WCAG AAA) --- */
+  --text: #ffffff;               /* Основний білий текст */
+  --text2: #c3dcff;              /* Чистий світло-блакитний (контраст > 8.2:1 AA) */
+  --text-muted: #8da6cc;         /* Підписи та підказки */
+  --font-sans: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 36px;
+
+  /* --- 1.5 Радіуси заокруглення (Без магічних чисел!) --- */
+  --r-xs: 6px;
+  --r-sm: 10px;                  /* Дрібні бейджі та підказки */
+  --r-md: 16px;                  /* Стандартний радіус карток і вікон */
+  --r-lg: 24px;                  /* Великі модальні вікна та банери */
+  --r-pill: 999px;               /* Овальні кнопки, чіпи та лічильники */
+
+  /* --- 1.6 Тіні та аркадне свічення --- */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
+  --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.75), 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-glow-green: 0 4px 20px rgba(0, 210, 106, 0.35);
+  --shadow-glow-cyan: 0 0 20px rgba(0, 210, 255, 0.3);
+  --shadow-glow-yellow: 0 0 20px rgba(255, 195, 18, 0.3);
+  --shadow-glow-red: 0 0 20px rgba(255, 71, 87, 0.25);
+
+  /* --- 1.7 Тактильні анімації --- */
+  --ease-smooth: cubic-bezier(0.25, 0.8, 0.25, 1);
+  --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 0.15s;
+  --duration-normal: 0.25s;
+
+  /* --- 1.8 Похідні кольори компонентів (щоб світла тема працювала без правок компонентів) --- */
+  --yellow-hover: #f0b50b;
+  --red-hover: #a82330;
+  --ghost-hover: rgba(255, 255, 255, 0.08);
+  --ok-bg: rgba(0, 210, 106, 0.16);
+  --ok-text: #86efac;
+  --warn-bg: rgba(255, 195, 18, 0.16);
+  --warn-text: #ffc312;
+  --danger-bg: rgba(192, 41, 55, 0.2);
+  --danger-text: #fca5a5;
+  --info-bg: rgba(30, 144, 255, 0.16);
+  --info-text: #7dd3fc;
+  --overlay: rgba(4, 7, 14, 0.78);
+  --placeholder: rgba(195, 220, 255, 0.5);
+  --header-bg: linear-gradient(135deg, #0f3460 0%, #1a1a2e 50%, #0f3460 100%);
+  --card-img-bg: linear-gradient(135deg, #e8f4f8, #ffffff);
+  --glow-bg-1: rgba(0, 210, 106, 0.06);
+  --glow-bg-2: rgba(30, 144, 255, 0.06);
+  --glow-bg-3: rgba(168, 85, 247, 0.04);
+  --shadow-glow-green-strong: 0 4px 20px rgba(0, 210, 106, 0.5);
+  --shadow-card-hover: 0 12px 36px rgba(0, 210, 106, 0.25);
+  --shadow-img: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --shadow-stud: inset 0 -2px 0 rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   1.9 СВІТЛА ТЕМА: <html data-theme="light"> (яскравий кабінет, слабкий проектор)
+   Ті самі акценти, білі плитки, текст і статуси з контрастом WCAG AA+.
+   ========================================================================== */
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f1f5fb;
+  --bg2: #ffffff;
+  --surface: #ffffff;
+  --surface2: #b9c8e0;
+  --card: #f4f7fc;
+  --card-hover: #e6edf8;
+
+  --border: rgba(15, 23, 42, 0.14);
+  --border-strong: rgba(15, 23, 42, 0.28);
+  --border-focus: #0077b6;
+
+  --text: #0f172a;
+  --text2: #334155;
+  --text-muted: #475569;
+
+  --ghost-hover: rgba(15, 23, 42, 0.06);
+  --ok-bg: rgba(0, 210, 106, 0.14);
+  --ok-text: #046c40;
+  --warn-bg: rgba(255, 195, 18, 0.2);
+  --warn-text: #7c4a03;
+  --danger-bg: rgba(192, 41, 55, 0.1);
+  --danger-text: #9f1d2b;
+  --info-bg: rgba(30, 144, 255, 0.12);
+  --info-text: #075985;
+  --overlay: rgba(15, 23, 42, 0.55);
+  --placeholder: rgba(51, 65, 85, 0.6);
+  --header-bg: linear-gradient(135deg, #ffffff 0%, #eef3fb 50%, #ffffff 100%);
+  --glow-bg-1: rgba(0, 210, 106, 0.08);
+  --glow-bg-2: rgba(30, 144, 255, 0.08);
+  --glow-bg-3: rgba(168, 85, 247, 0.05);
+
+  --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.08);
+  --shadow-md: 0 6px 20px rgba(15, 23, 42, 0.1);
+  --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.16);
+  --shadow-modal: 0 24px 60px rgba(15, 23, 42, 0.25), 0 4px 16px rgba(15, 23, 42, 0.12);
+  --shadow-stud: inset 0 -2px 0 rgba(0, 0, 0, 0.2), 0 2px 4px rgba(15, 23, 42, 0.2);
+}

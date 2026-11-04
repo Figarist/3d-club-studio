@@ -1,0 +1,10 @@
+name: Friendly Arcade
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  verify:
+    uses: Figarist/friendly-arcade/.github/workflows/verify-vendored.yml@v2

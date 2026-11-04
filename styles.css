@@ -4,99 +4,47 @@
    ========================================================================== */
 
 :root {
-  /* --- 1. СПІЛЬНІ ТОКЕНИ ПОВЕРХОНЬ (Deep Midnight Arcade) --- */
-  --bg: #1a1a2e;                 /* Головне тло сторінки */
-  --bg2: #16213e;                /* Поглиблені блоки, поля вводу */
-  --surface: #0f3460;            /* Панелі, сайдбари, тулбари */
-  --surface2: #1a4080;           /* Рамки контролів, розділювачі */
-  --card: #1e3a5f;               /* Тло карток */
-  --card-hover: #264d73;         /* Стан наведення карток */
+  /* Базові токени (кольори, тіні, радіуси, анімації) беруться з
+     vendor/friendly-arcade/tokens.css (v2.1.0, див. VERSION). Тут лише
+     відмінності студії та аліаси старих імен. Оновлення:
+     scripts/update-friendly-arcade.sh <tag>. */
 
-  /* --- 2. МІКРО-КОНТУРИ ТА РАМКИ --- */
-  --border: rgba(255, 255, 255, 0.12);
-  --border-strong: rgba(255, 255, 255, 0.24);
-  --border-focus: #00d2ff;
-  --border-width-control: 2px;
-  --border-width-card: 3px;
-
-  /* --- 3. АРКАДНІ ТА LEGO АКЦЕНТИ --- */
-  --green: #00d26a;              /* Головний CTA / Успіх / Готово */
-  --green2: #00b85c;
-  --green-dark: #00b85c;
-  --on-green: #06210f;           /* Контрастний темний текст на зеленому (> 7:1) */
-  --yellow: #ffc312;             /* Золото / Увага / Зірки */
-  --on-yellow: #261b00;          /* Текст на жовтому */
-  --red: #ff4757;                /* Сердечка / Вибране / Небезпека */
-  --on-red: #ffffff;
-  --blue: #1e90ff;               /* Інженерний інфо-синій */
-  --cyan: #00d2ff;               /* Фокус і небесний контур */
-  --purple: #a855f7;             /* Магія / Рідкісні місії */
-  --orange: #ff6b35;             /* Тренди / Вогонь */
-  --pink: #ff6b9d;               /* Додатковий акцент */
-
-  /* Архітектурні акценти Кузні */
-  --accent-forge: #f59e0b;       /* Теплий бурштин вогнища */
-  --accent-gold: #fbbf24;
-  --accent-craft: #00d26a;       /* Friendly green */
-  --accent-craft-dark: #00b85c;
-  --accent-primary: #1e90ff;     /* Friendly blue */
-  --accent-sky: #00d2ff;         /* Friendly cyan */
-
-  /* --- 4. СТАТУСИ ТА ДІАГНОСТИКА --- */
-  --status-ok: #00d26a;
-  --status-ok-bg: rgba(0, 210, 106, 0.16);
-  --status-warn: #ffc312;
-  --status-warn-bg: rgba(255, 195, 18, 0.16);
-  --status-danger: #ff4757;
-  --status-danger-bg: rgba(255, 71, 87, 0.18);
-
-  /* --- 5. ТИПОГРАФІКА ТА ТЕКСТОВИЙ КОНТРАСТ (WCAG AA) --- */
-  --text: #ffffff;
-  --text2: #c3dcff;
-  --text-muted: #8da6cc;
-  --text-main: #ffffff;
-  --text-secondary: #c3dcff;
-  --text-dim: #8da6cc;
-
-  --font-sans: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Monaco, Consolas, monospace;
-
-  --text-xs: 12px;
+  /* --- Відмінності студії: щільніша шкала тексту для редакторів --- */
   --text-sm: 13.5px;
   --text-base: 15px;
   --text-lg: 17px;
   --text-xl: 20px;
   --text-2xl: 24px;
-
-  /* --- 6. РАДІУСИ ЗАОКРУГЛЕННЯ --- */
-  --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius: 16px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-full: 999px;
-  --r-xs: 6px;
-  --r-sm: 10px;
-  --r-md: 16px;
-  --r-lg: 24px;
-  --r-pill: 999px;
-
-  /* --- 7. ТІНІ ТА М'ЯКЕ СВІЧЕННЯ --- */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5);
   --shadow-modal: 0 24px 48px rgba(0, 0, 0, 0.75), 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-glow-green: 0 4px 20px rgba(0, 210, 106, 0.35);
-  --shadow-glow-cyan: 0 0 20px rgba(0, 210, 255, 0.3);
 
-  /* --- 8. ТАКТИЛЬНІ АНІМАЦІЇ --- */
-  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-smooth: cubic-bezier(0.25, 0.8, 0.25, 1);
-  --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  /* --- Архітектурні акценти Кузні --- */
+  --accent-forge: #f59e0b;       /* Теплий бурштин вогнища */
+  --accent-gold: #fbbf24;
+  --accent-craft: var(--green);
+  --accent-craft-dark: var(--green-dark);
+  --accent-primary: var(--blue);
+  --accent-sky: var(--cyan);
+
+  /* --- Статуси та діагностика --- */
+  --status-ok: var(--green);
+  --status-ok-bg: rgba(0, 210, 106, 0.16);
+  --status-warn: var(--yellow);
+  --status-warn-bg: rgba(255, 195, 18, 0.16);
+  --status-danger: var(--red-bright);
+  --status-danger-bg: rgba(255, 71, 87, 0.18);
+
+  /* --- Зворотна сумісність (аліаси) --- */
+  --text-main: var(--text);
+  --text-secondary: var(--text2);
+  --text-dim: var(--text-muted);
+  --radius-xs: var(--r-xs);
+  --radius-sm: var(--r-sm);
+  --radius: var(--r-md);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-full: var(--r-pill);
   --transition-fast: 140ms var(--ease-spring);
   --transition-normal: 220ms var(--ease-spring);
-
-  /* --- 9. ЗВОРОТНА СУМІСНІСТЬ (ALIASES) --- */
   --bg-canvas: var(--bg);
   --bg-surface: var(--surface);
   --bg-card: var(--card);
@@ -1372,7 +1320,7 @@ details.collapsible-card[open] > summary.card-header::after {
 
 .connectivity-pill.danger {
   background: rgba(255, 71, 87, 0.18);
-  border-color: var(--red);
+  border-color: var(--red-bright);
   color: #fca5a5;
 }
 

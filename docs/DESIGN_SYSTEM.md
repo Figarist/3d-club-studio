@@ -23,7 +23,7 @@
 
 ## 2. Спільні CSS-Токени (`:root`)
 
-Кожен проєкт екосистеми зобов'язаний оголошувати ці токени у кореневому блоці `:root`:
+Ці токени не копіюються вручну: студія підключає `vendor/friendly-arcade/tokens.css` (копія тегованого релізу [friendly-arcade](https://github.com/Figarist/friendly-arcade), версія у `VERSION`) перед `styles.css`. Нижче — довідка; джерело правди — `tokens.css` релізу. Оновлення: `scripts/update-friendly-arcade.sh vX.Y.Z`.
 
 ```css
 :root {

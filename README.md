@@ -52,6 +52,8 @@
 ```text
 3d-club-studio/
 ├── index.html
+├── vendor/friendly-arcade/   # токени дизайн-системи, копія релізу (VERSION)
+├── scripts/update-friendly-arcade.sh
 ├── styles.css
 ├── adventure-shelf.css
 ├── pixel-editor-tools.css

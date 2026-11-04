@@ -1,0 +1,77 @@
+/* Friendly Arcade UI — base.css: скидання, тіло сторінки, типографіка, доступність. Автор: Ігор Сівочка (sivochka.com). MIT. */
+/* ==========================================================================
+   2. СКИДАННЯ ТА БАЗОВІ СТИЛІ
+   ========================================================================== */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(circle at 10% 20%, var(--glow-bg-1) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, var(--glow-bg-2) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, var(--glow-bg-3) 0%, transparent 60%);
+}
+
+/* Смуги прокрутки */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--surface2);
+  border-radius: var(--r-pill);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--green);
+}
+
+/* Моноширинні цифри для показників і таймерів */
+.num-tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   3. ДОСТУПНІСТЬ (WCAG AA/AAA)
+   ========================================================================== */
+:focus-visible {
+  outline: 3px solid var(--border-focus) !important;
+  outline-offset: 2px !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .card:hover, .btn:hover, .chip:hover, .modal-close:hover {
+    transform: none !important;
+  }
+}
+
+/* Сенсорні цілі на планшетах і смартфонах (мінімум 44x44px) */
+@media (hover: none) and (pointer: coarse) {
+  .btn, .chip, .pill, .modal-close, .lang-btn, .fav-btn {
+    min-height: 44px;
+  }
+}
