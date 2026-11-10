@@ -76,7 +76,7 @@
         }
       });
 
-      const allowedTabs = ['minecraft', 'illusion', 'physics', 'mob'];
+      const allowedTabs = ['minecraft', 'illusion', 'physics', 'mob', 'heightmap'];
       if (!allowedTabs.includes(mission.targetTab)) {
         throw new Error('Mission has an unsupported target tab: ' + mission.targetTab);
       }

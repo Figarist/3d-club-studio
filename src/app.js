@@ -4,7 +4,7 @@
 
   class StudioApp {
     constructor() {
-      this.activeTab = 'minecraft'; // 'minecraft', 'illusion', 'physics', 'mob'
+      this.activeTab = 'minecraft'; // 'minecraft', 'illusion', 'physics', 'mob', 'heightmap'
       this.viewMode = 'split';      // 'editor', 'split', 'viewport'
       this.sceneManager = null;
       this._isRestoring = false;
@@ -28,6 +28,15 @@
       this.illusionGen = new window.DualIllusionGenerator();
       this.physicsGen = new window.PhysicsMechanicsGenerator();
       this.mobGen = new window.MobMutatorGenerator();
+      this.heightmapGen = new window.HeightmapReliefGenerator();
+
+      this.heightmapGen.onImageReady = () => {
+        if (this.activeTab === 'heightmap' && !this._isRestoring) {
+          this.updateHeightmapPreview2D();
+          this.rebuildCurrentModel(true, true);
+          this.autosave();
+        }
+      };
 
       this.mcGen.onBeforeMutate = () => this.recordUndoSnapshot();
       this.mcGen.onAfterMutate = () => {
@@ -142,6 +151,28 @@
         valMobHead: document.getElementById('val-mob-head'),
         valMobBulk: document.getElementById('val-mob-bulk'),
 
+        // Контроли Фото-Барельєфа
+        hmDropzone: document.getElementById('hm-dropzone'),
+        hmFileInput: document.getElementById('hm-file-input'),
+        hmPreviewCanvas: document.getElementById('hm-preview-canvas'),
+        hmInvert: document.getElementById('hm-invert'),
+        hmContrast: document.getElementById('hm-contrast'),
+        hmBrightness: document.getElementById('hm-brightness'),
+        hmSmooth: document.getElementById('hm-smooth'),
+        hmWidth: document.getElementById('hm-width'),
+        hmReliefHeight: document.getElementById('hm-relief-height'),
+        hmBaseThickness: document.getElementById('hm-base-thickness'),
+        hmShape: document.getElementById('hm-shape'),
+        hmResolution: document.getElementById('hm-resolution'),
+        hmFrame: document.getElementById('hm-frame'),
+        hmKeychain: document.getElementById('hm-keychain'),
+        valHmContrast: document.getElementById('val-hm-contrast'),
+        valHmBrightness: document.getElementById('val-hm-brightness'),
+        valHmSmooth: document.getElementById('val-hm-smooth'),
+        valHmWidth: document.getElementById('val-hm-width'),
+        valHmReliefHeight: document.getElementById('val-hm-relief-height'),
+        valHmBaseThickness: document.getElementById('val-hm-base-thickness'),
+
         // V1 та Порівняння V1 ↔ V2
         btnSnapshotV1: document.getElementById('btn-snapshot-v1'),
         btnCompareV1V2: document.getElementById('btn-compare-v1v2'),
@@ -224,6 +255,7 @@
       this.bindIllusionControls();
       this.bindPhysicsControls();
       this.bindMobControls();
+      this.bindHeightmapControls();
       this.bindCameraControls();
       this.bindWorkflowStepper();
 
@@ -250,7 +282,7 @@
       const savedPair = this.safeStorage.getItem('3d_kuznya_pair_code') || '';
       return {
         app: '3d-club-studio',
-        version: '2.0.0',
+        version: '2.1.0',
         schemaVersion: 1,
         savedAt: new Date().toISOString(),
         activeTab: this.activeTab,
@@ -298,7 +330,20 @@
           mobTinkercadBlank: !!dom.mobTinkercadBlank?.checked,
           mobDesign: dom.mobDesign?.value || 'classic',
           ilDesign: dom.ilDesign?.value || 'classic',
-          phDesign: dom.phDesign?.value || 'classic'
+          phDesign: dom.phDesign?.value || 'classic',
+          hmPreset: this.heightmapGen ? this.heightmapGen.currentPresetKey : 'cat',
+          hmInvert: dom.hmInvert ? !!dom.hmInvert.checked : false,
+          hmContrast: dom.hmContrast?.value || '1',
+          hmBrightness: dom.hmBrightness?.value || '0',
+          hmSmooth: dom.hmSmooth?.value || '0',
+          hmWidth: dom.hmWidth?.value || '60',
+          hmReliefHeight: dom.hmReliefHeight?.value || '3.5',
+          hmBaseThickness: dom.hmBaseThickness?.value || '2',
+          hmShape: dom.hmShape?.value || 'rect',
+          hmResolution: dom.hmResolution?.value || '128',
+          hmFrame: dom.hmFrame ? !!dom.hmFrame.checked : true,
+          hmKeychain: dom.hmKeychain ? !!dom.hmKeychain.checked : false,
+          hmCustomImage: (this.heightmapGen && this.heightmapGen.customImageDataUrl) || ''
         }
       };
     }
@@ -386,6 +431,31 @@
         setVal(dom.mobName, c.mobName, '');
         setChk(dom.mobTinkercadBlank, c.mobTinkercadBlank, false);
         ['mobDesign', 'ilDesign', 'phDesign'].forEach(key => setVal(dom[key], c[key], 'classic'));
+
+        setChk(dom.hmInvert, c.hmInvert, false);
+        setVal(dom.hmContrast, c.hmContrast, '1');
+        setVal(dom.hmBrightness, c.hmBrightness, '0');
+        setVal(dom.hmSmooth, c.hmSmooth, '0');
+        setVal(dom.hmWidth, c.hmWidth, '60');
+        setVal(dom.hmReliefHeight, c.hmReliefHeight, '3.5');
+        setVal(dom.hmBaseThickness, c.hmBaseThickness, '2');
+        setVal(dom.hmShape, c.hmShape, 'rect');
+        setVal(dom.hmResolution, c.hmResolution, '128');
+        setChk(dom.hmFrame, c.hmFrame, true);
+        setChk(dom.hmKeychain, c.hmKeychain, false);
+
+        if (this.heightmapGen) {
+          if (c.hmCustomImage) {
+            this.heightmapGen.loadCustomImage(c.hmCustomImage, () => this.updateHeightmapPreview2D());
+            document.querySelectorAll('[data-hm-preset]').forEach((b) => b.classList.remove('active'));
+          } else {
+            const preset = c.hmPreset || 'cat';
+            this.heightmapGen.loadPreset(preset, () => this.updateHeightmapPreview2D());
+            document.querySelectorAll('[data-hm-preset]').forEach((b) => {
+              b.classList.toggle('active', b.getAttribute('data-hm-preset') === preset);
+            });
+          }
+        }
 
         if (state.minecraft) {
           this.mcGen.setState(state.minecraft, false);
@@ -686,6 +756,12 @@
         const arch = dom.mobArchetype?.value || 'boss';
         const name = (dom.mobName?.value || '').trim();
         return `mob_${arch}${name ? '_' + name : ''}.stl`;
+      }
+      if (this.activeTab === 'heightmap') {
+        const shape = dom.hmShape?.value === 'circle' ? 'coin' : 'relief';
+        const preset = (this.heightmapGen && this.heightmapGen.currentPresetKey) || 'custom';
+        const w = dom.hmWidth?.value || '60';
+        return `${shape}_${preset}_${w}mm.stl`;
       }
       return '3d_kuznya_model.stl';
     }
@@ -1924,6 +2000,137 @@
       });
     }
 
+    bindHeightmapControls() {
+      const dom = this._domCache || {};
+
+      // Швидкі дитячі пресети
+      document.querySelectorAll('[data-hm-preset]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const preset = btn.getAttribute('data-hm-preset');
+          if (!preset) return;
+          this.recordUndoSnapshot();
+          document.querySelectorAll('[data-hm-preset]').forEach((b) => {
+            b.classList.toggle('active', b === btn);
+          });
+          this.heightmapGen.loadPreset(preset, () => {
+            this.updateHeightmapPreview2D();
+            this.markModelModified();
+            this.rebuildCurrentModel(true, true);
+            this.autosave();
+            if (window.StudioSound) window.StudioSound.playPop(520);
+          });
+        });
+      });
+
+      // Зона вибору файлу та Drag & Drop
+      if (dom.hmDropzone && dom.hmFileInput) {
+        dom.hmDropzone.addEventListener('click', () => dom.hmFileInput.click());
+        dom.hmDropzone.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            dom.hmFileInput.click();
+          }
+        });
+
+        const handleImageFile = (file) => {
+          if (!file || !file.type.startsWith('image/')) return;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const rawUrl = e.target.result;
+            const img = new Image();
+            img.onload = () => {
+              const maxDim = 256;
+              let w = img.width;
+              let h = img.height;
+              if (w > maxDim || h > maxDim) {
+                if (w > h) {
+                  h = Math.round((h * maxDim) / w);
+                  w = maxDim;
+                } else {
+                  w = Math.round((w * maxDim) / h);
+                  h = maxDim;
+                }
+              }
+              const offCanvas = document.createElement('canvas');
+              offCanvas.width = w;
+              offCanvas.height = h;
+              const offCtx = offCanvas.getContext('2d');
+              offCtx.drawImage(img, 0, 0, w, h);
+              const compactUrl = offCanvas.toDataURL('image/jpeg', 0.88);
+
+              this.recordUndoSnapshot();
+              document.querySelectorAll('[data-hm-preset]').forEach((b) => b.classList.remove('active'));
+              this.heightmapGen.loadCustomImage(compactUrl, () => {
+                this.updateHeightmapPreview2D();
+                this.markModelModified();
+                this.rebuildCurrentModel(true, true);
+                this.autosave();
+                if (window.StudioSound) window.StudioSound.playMagicGenerate();
+              });
+            };
+            img.src = rawUrl;
+          };
+          reader.readAsDataURL(file);
+        };
+
+        dom.hmFileInput.addEventListener('change', (e) => {
+          if (e.target.files && e.target.files[0]) {
+            handleImageFile(e.target.files[0]);
+          }
+        });
+
+        dom.hmDropzone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          dom.hmDropzone.classList.add('dragover');
+        });
+        dom.hmDropzone.addEventListener('dragleave', () => {
+          dom.hmDropzone.classList.remove('dragover');
+        });
+        dom.hmDropzone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          dom.hmDropzone.classList.remove('dragover');
+          if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+            handleImageFile(e.dataTransfer.files[0]);
+          }
+        });
+      }
+
+      // Слухачі налаштувань
+      const ids = [
+        'hm-invert', 'hm-contrast', 'hm-brightness', 'hm-smooth',
+        'hm-width', 'hm-relief-height', 'hm-base-thickness',
+        'hm-shape', 'hm-resolution', 'hm-frame', 'hm-keychain'
+      ];
+      ids.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('focus', () => this.recordUndoSnapshot());
+          el.addEventListener('mousedown', () => this.recordUndoSnapshot());
+          const handleUpdate = () => {
+            this._playControlFeedback(el);
+            this.updateValueLabels();
+            this.updateHeightmapPreview2D();
+            this.markModelModified();
+            this.rebuildCurrentModel(false, true);
+            this.autosave();
+          };
+          el.addEventListener('input', handleUpdate);
+          el.addEventListener('change', handleUpdate);
+        }
+      });
+    }
+
+    updateHeightmapPreview2D() {
+      const dom = this._domCache || {};
+      if (!dom.hmPreviewCanvas || !this.heightmapGen) return;
+      this.heightmapGen.render2DPreview(dom.hmPreviewCanvas, {
+        invert: dom.hmInvert?.checked,
+        contrast: dom.hmContrast?.value,
+        brightness: dom.hmBrightness?.value,
+        smooth: dom.hmSmooth?.value
+      });
+    }
+
     _playControlFeedback(el) {
       if (!window.StudioSound) return;
       if (el.type === 'range') {
@@ -1960,6 +2167,25 @@
         if (inp && lbl) {
           lbl.textContent = inp.value + suffix;
         }
+      }
+
+      if (dom.valHmContrast && dom.hmContrast) {
+        dom.valHmContrast.textContent = Number(dom.hmContrast.value).toFixed(1) + 'x';
+      }
+      if (dom.valHmBrightness && dom.hmBrightness) {
+        dom.valHmBrightness.textContent = dom.hmBrightness.value;
+      }
+      if (dom.valHmSmooth && dom.hmSmooth) {
+        dom.valHmSmooth.textContent = dom.hmSmooth.value === '0' ? 'Вимк' : dom.hmSmooth.value + ' px';
+      }
+      if (dom.valHmWidth && dom.hmWidth) {
+        dom.valHmWidth.textContent = dom.hmWidth.value + ' мм';
+      }
+      if (dom.valHmReliefHeight && dom.hmReliefHeight) {
+        dom.valHmReliefHeight.textContent = Number(dom.hmReliefHeight.value).toFixed(1) + ' мм';
+      }
+      if (dom.valHmBaseThickness && dom.hmBaseThickness) {
+        dom.valHmBaseThickness.textContent = Number(dom.hmBaseThickness.value).toFixed(1) + ' мм';
       }
 
       if (dom.mcSlotWidth && dom.valMcSlot) {
@@ -2021,6 +2247,23 @@
         if (dom.mobBodyBulk) dom.mobBodyBulk.value = (0.85 + Math.random() * 0.45).toFixed(2);
         this.updateValueLabels();
         this.rebuildCurrentModel(true, true);
+        return;
+      }
+
+      if (this.activeTab === 'heightmap') {
+        const presets = ['cat', 'rocket', 'star', 'coin', 'smiley', 'dino'];
+        const pick = presets[Math.floor(Math.random() * presets.length)];
+        document.querySelectorAll('[data-hm-preset]').forEach((b) => {
+          b.classList.toggle('active', b.getAttribute('data-hm-preset') === pick);
+        });
+        if (dom.hmShape) dom.hmShape.value = Math.random() > 0.5 ? 'circle' : 'rect';
+        if (dom.hmInvert) dom.hmInvert.checked = Math.random() > 0.6;
+        this.heightmapGen.loadPreset(pick, () => {
+          this.updateValueLabels();
+          this.updateHeightmapPreview2D();
+          this.rebuildCurrentModel(true, true);
+        });
+        return;
       }
     }
 
@@ -2078,6 +2321,21 @@
           mobName: dom.mobName?.value,
           tinkercadBlank: dom.mobTinkercadBlank?.checked
         });
+      } else if (this.activeTab === 'heightmap') {
+        group = this.heightmapGen.build3D({
+          invert: dom.hmInvert ? dom.hmInvert.checked : false,
+          contrast: dom.hmContrast?.value || '1',
+          brightness: dom.hmBrightness?.value || '0',
+          smooth: dom.hmSmooth?.value || '0',
+          width: dom.hmWidth?.value || '60',
+          reliefHeight: dom.hmReliefHeight?.value || '3.5',
+          baseThickness: dom.hmBaseThickness?.value || '2',
+          shape: dom.hmShape?.value || 'rect',
+          resolution: dom.hmResolution?.value || '128',
+          frame: dom.hmFrame ? dom.hmFrame.checked : true,
+          keychain: dom.hmKeychain ? dom.hmKeychain.checked : false
+        });
+        this.updateHeightmapPreview2D();
       }
 
       if (group) {
