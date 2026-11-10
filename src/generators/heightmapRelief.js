@@ -438,43 +438,42 @@
         }
       }
 
-      // ТРИКУТНИКИ ВЕРХНЬОЇ ПОВЕРХНІ (нормалі дивляться ВГОРУ)
+      // ТРИКУТНИКИ ВЕРХНЬОЇ ПОВЕРХНІ (нормалі дивляться ВГОРУ +Y)
       for (let j = 0; j < resY - 1; j++) {
         for (let i = 0; i < resX - 1; i++) {
           const a = j * resX + i;
           const b = a + 1;
           const c = (j + 1) * resX + i;
           const d = c + 1;
-          indices.push(a, b, d);
-          indices.push(a, d, c);
+          indices.push(a, c, d);
+          indices.push(a, d, b);
         }
       }
 
-      // ТРИКУТНИКИ ДНА (нормалі дивляться ВНИЗ, обхід за годинниковою стрілкою)
+      // ТРИКУТНИКИ ДНА (нормалі дивляться ВНИЗ -Y)
       for (let j = 0; j < resY - 1; j++) {
         for (let i = 0; i < resX - 1; i++) {
           const a = topCount + j * resX + i;
           const b = a + 1;
           const c = topCount + (j + 1) * resX + i;
           const d = c + 1;
-          indices.push(a, d, b);
-          indices.push(a, c, d);
+          indices.push(a, b, d);
+          indices.push(a, d, c);
         }
       }
 
       // 3. ЧОТИРИ БІЧНІ СТІНКИ (Side Walls)
-      // Стінка 1: Північ (j = 0, Z = -halfD)
+      // Стінка 1: Північ (j = 0, Z = -halfD, нормаль 0, 0, -1)
       for (let i = 0; i < resX - 1; i++) {
         const topA = i;
         const topB = i + 1;
         const botA = topCount + i;
         const botB = topCount + i + 1;
-        // Нормаль назовні (Z < 0)
-        indices.push(topA, botA, botB);
-        indices.push(topA, botB, topB);
+        indices.push(topA, topB, botB);
+        indices.push(topA, botB, botA);
       }
 
-      // Стінка 2: Південь (j = resY - 1, Z = +halfD)
+      // Стінка 2: Південь (j = resY - 1, Z = +halfD, нормаль 0, 0, +1)
       const southTopRow = (resY - 1) * resX;
       const southBotRow = topCount + southTopRow;
       for (let i = 0; i < resX - 1; i++) {
@@ -482,31 +481,28 @@
         const topB = southTopRow + i + 1;
         const botA = southBotRow + i;
         const botB = southBotRow + i + 1;
-        // Нормаль назовні (Z > 0)
-        indices.push(topA, botB, botA);
-        indices.push(topA, topB, botB);
+        indices.push(topA, botB, topB);
+        indices.push(topA, botA, botB);
       }
 
-      // Стінка 3: Захід (i = 0, X = -halfW)
+      // Стінка 3: Захід (i = 0, X = -halfW, нормаль -1, 0, 0)
       for (let j = 0; j < resY - 1; j++) {
         const topA = j * resX;
         const topB = (j + 1) * resX;
         const botA = topCount + topA;
         const botB = topCount + topB;
-        // Нормаль назовні (X < 0)
-        indices.push(topA, topB, botB);
-        indices.push(topA, botB, botA);
+        indices.push(topA, botA, topB);
+        indices.push(topB, botA, botB);
       }
 
-      // Стінка 4: Схід (i = resX - 1, X = +halfW)
+      // Стінка 4: Схід (i = resX - 1, X = +halfW, нормаль +1, 0, 0)
       for (let j = 0; j < resY - 1; j++) {
         const topA = j * resX + (resX - 1);
         const topB = (j + 1) * resX + (resX - 1);
         const botA = topCount + topA;
         const botB = topCount + topB;
-        // Нормаль назовні (X > 0)
-        indices.push(topA, botA, botB);
-        indices.push(topA, botB, topB);
+        indices.push(topA, topB, botB);
+        indices.push(topA, botB, botA);
       }
 
       const geom = new THREE.BufferGeometry();
@@ -515,10 +511,10 @@
       geom.computeVertexNormals();
 
       const mat = new THREE.MeshStandardMaterial({
-        color: 0xd8dde4, // Світлий сіро-сріблястий шовковий пластик
-        roughness: 0.55,
-        metalness: 0.1,
-        side: THREE.FrontSide
+        color: 0x94a3b8, // Чіткий сріблясто-платиновий рельєф (slate-400)
+        roughness: 0.35,
+        metalness: 0.15,
+        side: THREE.DoubleSide
       });
 
       const mesh = new THREE.Mesh(geom, mat);
@@ -659,10 +655,10 @@
       geom.computeVertexNormals();
 
       const mat = new THREE.MeshStandardMaterial({
-        color: 0xd8dde4,
-        roughness: 0.55,
-        metalness: 0.1,
-        side: THREE.FrontSide
+        color: 0x94a3b8,
+        roughness: 0.35,
+        metalness: 0.15,
+        side: THREE.DoubleSide
       });
 
       const mesh = new THREE.Mesh(geom, mat);
@@ -738,10 +734,10 @@
       geom.computeVertexNormals();
 
       const mat = new THREE.MeshStandardMaterial({
-        color: 0xd8dde4,
-        roughness: 0.55,
-        metalness: 0.1,
-        side: THREE.FrontSide
+        color: 0x94a3b8,
+        roughness: 0.35,
+        metalness: 0.15,
+        side: THREE.DoubleSide
       });
 
       const mesh = new THREE.Mesh(geom, mat);
