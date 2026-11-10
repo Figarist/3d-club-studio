@@ -3277,3 +3277,97 @@ select:focus, input[type="text"]:focus {
     page-break-inside: avoid;
   }
 }
+
+/* ==========================================================================
+   ГЕНЕРАТОР: ФОТО-БАРЕЛЬЄФ (HEIGHTMAP TO SOLID STL)
+   ========================================================================== */
+.hm-dropzone {
+  border: var(--border-width-control) dashed var(--card-border, #3a3a5a);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  padding: 14px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease, transform 0.1s ease;
+  user-select: none;
+}
+
+.hm-dropzone:hover,
+.hm-dropzone:focus-visible {
+  border-color: var(--cyan, #38bdf8);
+  background: rgba(56, 189, 248, 0.08);
+  outline: none;
+}
+
+.hm-dropzone.dragover {
+  border-color: var(--green, #10b981);
+  background: rgba(16, 185, 129, 0.14);
+  transform: scale(1.02);
+}
+
+.hm-dropzone-icon {
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.hm-dropzone-text {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.hm-dropzone-sub {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.hm-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.hm-preset-btn {
+  font-size: var(--text-xs);
+  padding: 6px 4px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hm-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  background: var(--surface);
+  border-radius: var(--r-md);
+  border: var(--border-width-control) solid var(--card-border, #3a3a5a);
+  margin-top: 8px;
+}
+
+.hm-preview-canvas {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  border-radius: var(--r-md);
+  border: var(--border-width-control) solid var(--card-border, #3a3a5a);
+  background: #000000;
+  image-rendering: pixelated;
+}
+
+.hm-preview-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.hm-preview-hint {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  line-height: 1.25;
+}

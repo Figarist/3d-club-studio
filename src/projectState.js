@@ -4,7 +4,7 @@
   const APP_ID = '3d-club-studio';
   const GRID_SIZE = 16;
   const DEFAULT_COLORS = { 1: 0x5c3a21, 2: 0x0284c7, 3: 0x38bdf8, 4: 0xe0f2fe };
-  const TABS = ['minecraft', 'illusion', 'physics', 'mob'];
+  const TABS = ['minecraft', 'illusion', 'physics', 'mob', 'heightmap'];
   const VERIFICATION_STATUSES = ['generated', 'sliced', 'printed'];
   const CONTROL_DEFAULTS = {
     mcVoxelSize: '2', mcHeightStep: '1.2', mcSolidBase: true,
@@ -16,7 +16,11 @@
     mobArchetype: 'creeper', mobHeadScale: '1', mobBodyBulk: '1',
     mobEyeType: 'two', mobHeadgear: 'none', mobBackgear: 'none',
     mobWeapon: 'sword', mobName: '', mobTinkercadBlank: false,
-    mobDesign: 'classic', ilDesign: 'classic', phDesign: 'classic'
+    mobDesign: 'classic', ilDesign: 'classic', phDesign: 'classic',
+    hmPreset: 'cat', hmInvert: false, hmContrast: '1', hmBrightness: '0',
+    hmSmooth: '0', hmWidth: '60', hmReliefHeight: '3.5', hmBaseThickness: '2',
+    hmShape: 'rect', hmFrame: true, hmKeychain: false, hmResolution: '128',
+    hmCustomImage: ''
   };
   const NUMERIC_CONTROLS = {
     mcVoxelSize: { min: 1.8, max: 5.0, step: 0.1, places: 1 },
@@ -27,7 +31,13 @@
     phWingWeight: { min: 7.0, max: 16.0, step: 0.5, places: 1 },
     phArmLength: { min: 52, max: 85, step: 1, places: 0 },
     mobHeadScale: { min: 0.75, max: 1.45, step: 0.05, places: 2 },
-    mobBodyBulk: { min: 0.8, max: 1.35, step: 0.05, places: 2 }
+    mobBodyBulk: { min: 0.8, max: 1.35, step: 0.05, places: 2 },
+    hmContrast: { min: 0.5, max: 2.5, step: 0.1, places: 1 },
+    hmBrightness: { min: -50, max: 50, step: 5, places: 0 },
+    hmSmooth: { min: 0, max: 3, step: 1, places: 0 },
+    hmWidth: { min: 30, max: 140, step: 5, places: 0 },
+    hmReliefHeight: { min: 1.0, max: 12.0, step: 0.5, places: 1 },
+    hmBaseThickness: { min: 1.0, max: 6.0, step: 0.5, places: 1 }
   };
   const ENUM_CONTROLS = {
     mcMountType: ['keychain', 'none', 'stand'],
@@ -37,13 +47,16 @@
     mobEyeType: ['two', 'creeper', 'visor', 'one', 'three'],
     mobHeadgear: ['crown', 'horns', 'antenna', 'ears', 'none'],
     mobBackgear: ['wings', 'jetpack', 'cape', 'none'],
-    mobWeapon: ['sword', 'hammer', 'shield', 'dual_axes']
+    mobWeapon: ['sword', 'hammer', 'shield', 'dual_axes'],
+    hmPreset: ['cat', 'rocket', 'star', 'coin', 'smiley', 'dino', 'custom'],
+    hmShape: ['rect', 'circle'],
+    hmResolution: ['64', '96', '128', '160', '192']
   };
   const SLOT_WIDTHS = ['1.5', '2.0', '2.5', '3.0'];
   const TEXT_CONTROLS = {
     mcCustomLabel: 9, ilWord1: 9, ilWord2: 9, phCustomText: 6, mobName: 7
   };
-  const BOOLEAN_CONTROLS = ['mcSolidBase', 'ilSafeSupports', 'phIncludeAmmo', 'mobTinkercadBlank'];
+  const BOOLEAN_CONTROLS = ['mcSolidBase', 'ilSafeSupports', 'phIncludeAmmo', 'mobTinkercadBlank', 'hmInvert', 'hmFrame', 'hmKeychain'];
 
   function fail(path, message) {
     throw new Error('Invalid project field "' + path + '": ' + message);
@@ -147,6 +160,14 @@
       if (source[key].length > TEXT_CONTROLS[key]) fail('controls.' + key, 'is too long');
       controls[key] = source[key];
     });
+    if (source.hmCustomImage !== undefined) {
+      if (typeof source.hmCustomImage !== 'string') fail('controls.hmCustomImage', 'must be text');
+      if (source.hmCustomImage.length > 250000) fail('controls.hmCustomImage', 'is too large');
+      if (source.hmCustomImage && !source.hmCustomImage.startsWith('data:image/')) {
+        fail('controls.hmCustomImage', 'must be a valid image data URL');
+      }
+      controls.hmCustomImage = source.hmCustomImage;
+    }
     controls.ilColorPrimary = colorValue(source.ilColorPrimary, 'controls.ilColorPrimary', controls.ilColorPrimary);
     BOOLEAN_CONTROLS.forEach(function (key) {
       controls[key] = booleanValue(source[key], 'controls.' + key, controls[key]);
