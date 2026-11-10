@@ -58,7 +58,7 @@
   </script>
 
   <link rel="stylesheet" href="vendor/friendly-arcade/tokens.css" />
-  <link rel="stylesheet" href="styles.css?v=2.0.0" />
+  <link rel="stylesheet" href="styles.css?v=2.1.0" />
   <link rel="stylesheet" href="adventure-shelf.css" />
   <link rel="stylesheet" href="pixel-editor-tools.css" />
   <link rel="stylesheet" href="lesson-companion.css" />
@@ -72,13 +72,13 @@
       <div class="brand-title">
         <div class="brand-title-row">
           <h1>3D КУЗНЯ ЧУДЕС</h1>
-          <span id="app-version-pill" class="version-pill" title="Версія програми: v2.0.0">v2.0.0</span>
+          <span id="app-version-pill" class="version-pill" title="Версія програми: v2.1.0">v2.1.0</span>
         </div>
         <p class="brand-subtitle">Minecraft &amp; Print-Safe 3D Генератор • Tinkercad / Makers Empire / 3D-Принтер</p>
       </div>
     </div>
 
-    <!-- ПЕРЕМИКАЧ 4 ГЕНЕРАТОРІВ -->
+    <!-- ПЕРЕМИКАЧ 5 ГЕНЕРАТОРІВ -->
     <nav class="gen-tabs" aria-label="3D Генератори">
       <button class="gen-tab-btn active" data-tab="minecraft">
         ⛏️ Майнкрафт-Кузня
@@ -91,6 +91,9 @@
       </button>
       <button class="gen-tab-btn" data-tab="mob">
         👾 Мутатор Мобів
+      </button>
+      <button class="gen-tab-btn" data-tab="heightmap">
+        🖼️ Фото-Барельєф
       </button>
     </nav>
 
@@ -677,6 +680,144 @@
         </details>
       </section>
 
+      <!-- 5. ГЕНЕРАТОР: ФОТО-БАРЕЛЬЄФ (GRAYSCALE HEIGHTMAP TO SOLID STL) -->
+      <section id="panel-heightmap" class="panel-section">
+        <div class="printer-safe-tip">
+          🖼️ <b>Порада:</b> Завантаж будь-яку картинку чи фото, або обери дитячий значок нижче. Світлі місця стануть рельєфними вершинами, а темні — заглибинами!
+        </div>
+
+        <!-- КАРТКА 1: ЗОБРАЖЕННЯ ТА ДИТЯЧІ ПРЕСЕТИ -->
+        <div class="card">
+          <div class="card-header">
+            <span>📷 Зображення або Значок</span>
+          </div>
+
+          <!-- Зона вибору / перетягування файлу -->
+          <div id="hm-dropzone" class="hm-dropzone" tabindex="0" role="button" aria-label="Зона завантаження зображення: натисніть або перетягніть файл">
+            <input type="file" id="hm-file-input" accept="image/*" style="display:none;" />
+            <div class="hm-dropzone-icon">📥</div>
+            <div class="hm-dropzone-text"><b>Обери картинку</b> або перетягни сюди</div>
+            <div class="hm-dropzone-sub">PNG, JPG, BMP, WebP або SVG</div>
+          </div>
+
+          <!-- Сітка швидких дитячих пресетів -->
+          <div class="control-row" style="margin-top:8px;">
+            <div class="control-label"><span>Або обери швидкий значок:</span></div>
+            <div class="preset-grid hm-preset-grid" role="group" aria-label="Швидкі дитячі пресети">
+              <button class="preset-btn hm-preset-btn active" data-hm-preset="cat" type="button" title="Котик 🐱">🐱 Котик</button>
+              <button class="preset-btn hm-preset-btn" data-hm-preset="rocket" type="button" title="Ракета 🚀">🚀 Ракета</button>
+              <button class="preset-btn hm-preset-btn" data-hm-preset="star" type="button" title="Зірочка ⭐">⭐ Зірочка</button>
+              <button class="preset-btn hm-preset-btn" data-hm-preset="coin" type="button" title="Монета 🪙">🪙 Монета</button>
+              <button class="preset-btn hm-preset-btn" data-hm-preset="smiley" type="button" title="Смайлик 😊">😊 Смайлик</button>
+              <button class="preset-btn hm-preset-btn" data-hm-preset="dino" type="button" title="Динозавр 🦕">🦕 Дино</button>
+            </div>
+          </div>
+
+          <!-- Ч/Б 2D Прев'ю -->
+          <div class="hm-preview-row">
+            <canvas id="hm-preview-canvas" width="128" height="128" class="hm-preview-canvas" title="Ч/Б Прев'ю висот рельєфу"></canvas>
+            <div class="hm-preview-info">
+              <label class="checkbox-row" style="margin:0;">
+                <input id="hm-invert" type="checkbox" aria-label="Інвертувати висоти: чорне стає опуклим, біле — заглибленим" />
+                <span>🔄 <b>Інвертувати висоти</b> (для печаток і штампів)</span>
+              </label>
+              <div class="hm-preview-hint">Біле = високе, Чорне = низьке. Інверсія міняє їх місцями!</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- КАРТКА 2: ОБРОБКА ТА ЧІТКІСТЬ КАРТИНКИ -->
+        <details class="card collapsible-card" open>
+          <summary class="card-header">
+            <span>🎛️ Чіткість та Фільтри Рельєфу</span>
+          </summary>
+
+          <div class="collapsible-card-content">
+            <div class="control-row">
+              <div class="control-label">
+                <span>Контрастність (виразність ліній):</span>
+                <span id="val-hm-contrast" class="control-val">1.0x</span>
+              </div>
+              <input id="hm-contrast" type="range" min="0.5" max="2.5" step="0.1" value="1.0" aria-label="Контрастність рельєфу" />
+            </div>
+
+            <div class="control-row">
+              <div class="control-label">
+                <span>Яскравість (підйом висот):</span>
+                <span id="val-hm-brightness" class="control-val">0</span>
+              </div>
+              <input id="hm-brightness" type="range" min="-50" max="50" step="5" value="0" aria-label="Яскравість" />
+            </div>
+
+            <div class="control-row">
+              <div class="control-label">
+                <span>Згладжування (прибрати піксельний шум):</span>
+                <span id="val-hm-smooth" class="control-val">Вимк</span>
+              </div>
+              <input id="hm-smooth" type="range" min="0" max="3" step="1" value="0" aria-label="Згладжування рельєфу" />
+            </div>
+          </div>
+        </details>
+
+        <!-- КАРТКА 3: 3D-РОЗМІРИ ДЛЯ ПРИНТЕРА ТА ФОРМА -->
+        <div class="card">
+          <div class="card-header">
+            <span>📐 Розміри для 3D-Принтера (в мм)</span>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label">
+              <span>Ширина основи:</span>
+              <span id="val-hm-width" class="control-val">60 мм</span>
+            </div>
+            <input id="hm-width" type="range" min="30" max="140" step="5" value="60" aria-label="Ширина основи моделі в мм" />
+          </div>
+
+          <div class="control-row">
+            <div class="control-label">
+              <span>Висота 3D-рельєфу:</span>
+              <span id="val-hm-relief-height" class="control-val">3.5 мм</span>
+            </div>
+            <input id="hm-relief-height" type="range" min="1.0" max="12.0" step="0.5" value="3.5" aria-label="Висота рельєфу в мм" />
+          </div>
+
+          <div class="control-row">
+            <div class="control-label">
+              <span>Товщина підкладки (дно):</span>
+              <span id="val-hm-base-thickness" class="control-val">2.0 мм</span>
+            </div>
+            <input id="hm-base-thickness" type="range" min="1.0" max="6.0" step="0.5" value="2.0" aria-label="Товщина підкладки в мм" />
+          </div>
+
+          <div class="control-row">
+            <div class="control-label"><span>Форма виробу:</span></div>
+            <select id="hm-shape" aria-label="Форма основи">
+              <option value="rect" selected>⏹️ Прямокутна пластина (картина / значок)</option>
+              <option value="circle">🪙 Круглий медальйон (монета / орден)</option>
+            </select>
+          </div>
+
+          <div class="control-row">
+            <div class="control-label"><span>Деталізація сітки (полігони):</span></div>
+            <select id="hm-resolution" aria-label="Деталізація сітки">
+              <option value="64">⚡ Швидка (64×64 — для слабких ПК)</option>
+              <option value="128" selected>✨ Стандартна (128×128 — гладенький друк)</option>
+              <option value="192">💎 Висока (192×192 — максимальна чіткість)</option>
+            </select>
+          </div>
+
+          <label class="checkbox-row">
+            <input id="hm-frame" type="checkbox" checked aria-label="Захисний бортик навколо рельєфу" />
+            <span>🖼️ Захисний бортик по краях (як рамка картини або гурт монети)</span>
+          </label>
+
+          <label class="checkbox-row">
+            <input id="hm-keychain" type="checkbox" aria-label="Вушко з отвором для брелока" />
+            <span>🎒 Вушко для брелока (отвір 4.8 мм для шнурка чи кільця)</span>
+          </label>
+        </div>
+      </section>
+
     </aside>
 
     <!-- ПРАВА ЧАСТИНА — ІНТЕРАКТИВНА 3D-СЦЕНА -->
@@ -744,8 +885,8 @@
           <a id="author-badge-link" class="author-corner-badge" href="https://sivochka.com/" target="_blank" rel="noopener" title="Автор: Ігор Сівочка (sivochka.com) — уроки 3D-моделювання та програмування">
             👨‍🏫 Ігор Сівочка • sivochka.com ↗
           </a>
-          <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • v2.0.0 Friendly Arcade: єдиний дитячий стиль, одноколірні пригоди та пошук за темами">
-            ⚒️ v2.0.0
+          <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • v2.1.0 Friendly Arcade: Фото-Барельєф, єдиний дитячий стиль, одноколірні пригоди та пошук за темами">
+            ⚒️ v2.1.0
           </div>
         </div>
       </div>
@@ -1050,28 +1191,29 @@
 
   <!-- ПІДКЛЮЧЕННЯ СКРИПТІВ (Працює 100% офлайн без інтернету та серверів!) -->
   <script src="lib/three.min.js"></script>
-  <script src="src/voxelFont.js?v=2.0.0"></script>
-  <script src="src/soundEffects.js?v=2.0.0"></script>
-  <script src="src/safeStorage.js?v=2.0.0"></script>
-  <script src="src/historyManager.js?v=2.0.0"></script>
-  <script src="src/contentRegistry.js?v=2.0.0"></script>
-  <script src="src/missionManager.js?v=2.0.0"></script>
-  <script src="src/projectState.js?v=2.0.0"></script>
-  <script src="src/modalFocus.js?v=2.0.0"></script>
-  <script src="src/snapshotCompareController.js?v=2.0.0"></script>
-  <script src="src/passportPrintController.js?v=2.0.0"></script>
-  <script src="src/generators/minecraftForge.js?v=2.0.0"></script>
-  <script src="src/generators/dualIllusion.js?v=2.0.0"></script>
-  <script src="src/generators/physicsMechanics.js?v=2.0.0"></script>
-  <script src="src/generators/mobMutator.js?v=2.0.0"></script>
-  <script src="src/content/adventurePack.js?v=2.0.0"></script>
-  <script src="src/content/funReliefs.js?v=2.0.0"></script>
-  <script src="src/content/funDiscoveries.js?v=2.0.0"></script>
-  <script src="src/content/funEngineering.js?v=2.0.0"></script>
-  <script src="src/adventureShelf.js?v=2.0.0"></script>
-  <script src="src/pixelEditorTools.js?v=2.0.0"></script>
-  <script src="src/lessonCompanion.js?v=2.0.0"></script>
-  <script src="src/sceneManager.js?v=2.0.0"></script>
-  <script src="src/app.js?v=2.0.0"></script>
+  <script src="src/voxelFont.js?v=2.1.0"></script>
+  <script src="src/soundEffects.js?v=2.1.0"></script>
+  <script src="src/safeStorage.js?v=2.1.0"></script>
+  <script src="src/historyManager.js?v=2.1.0"></script>
+  <script src="src/contentRegistry.js?v=2.1.0"></script>
+  <script src="src/missionManager.js?v=2.1.0"></script>
+  <script src="src/projectState.js?v=2.1.0"></script>
+  <script src="src/modalFocus.js?v=2.1.0"></script>
+  <script src="src/snapshotCompareController.js?v=2.1.0"></script>
+  <script src="src/passportPrintController.js?v=2.1.0"></script>
+  <script src="src/generators/minecraftForge.js?v=2.1.0"></script>
+  <script src="src/generators/dualIllusion.js?v=2.1.0"></script>
+  <script src="src/generators/physicsMechanics.js?v=2.1.0"></script>
+  <script src="src/generators/mobMutator.js?v=2.1.0"></script>
+  <script src="src/generators/heightmapRelief.js?v=2.1.0"></script>
+  <script src="src/content/adventurePack.js?v=2.1.0"></script>
+  <script src="src/content/funReliefs.js?v=2.1.0"></script>
+  <script src="src/content/funDiscoveries.js?v=2.1.0"></script>
+  <script src="src/content/funEngineering.js?v=2.1.0"></script>
+  <script src="src/adventureShelf.js?v=2.1.0"></script>
+  <script src="src/pixelEditorTools.js?v=2.1.0"></script>
+  <script src="src/lessonCompanion.js?v=2.1.0"></script>
+  <script src="src/sceneManager.js?v=2.1.0"></script>
+  <script src="src/app.js?v=2.1.0"></script>
 </body>
 </html>
