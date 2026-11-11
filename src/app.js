@@ -158,6 +158,11 @@
         hmDropzone: document.getElementById('hm-dropzone'),
         hmFileInput: document.getElementById('hm-file-input'),
         hmPreviewCanvas: document.getElementById('hm-preview-canvas'),
+        hmFloatingHud: document.getElementById('hm-floating-hud'),
+        hmHudPreviewCanvas: document.getElementById('hm-hud-preview-canvas'),
+        btnToggleHmHud: document.getElementById('btn-toggle-hm-hud'),
+        btnHmHudClose: document.getElementById('btn-hm-hud-close'),
+        btnHmHudSize: document.getElementById('btn-hm-hud-size'),
         hmInvert: document.getElementById('hm-invert'),
         hmAutoLevels: document.getElementById('hm-auto-levels'),
         hmContrast: document.getElementById('hm-contrast'),
@@ -785,6 +790,14 @@
       const physicsActionBar = this._domCache?.physicsActionBar || document.getElementById('physics-action-bar');
       if (illusionCameraBar) illusionCameraBar.style.display = tabName === 'illusion' ? 'flex' : 'none';
       if (physicsActionBar) physicsActionBar.style.display = tabName === 'physics' ? 'flex' : 'none';
+
+      const dom = this._domCache || {};
+      if (dom.hmFloatingHud) {
+        dom.hmFloatingHud.style.display = (tabName === 'heightmap' && this._hmHudUserEnabled) ? 'flex' : 'none';
+        if (tabName === 'heightmap' && this._hmHudUserEnabled) {
+          this.updateHeightmapPreview2D();
+        }
+      }
 
       if (tabName === 'illusion') {
         this.sceneManager.setCameraView('front');
@@ -2233,6 +2246,50 @@
           el.addEventListener('change', handleUpdate);
         }
       });
+
+      // Керування плаваючим вікном (HUD PIP) карти висот у 3D сцені
+      if (dom.btnToggleHmHud && dom.hmFloatingHud) {
+        dom.btnToggleHmHud.addEventListener('click', () => {
+          const isVisible = dom.hmFloatingHud.style.display !== 'none';
+          this.setHeightmapHudVisible(!isVisible);
+        });
+      }
+      if (dom.btnHmHudClose && dom.hmFloatingHud) {
+        dom.btnHmHudClose.addEventListener('click', () => {
+          this.setHeightmapHudVisible(false);
+        });
+      }
+      if (dom.btnHmHudSize && dom.hmFloatingHud) {
+        dom.btnHmHudSize.addEventListener('click', () => {
+          dom.hmFloatingHud.classList.toggle('compact');
+          const isCompact = dom.hmFloatingHud.classList.contains('compact');
+          dom.btnHmHudSize.textContent = isCompact ? '🗖' : '🗗';
+          dom.btnHmHudSize.title = isCompact ? 'Збільшити розмір вікна' : 'Зменшити розмір вікна';
+        });
+      }
+      if (dom.hmFloatingHud) {
+        // Запобігаємо обертанню 3D камери при кліках і скролі всередині плаваючого вікна
+        const stopProp = (e) => e.stopPropagation();
+        dom.hmFloatingHud.addEventListener('pointerdown', stopProp);
+        dom.hmFloatingHud.addEventListener('mousedown', stopProp);
+        dom.hmFloatingHud.addEventListener('touchstart', stopProp, { passive: true });
+        dom.hmFloatingHud.addEventListener('wheel', stopProp, { passive: true });
+      }
+    }
+
+    setHeightmapHudVisible(visible) {
+      const dom = this._domCache || {};
+      if (!dom.hmFloatingHud) return;
+      this._hmHudUserEnabled = Boolean(visible);
+      const shouldShow = visible && this.activeTab === 'heightmap';
+      dom.hmFloatingHud.style.display = shouldShow ? 'flex' : 'none';
+      if (dom.btnToggleHmHud) {
+        dom.btnToggleHmHud.classList.toggle('active', Boolean(visible));
+        dom.btnToggleHmHud.textContent = visible ? '🪟 Вікно: УВІМК' : '🪟 У сцену';
+      }
+      if (shouldShow) {
+        this.updateHeightmapPreview2D();
+      }
     }
 
     updateHeightmapPreview2D() {
@@ -2246,6 +2303,15 @@
         gamma: dom.hmGamma?.value,
         smooth: dom.hmSmooth?.value
       });
+
+      // Синхронізація з плаваючим вікном у 3D сцені (HUD)
+      if (dom.hmFloatingHud && dom.hmFloatingHud.style.display !== 'none' && dom.hmHudPreviewCanvas) {
+        const hudCtx = dom.hmHudPreviewCanvas.getContext('2d');
+        if (hudCtx) {
+          hudCtx.clearRect(0, 0, dom.hmHudPreviewCanvas.width, dom.hmHudPreviewCanvas.height);
+          hudCtx.drawImage(dom.hmPreviewCanvas, 0, 0, dom.hmHudPreviewCanvas.width, dom.hmHudPreviewCanvas.height);
+        }
+      }
     }
 
     updateHeightmapMeshValidation(group) {
