@@ -44,6 +44,10 @@
       this.slicerMaxY = 40;
       this.clipPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 500);
       this.nozzleMesh = null;
+      this.sliceCapMesh = null;
+      this._simLayerIndex = 0;
+      this._simTotalLayers = 1;
+      this._simLastPtIdx = -1;
 
       // Фізична анімація (катапульта / балансир)
       this.physicsUpdateFn = null;
@@ -220,30 +224,90 @@
     }
 
     setupNozzle() {
-      // Віртуальне сопло (екструдер) для режиму "Симуляція 3D-принтера"
+      // Реалістичний хотенд світового стандарту (латунне сопло 0.4 мм, алюмінієвий термоблок, радіатор)
       const group = new THREE.Group();
 
-      const coneGeo = new THREE.ConeGeometry(4, 10, 16);
-      coneGeo.rotateX(Math.PI);
-      const coneMat = new THREE.MeshStandardMaterial({
-        color: 0xf59e0b,
-        metalness: 0.8,
-        roughness: 0.2,
-        emissive: 0xd97706,
-        emissiveIntensity: 0.4
+      // 1. Латунне сопло стандарту 0.4 мм (E3D V6 / MK8 Brass Nozzle)
+      const brassMat = new THREE.MeshStandardMaterial({
+        color: 0xd4af37, // Золотиста латунь
+        metalness: 0.88,
+        roughness: 0.22
       });
-      const cone = new THREE.Mesh(coneGeo, coneMat);
-      cone.position.y = 5;
+
+      // Шестигранна основа під ключ (Hex Nut 7 мм)
+      const hexGeo = new THREE.CylinderGeometry(3.5, 3.5, 3.2, 6);
+      const hexNut = new THREE.Mesh(hexGeo, brassMat);
+      hexNut.position.y = 1.6 + 2.4;
+      group.add(hexNut);
+
+      // Конічний наконечник (перехід від 6 мм до 0.4 мм на кінчику)
+      const coneGeo = new THREE.CylinderGeometry(0.2, 2.8, 2.4, 18);
+      const cone = new THREE.Mesh(coneGeo, brassMat);
+      cone.position.y = 1.2;
       group.add(cone);
 
-      const blockGeo = new THREE.BoxGeometry(14, 10, 14);
-      const blockMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4 });
+      // Калібрований вихідний отвір сопла 0.4 мм (діаметр 0.4 мм = радіус 0.2 мм)
+      const orificeGeo = new THREE.CircleGeometry(0.2, 12);
+      orificeGeo.rotateX(Math.PI / 2);
+      const orificeMat = new THREE.MeshBasicMaterial({ color: 0x18181b });
+      const orifice = new THREE.Mesh(orificeGeo, orificeMat);
+      orifice.position.y = 0.01;
+      group.add(orifice);
+
+      // Мікро-крапля свіжого розплавленого пластику на кінчику 0.4 мм
+      const beadGeo = new THREE.SphereGeometry(0.28, 8, 8);
+      const beadMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+      const bead = new THREE.Mesh(beadGeo, beadMat);
+      bead.position.y = 0.15;
+      group.add(bead);
+
+      // 2. Алюмінієвий нагрівальний блок (Heater Block V6/MK8: 20 x 16 x 11.5 мм)
+      const blockMat = new THREE.MeshStandardMaterial({
+        color: 0xc4cbd4, // Матовий сріблястий алюміній
+        metalness: 0.65,
+        roughness: 0.35
+      });
+      const blockGeo = new THREE.BoxGeometry(16, 11.5, 20);
       const block = new THREE.Mesh(blockGeo, blockMat);
-      block.position.y = 14;
+      block.position.set(0, 3.2 + 2.4 + 11.5 / 2, 2.0);
       group.add(block);
 
-      const glowGeo = new THREE.SphereGeometry(2.2, 12, 12);
-      const glowMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+      // Гніздо нагрівального патрона з гвинтом фіксації
+      const heaterGeo = new THREE.CylinderGeometry(3.0, 3.0, 16.2, 12);
+      heaterGeo.rotateZ(Math.PI / 2);
+      const heaterMat = new THREE.MeshStandardMaterial({ color: 0x9ca3af, metalness: 0.7, roughness: 0.3 });
+      const heater = new THREE.Mesh(heaterGeo, heaterMat);
+      heater.position.set(0, 3.2 + 2.4 + 4.5, 5.0);
+      group.add(heater);
+
+      // 3. Термобар'єр (Stainless Steel Throat 4 мм)
+      const throatMat = new THREE.MeshStandardMaterial({ color: 0x71717a, metalness: 0.85, roughness: 0.25 });
+      const throatGeo = new THREE.CylinderGeometry(2.0, 2.0, 5, 16);
+      const throat = new THREE.Mesh(throatGeo, throatMat);
+      throat.position.y = 17.1 + 2.5;
+      group.add(throat);
+
+      // 4. Алюмінієвий радіатор охолодження з ребрами (Heat Sink V6)
+      const sinkMat = new THREE.MeshStandardMaterial({
+        color: 0x2563eb, // Класичний анодований синій V6
+        metalness: 0.65,
+        roughness: 0.35
+      });
+      const finCount = 5;
+      for (let i = 0; i < finCount; i++) {
+        const finGeo = new THREE.CylinderGeometry(11, 11, 1.2, 24);
+        const fin = new THREE.Mesh(finGeo, sinkMat);
+        fin.position.y = 22.0 + i * 3.2;
+        group.add(fin);
+      }
+      const coreGeo = new THREE.CylinderGeometry(6, 6, finCount * 3.2, 20);
+      const core = new THREE.Mesh(coreGeo, sinkMat);
+      core.position.y = 22.0 + (finCount * 3.2) / 2 - 1.6;
+      group.add(core);
+
+      // М'яке світло свіжого друку під соплом
+      const glowGeo = new THREE.SphereGeometry(1.6, 10, 10);
+      const glowMat = new THREE.MeshBasicMaterial({ color: 0xfef08a, transparent: true, opacity: 0.65 });
       const glow = new THREE.Mesh(glowGeo, glowMat);
       glow.position.y = 0.5;
       group.add(glow);
@@ -251,6 +315,21 @@
       group.visible = false;
       this.nozzleMesh = group;
       this.scene.add(this.nozzleMesh);
+
+      // 5. Динамічний суцільний свіжий шар пластику на розрізі (Solid Hot Slice Cap)
+      const capGeo = new THREE.PlaneGeometry(210, 210);
+      capGeo.rotateX(-Math.PI / 2);
+      const capMat = new THREE.MeshStandardMaterial({
+        color: 0xcfd6df, // Відтінок свіжого гарячого пластику
+        roughness: 0.65,
+        metalness: 0.05,
+        side: THREE.DoubleSide
+      });
+      this.sliceCapMesh = new THREE.Mesh(capGeo, capMat);
+      this.sliceCapMesh.position.y = 0;
+      this.sliceCapMesh.visible = false;
+      this.sliceCapMesh.renderOrder = 1;
+      this.scene.add(this.sliceCapMesh);
     }
 
     setupControls() {
@@ -669,8 +748,31 @@
         return false;
       }
       this.slicerActive = true;
-      this.slicerProgress = 0.02;
-      this.nozzleMesh.visible = true;
+      this.slicerProgress = 0.01;
+      this._simLastPtIdx = -1;
+
+      // Підготовка загальної кількості шарів зі стандартною висотою шару 0.2 мм для сопла 0.4 мм
+      const totalH = Math.max(1.0, this.dimensions.z || (this.slicerMaxY - 2) || 4);
+      this._simLayerHeight = 0.2; // 0.2 мм світовий стандарт
+      this._simTotalLayers = Math.max(1, Math.ceil(totalH / this._simLayerHeight));
+      this._simLayerIndex = 0;
+
+      if (this.nozzleMesh) this.nozzleMesh.visible = true;
+      if (this.sliceCapMesh) {
+        this.sliceCapMesh.visible = true;
+        this.sliceCapMesh.position.y = this._simLayerHeight;
+      }
+
+      // Тимчасово вмикаємо двосторонній рендер на моделях, щоб внутрішні порожнини зрізу не провалювалися в чорну дірку
+      this.modelGroup.traverse((child) => {
+        if (child.isMesh && child.material) {
+          if (!child.userData._simPrevSide) {
+            child.userData._simPrevSide = child.material.side;
+          }
+          child.material.side = THREE.DoubleSide;
+        }
+      });
+
       const btn = document.getElementById('btn-simulate-print');
       if (btn) btn.classList.add('active-sim');
       return true;
@@ -680,6 +782,16 @@
       this.slicerActive = false;
       this.clipPlane.constant = 500;
       if (this.nozzleMesh) this.nozzleMesh.visible = false;
+      if (this.sliceCapMesh) this.sliceCapMesh.visible = false;
+
+      // Повертаємо початковий side матеріалам моделі
+      this.modelGroup.traverse((child) => {
+        if (child.isMesh && child.material && child.userData._simPrevSide !== undefined) {
+          child.material.side = child.userData._simPrevSide;
+          delete child.userData._simPrevSide;
+        }
+      });
+
       const btn = document.getElementById('btn-simulate-print');
       if (btn) {
         btn.classList.remove('active-sim');
@@ -825,6 +937,83 @@
       this.renderer.setSize(w, h);
     }
 
+    // Розрахунок реалістичної траєкторії сопла 0.4 мм: периметр + заповнення під кутом 45/135 градусів
+    _calculateGcodeTrajectory(halfX, halfZ, layerIndex, subProgress) {
+      const minX = -halfX;
+      const maxX = halfX;
+      const minZ = -halfZ;
+      const maxZ = halfZ;
+
+      // Створюємо опорні точки друку поточного шару:
+      // 1. Зовнішній периметр (Perimeter 1)
+      const pts = [
+        { x: minX, z: minZ },
+        { x: maxX, z: minZ },
+        { x: maxX, z: maxZ },
+        { x: minX, z: maxZ },
+        { x: minX, z: minZ }
+      ];
+
+      // 2. Внутрішній периметр (Perimeter 2 зі зміщенням товщини сопла 0.4 мм)
+      const nozzleOffset = 0.4;
+      pts.push(
+        { x: minX + nozzleOffset, z: minZ + nozzleOffset },
+        { x: maxX - nozzleOffset, z: minZ + nozzleOffset },
+        { x: maxX - nozzleOffset, z: maxZ - nozzleOffset },
+        { x: minX + nozzleOffset, z: maxZ - nozzleOffset },
+        { x: minX + nozzleOffset, z: minZ + nozzleOffset }
+      );
+
+      // 3. Растрове заповнення (Infill) зі зміною кута на 90° між шарами (+45° / -45°)
+      const infillDensity = 2.4; // крок ліній заповнення в мм
+      const isEven = layerIndex % 2 === 0;
+      const spanZ = (maxZ - minZ) - 2 * nozzleOffset;
+      const numLines = Math.max(2, Math.floor(spanZ / infillDensity));
+
+      for (let i = 0; i <= numLines; i++) {
+        const lineZ = minZ + nozzleOffset + (i / numLines) * spanZ;
+        if ((i % 2 === 0) === isEven) {
+          pts.push({ x: minX + nozzleOffset, z: lineZ });
+          pts.push({ x: maxX - nozzleOffset, z: lineZ });
+        } else {
+          pts.push({ x: maxX - nozzleOffset, z: lineZ });
+          pts.push({ x: minX + nozzleOffset, z: lineZ });
+        }
+      }
+
+      // Обчислення кумулятивних довжин відрізків
+      let totalDist = 0;
+      const segDists = [0];
+      for (let i = 1; i < pts.length; i++) {
+        const d = Math.hypot(pts[i].x - pts[i - 1].x, pts[i].z - pts[i - 1].z);
+        totalDist += d;
+        segDists.push(totalDist);
+      }
+
+      if (totalDist <= 0.001) {
+        return { x: 0, z: 0, segIdx: 0 };
+      }
+
+      const targetDist = Math.max(0, Math.min(1, subProgress)) * totalDist;
+
+      // Пошук поточного відрізка
+      for (let i = 1; i < segDists.length; i++) {
+        if (targetDist <= segDists[i] || i === segDists.length - 1) {
+          const segLen = segDists[i] - segDists[i - 1] || 1;
+          const t = (targetDist - segDists[i - 1]) / segLen;
+          const pA = pts[i - 1];
+          const pB = pts[i];
+          return {
+            x: pA.x + (pB.x - pA.x) * t,
+            z: pA.z + (pB.z - pA.z) * t,
+            segIdx: i
+          };
+        }
+      }
+
+      return { x: pts[0].x, z: pts[0].z, segIdx: 0 };
+    }
+
     animate() {
       requestAnimationFrame(() => this.animate());
       const frameDelta = Math.min(0.25, this.clock.getDelta());
@@ -873,22 +1062,60 @@
         if (!anyActive) this.popAnimBlocks = [];
       }
 
-      // Симуляція пошарового 3D-друку
+      // Симуляція пошарового 3D-друку зі стандартом сопла 0.4 мм та кроком 0.2 мм
       if (this.slicerActive) {
-        this.slicerProgress += dt * 0.22;
-        if (this.slicerProgress >= 1.05) {
+        // Швидкість просування по моделі: динамічно адаптована до загальної висоти
+        const totalHeight = Math.max(1.0, this.dimensions.z || (this.slicerMaxY - 2) || 4);
+        const layerH = this._simLayerHeight || 0.2;
+        const totalLayers = Math.max(1, Math.ceil(totalHeight / layerH));
+        this._simTotalLayers = totalLayers;
+
+        // Повний цикл симуляції ~12-16 секунд для комфортного візуального спостереження
+        const simSpeed = 1.0 / Math.max(10, Math.min(22, totalLayers * 0.45));
+        this.slicerProgress += dt * simSpeed;
+
+        if (this.slicerProgress >= 1.0) {
           this.stopSlicerSimulation();
           if (window.StudioSound) window.StudioSound.playPrintComplete();
         } else {
-          const currentH = this.slicerProgress * this.slicerMaxY;
-          this.clipPlane.constant = currentH;
-          const t = performance.now() * 0.012;
-          const swingX = Math.sin(t * 2.3) * Math.min(35, this.dimensions.x * 0.35);
-          const swingZ = Math.cos(t * 1.7) * Math.min(35, this.dimensions.y * 0.35);
-          this.nozzleMesh.position.set(swingX, currentH, swingZ);
+          // Розрахунок поточного шару (0 .. totalLayers - 1)
+          const currentLayerIdx = Math.min(totalLayers - 1, Math.floor(this.slicerProgress * totalLayers));
+          const layerSubProgress = (this.slicerProgress * totalLayers) - currentLayerIdx; // 0.0 .. 1.0 всередині шару
+          const currentH = Math.min(totalHeight, (currentLayerIdx + 1) * layerH);
 
-          if (Math.random() < 0.35 && window.StudioSound) {
-            window.StudioSound.playPrinterStep(this.slicerProgress);
+          this._simLayerIndex = currentLayerIdx;
+          this.clipPlane.constant = currentH;
+
+          if (this.sliceCapMesh) {
+            this.sliceCapMesh.position.y = currentH;
+          }
+
+          // Отримуємо реалістичні межі моделі (X та Z)
+          const halfX = Math.max(8, (this.dimensions.x || 30) * 0.48);
+          const halfZ = Math.max(8, (this.dimensions.y || 30) * 0.48);
+
+          // Побудова траєкторії G-code: периметри + штрихування під кутом 45/135 градусів
+          const nozzlePos = this._calculateGcodeTrajectory(halfX, halfZ, currentLayerIdx, layerSubProgress);
+          this.nozzleMesh.position.set(nozzlePos.x, currentH, nozzlePos.z);
+
+          // Звук крокових двигунів при зміні сегмента або лінії
+          if (nozzlePos.segIdx !== this._simLastPtIdx) {
+            this._simLastPtIdx = nozzlePos.segIdx;
+            if (window.StudioSound) {
+              window.StudioSound.playPrinterStep(this.slicerProgress);
+            }
+          }
+
+          // Оновлюємо статус/підказку на кнопці симуляції (номер шару та висота Z)
+          const btn = document.getElementById('btn-simulate-print');
+          if (btn) {
+            const lbl = btn.querySelector('.btn-lbl');
+            const layerText = `Шар ${currentLayerIdx + 1}/${totalLayers} (${currentH.toFixed(1)} мм)`;
+            if (lbl) {
+              lbl.textContent = layerText;
+            } else {
+              btn.textContent = `🔥 ${layerText}`;
+            }
           }
         }
       }
