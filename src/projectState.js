@@ -17,8 +17,8 @@
     mobEyeType: 'two', mobHeadgear: 'none', mobBackgear: 'none',
     mobWeapon: 'sword', mobName: '', mobTinkercadBlank: false,
     mobDesign: 'classic', ilDesign: 'classic', phDesign: 'classic',
-    hmPreset: 'cat', hmInvert: false, hmContrast: '1', hmBrightness: '0',
-    hmSmooth: '0', hmWidth: '60', hmReliefHeight: '3.5', hmBaseThickness: '2',
+    hmPreset: 'cat', hmInvert: false, hmAutoLevels: true, hmContrast: '1', hmBrightness: '0',
+    hmGamma: '1', hmSmooth: '0', hmWidth: '60', hmReliefHeight: '3.5', hmBaseThickness: '2',
     hmShape: 'rect', hmFrame: true, hmKeychain: false, hmResolution: '128',
     hmCustomImage: ''
   };
@@ -34,6 +34,7 @@
     mobBodyBulk: { min: 0.8, max: 1.35, step: 0.05, places: 2 },
     hmContrast: { min: 0.5, max: 2.5, step: 0.1, places: 1 },
     hmBrightness: { min: -50, max: 50, step: 5, places: 0 },
+    hmGamma: { min: 0.5, max: 2.0, step: 0.1, places: 1 },
     hmSmooth: { min: 0, max: 3, step: 1, places: 0 },
     hmWidth: { min: 30, max: 140, step: 5, places: 0 },
     hmReliefHeight: { min: 1.0, max: 12.0, step: 0.5, places: 1 },
@@ -50,13 +51,13 @@
     mobWeapon: ['sword', 'hammer', 'shield', 'dual_axes'],
     hmPreset: ['cat', 'rocket', 'star', 'coin', 'smiley', 'dino', 'custom'],
     hmShape: ['rect', 'circle'],
-    hmResolution: ['64', '96', '128', '160', '192']
+    hmResolution: ['64', '96', '128', '160', '192', '256']
   };
   const SLOT_WIDTHS = ['1.5', '2.0', '2.5', '3.0'];
   const TEXT_CONTROLS = {
     mcCustomLabel: 9, ilWord1: 9, ilWord2: 9, phCustomText: 6, mobName: 7
   };
-  const BOOLEAN_CONTROLS = ['mcSolidBase', 'ilSafeSupports', 'phIncludeAmmo', 'mobTinkercadBlank', 'hmInvert', 'hmFrame', 'hmKeychain'];
+  const BOOLEAN_CONTROLS = ['mcSolidBase', 'ilSafeSupports', 'phIncludeAmmo', 'mobTinkercadBlank', 'hmInvert', 'hmAutoLevels', 'hmFrame', 'hmKeychain'];
 
   function fail(path, message) {
     throw new Error('Invalid project field "' + path + '": ' + message);

@@ -1,6 +1,12 @@
-// Генератор «Фото-Барельєф» (Grayscale Heightmap to Solid Print-Safe STL)
+// Генератор «Фото-Барельєф» (Grayscale Heightmap to Solid Print-Safe STL) v2.2.0
 // 100% чистий офлайн Vanilla JS + Three.js r128 для дитячої студії «3D Кузня Чудес».
+// Монолітна топологія на основі 2D SDF-маскованої регулярної сітки:
+// - Єдина замкнена оболонка (watertight/manifold).
+// - Вушко брелока монолітно зрощене з основою (без перетинань двох тіл).
+// - Гарантована орієнтація нормалей (CCW, знаковий об'єм > 0).
 (function () {
+  'use strict';
+
   class HeightmapReliefGenerator {
     constructor() {
       this.currentPresetKey = 'cat';
@@ -231,76 +237,181 @@
     }
 
     // -------------------------------------------------------------------------
-    // ОБРОБКА ПІКСЕЛІВ ТА ГЕНЕРАЦІЯ КАРТИ ВИСОТ
+    // КОНВЕЄР ОБРОБКИ ПІКСЕЛІВ ТА ГЕНЕРАЦІЯ КАРТИ ВИСОТ
     // -------------------------------------------------------------------------
     _sampleHeightGrid(resX, resY, options = {}) {
       const invert = Boolean(options.invert);
       const contrast = parseFloat(options.contrast) || 1.0;
       const brightness = parseFloat(options.brightness) || 0;
       const smoothRadius = Math.max(0, parseInt(options.smooth, 10) || 0);
+      const autoLevels = options.autoLevels !== false;
+      const gamma = Math.max(0.4, Math.min(2.5, parseFloat(options.gamma) || 1.0));
 
       this.canvas.width = resX;
       this.canvas.height = resY;
       const ctx = this.ctx;
 
-      // Малюємо поточне зображення розтягнутим на розмір сітки
+      // Малюємо чорний фон (поля = основа)
       ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, resX, resY);
-      if (this.currentImage) {
-        ctx.drawImage(this.currentImage, 0, 0, resX, resY);
+
+      if (this.currentImage && this.currentImage.width && this.currentImage.height) {
+        // Вписування зображення (contain) зі збереженням пропорцій по центру
+        const iw = this.currentImage.width;
+        const ih = this.currentImage.height;
+        const scale = Math.min(resX / iw, resY / ih);
+        const dw = Math.round(iw * scale);
+        const dh = Math.round(ih * scale);
+        const dx = Math.round((resX - dw) / 2);
+        const dy = Math.round((resY - dh) / 2);
+
+        ctx.drawImage(this.currentImage, dx, dy, dw, dh);
       } else {
         this._drawDefaultProceduralCat(ctx, resX, resY);
       }
 
       const imgData = ctx.getImageData(0, 0, resX, resY);
       const data = imgData.data;
-      const heights = new Float32Array(resX * resY);
+      const totalPixels = resX * resY;
+      const lums = new Float32Array(totalPixels);
 
-      // Крок 1: Grayscale + Contrast + Brightness + Invert
-      for (let i = 0, p = 0; i < heights.length; i++, p += 4) {
-        const r = data[p];
-        const g = data[p + 1];
-        const b = data[p + 2];
-        // Стандартна фотометрична яскравість
-        let lum = 0.299 * r + 0.587 * g + 0.114 * b;
-
-        // Контраст навколо середини (128)
-        lum = (lum - 128) * contrast + 128 + brightness;
-        lum = Math.max(0, Math.min(255, lum));
-
-        if (invert) {
-          lum = 255 - lum;
-        }
-
-        heights[i] = lum / 255.0; // 0.0 .. 1.0
+      // Крок 1: Фотометричний Grayscale
+      for (let i = 0, p = 0; i < totalPixels; i++, p += 4) {
+        lums[i] = 0.299 * data[p] + 0.587 * data[p + 1] + 0.114 * data[p + 2];
       }
 
-      // Крок 2: Згладжування (Box Blur 3x3) для усунення цифрового шуму
+      // Крок 2: Медіанний фільтр 3x3 для прибирання одиничних гострих пікселів-шипів
+      const cleanLums = this._applyMedian3(lums, resX, resY);
+
+      // Крок 3: Автоконтраст за перцентилями (2%..98%) якщо увімкнено
+      let minLum = 0;
+      let maxLum = 255;
+      if (autoLevels) {
+        const hist = new Int32Array(256);
+        for (let i = 0; i < totalPixels; i++) {
+          const val = Math.max(0, Math.min(255, Math.round(cleanLums[i])));
+          hist[val]++;
+        }
+        const lowCut = totalPixels * 0.02;
+        const highCut = totalPixels * 0.98;
+        let accum = 0;
+        for (let i = 0; i < 256; i++) {
+          accum += hist[i];
+          if (accum >= lowCut) {
+            minLum = i;
+            break;
+          }
+        }
+        accum = 0;
+        for (let i = 255; i >= 0; i--) {
+          accum += hist[i];
+          if (accum >= (totalPixels - highCut)) {
+            maxLum = i;
+            break;
+          }
+        }
+        if (maxLum <= minLum) {
+          minLum = 0;
+          maxLum = 255;
+        }
+      }
+
+      const lumRange = maxLum - minLum || 255;
+      const heights = new Float32Array(totalPixels);
+
+      // Крок 4: Нормалізація, Гамма, Контраст, Яскравість та Інверсія
+      for (let i = 0; i < totalPixels; i++) {
+        let norm = (cleanLums[i] - minLum) / lumRange;
+        norm = Math.max(0, Math.min(1, norm));
+
+        // Гамма-корекція (поглиблення тіней чи висвітлення середніх тонів)
+        if (Math.abs(gamma - 1.0) > 0.01) {
+          norm = Math.pow(norm, gamma);
+        }
+
+        // Ручний контраст та яскравість
+        let lumVal = norm * 255.0;
+        lumVal = (lumVal - 128.0) * contrast + 128.0 + brightness;
+        lumVal = Math.max(0, Math.min(255.0, lumVal));
+
+        if (invert) {
+          lumVal = 255.0 - lumVal;
+        }
+
+        heights[i] = lumVal / 255.0; // 0.0 .. 1.0
+      }
+
+      // Крок 5: Двостороннє згладжування (Edge-Preserving Bilateral Filter)
       if (smoothRadius > 0) {
-        return this._applyBlur(heights, resX, resY, smoothRadius);
+        return this._applyBilateralFilter(heights, resX, resY, smoothRadius);
       }
 
       return heights;
     }
 
-    _applyBlur(src, w, h, radius) {
+    _applyMedian3(src, w, h) {
       const dst = new Float32Array(src.length);
-      const r = Math.min(3, radius);
+      const buf = new Float32Array(9);
       for (let y = 0; y < h; y++) {
         for (let x = 0; x < w; x++) {
+          let n = 0;
+          for (let dy = -1; dy <= 1; dy++) {
+            const ny = y + dy;
+            if (ny < 0 || ny >= h) continue;
+            for (let dx = -1; dx <= 1; dx++) {
+              const nx = x + dx;
+              if (nx < 0 || nx >= w) continue;
+              buf[n++] = src[ny * w + nx];
+            }
+          }
+          for (let i = 1; i < n; i++) {
+            const val = buf[i];
+            let j = i - 1;
+            while (j >= 0 && buf[j] > val) {
+              buf[j + 1] = buf[j];
+              j--;
+            }
+            buf[j + 1] = val;
+          }
+          dst[y * w + x] = buf[Math.floor(n / 2)];
+        }
+      }
+      return dst;
+    }
+
+    _applyBilateralFilter(src, w, h, radius) {
+      const dst = new Float32Array(src.length);
+      const r = Math.min(3, radius);
+      const sigmaSpatial = r * 0.75;
+      const sigmaIntensity = 0.12;
+
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          const centerVal = src[y * w + x];
           let sum = 0;
-          let count = 0;
+          let weightSum = 0;
+
           for (let dy = -r; dy <= r; dy++) {
             const ny = y + dy;
             if (ny < 0 || ny >= h) continue;
             for (let dx = -r; dx <= r; dx++) {
               const nx = x + dx;
               if (nx < 0 || nx >= w) continue;
-              sum += src[ny * w + nx];
-              count++;
+
+              const val = src[ny * w + nx];
+              const distSq = dx * dx + dy * dy;
+              const diff = val - centerVal;
+
+              const wSpatial = Math.exp(-distSq / (2 * sigmaSpatial * sigmaSpatial));
+              const wRange = Math.exp(-(diff * diff) / (2 * sigmaIntensity * sigmaIntensity));
+              const wTotal = wSpatial * wRange;
+
+              sum += val * wTotal;
+              weightSum += wTotal;
             }
           }
-          dst[y * w + x] = count > 0 ? sum / count : src[y * w + x];
+
+          dst[y * w + x] = weightSum > 0 ? sum / weightSum : centerVal;
         }
       }
       return dst;
@@ -309,8 +420,8 @@
     // Оновлення 2D Canvas для прев'ю в панелі інструментів
     render2DPreview(targetCanvas, options = {}) {
       if (!targetCanvas) return;
-      const w = targetCanvas.width || 120;
-      const h = targetCanvas.height || 120;
+      const w = targetCanvas.width || 128;
+      const h = targetCanvas.height || 128;
       const ctx = targetCanvas.getContext('2d');
       if (!ctx) return;
 
@@ -338,394 +449,298 @@
       const shape = params.shape === 'circle' ? 'circle' : 'rect';
       const frame = params.frame !== false;
       const keychain = Boolean(params.keychain);
-      const resolution = Math.max(48, Math.min(192, parseInt(params.resolution, 10) || 128));
+      const resolution = Math.max(48, Math.min(256, parseInt(params.resolution, 10) || 128));
 
-      // Зберігаємо квадрат або пропорційність
       const resX = resolution;
       const resY = resolution;
-      const depth = width; // Квадратний або круглий габарит
-
       const heights = this._sampleHeightGrid(resX, resY, params);
 
       const group = new THREE.Group();
       group.name = 'HeightmapReliefModel';
 
-      let mesh = null;
-      if (shape === 'circle') {
-        mesh = this._buildCircularSolidMesh({
-          radius: width / 2,
-          reliefHeight,
-          baseThickness,
-          frame,
-          heights,
-          resX,
-          resY
-        });
-      } else {
-        mesh = this._buildRectangularSolidMesh({
-          width,
-          depth,
-          reliefHeight,
-          baseThickness,
-          frame,
-          heights,
-          resX,
-          resY
-        });
-      }
+      // Єдина монолітна модель на базі SDF-маскованої сітки (WATERTIGHT MANIFOLD)
+      const mesh = this._buildUnifiedSolidMesh({
+        width,
+        depth: width,
+        reliefHeight,
+        baseThickness,
+        shape,
+        frame,
+        keychain,
+        heights,
+        resX,
+        resY
+      });
 
       if (mesh) {
         group.add(mesh);
-      }
-
-      // Додаткове вушко для брелока (Keychain Loop)
-      if (keychain) {
-        const loopMesh = this._buildKeychainLoop({
-          shape,
-          width,
-          depth,
-          baseThickness
-        });
-        if (loopMesh) {
-          group.add(loopMesh);
-        }
       }
 
       return group;
     }
 
     // -------------------------------------------------------------------------
-    // ПРЯМОКУТНИЙ SOLID MESH: Верх + Дно (Y=0) + 4 Стінки
+    // ЄДИНА МОНОЛІТНА СІТКА НА SDF-МАСЦІ (Rectangle / Circle + Fused Keychain)
+    // Гарантує:
+    // 1. Повна відсутність швів або перетинань окремих мешів.
+    // 2. Строгий CCW обхід граней: нормалі дивляться строго назовні.
+    // 3. Закрите дно Y=0, закриті бічні стінки, закритий верх.
     // -------------------------------------------------------------------------
-    _buildRectangularSolidMesh({ width, depth, reliefHeight, baseThickness, frame, heights, resX, resY }) {
+    _buildUnifiedSolidMesh(cfg) {
+      const {
+        width,
+        depth,
+        reliefHeight,
+        baseThickness,
+        shape,
+        frame,
+        keychain,
+        heights,
+        resX,
+        resY
+      } = cfg;
+
       const halfW = width / 2;
       const halfD = depth / 2;
-      const dx = width / (resX - 1);
-      const dz = depth / (resY - 1);
+      const radius = width / 2;
 
-      // Рамка (бортик): 2-3 крайні клітинки по периметру
-      const frameCellsX = frame ? Math.max(2, Math.round(resX * 0.04)) : 0;
-      const frameCellsY = frame ? Math.max(2, Math.round(resY * 0.04)) : 0;
-      const frameElevation = baseThickness + reliefHeight + 0.6; // Бортик трохи вищий за піки
+      // Параметри міцного зрощеного вушка (всі значення в мм):
+      const holeR = 2.4;          // 4.8 мм внутрішній отвір під кільце/шнурок
+      const tabR = 4.6;           // 9.2 мм зовнішня ширина вушка (стінка 2.2 мм)
+      const tabHeight = Math.max(2.8, baseThickness + 0.8); // міцна висота вушка
 
-      const vertices = [];
-      const indices = [];
+      // Положення центру отвору: прямо біля верхньої кромки (Z = -halfD або -radius)
+      const edgeZ = shape === 'circle' ? -radius : -halfD;
+      const tabCenterZ = edgeZ - (holeR + 1.2);
+      const tabOverlapZ = edgeZ + 3.0; // заглиблення всередину тіла на 3 мм для монолітного зрощення
 
-      // 1. ВЕРХНІ ВЕРШИНИ (індекси: 0 .. resX * resY - 1)
-      for (let j = 0; j < resY; j++) {
-        const z = -halfD + j * dz;
-        for (let i = 0; i < resX; i++) {
-          const x = -halfW + i * dx;
-          const isBorder = frame && (i < frameCellsX || i >= resX - frameCellsX || j < frameCellsY || j >= resY - frameCellsY);
-          let y = 0;
-          if (isBorder) {
-            y = frameElevation;
-          } else {
-            const hNorm = heights[j * resX + i];
-            y = baseThickness + hNorm * reliefHeight;
-          }
-          vertices.push(x, y, z);
+      // Габаритний бокс сітки з запасом під вушко
+      const minX = -halfW - (keychain ? 2 : 1);
+      const maxX = halfW + (keychain ? 2 : 1);
+      const minZ = (keychain ? (tabCenterZ - tabR - 1.5) : -halfD) - 1;
+      const maxZ = halfD + 1;
+
+      // Крок решітки (мм на клітинку)
+      const cellSize = width / (resX - 1);
+      const gridCols = Math.ceil((maxX - minX) / cellSize) + 1;
+      const gridRows = Math.ceil((maxZ - minZ) / cellSize) + 1;
+
+      // 2D Signed Distance Field (SDF) для об'єднаної форми
+      const sdfAt = (x, z) => {
+        // 1. Основне тіло
+        let dBody = 0;
+        if (shape === 'circle') {
+          dBody = Math.sqrt(x * x + z * z) - radius;
+        } else {
+          // Прямокутник з радіусом скруглення кутів 2.0 мм
+          const cornerR = 2.0;
+          const qx = Math.abs(x) - (halfW - cornerR);
+          const qz = Math.abs(z) - (halfD - cornerR);
+          const extDist = Math.hypot(Math.max(qx, 0), Math.max(qz, 0));
+          const intDist = Math.min(Math.max(qx, qz), 0);
+          dBody = extDist + intDist - cornerR;
         }
-      }
 
-      // 2. НИЖНІ ВЕРШИНИ (ДНО на Y = 0) (індекси: topCount .. 2 * topCount - 1)
-      const topCount = resX * resY;
-      for (let j = 0; j < resY; j++) {
-        const z = -halfD + j * dz;
-        for (let i = 0; i < resX; i++) {
-          const x = -halfW + i * dx;
-          vertices.push(x, 0, z);
+        if (!keychain) {
+          return dBody;
         }
-      }
 
-      // ТРИКУТНИКИ ВЕРХНЬОЇ ПОВЕРХНІ (нормалі дивляться ВГОРУ +Y)
-      for (let j = 0; j < resY - 1; j++) {
-        for (let i = 0; i < resX - 1; i++) {
-          const a = j * resX + i;
-          const b = a + 1;
-          const c = (j + 1) * resX + i;
-          const d = c + 1;
-          indices.push(a, c, d);
-          indices.push(a, d, b);
-        }
-      }
+        // 2. Вушко: капсула / язичок від tabOverlapZ до tabCenterZ
+        const capP1 = tabOverlapZ;
+        const capP2 = tabCenterZ;
+        const clampedZ = Math.max(Math.min(z, capP1), capP2);
+        const dTabSolid = Math.hypot(x, z - clampedZ) - tabR;
 
-      // ТРИКУТНИКИ ДНА (нормалі дивляться ВНИЗ -Y)
-      for (let j = 0; j < resY - 1; j++) {
-        for (let i = 0; i < resX - 1; i++) {
-          const a = topCount + j * resX + i;
-          const b = a + 1;
-          const c = topCount + (j + 1) * resX + i;
-          const d = c + 1;
-          indices.push(a, b, d);
-          indices.push(a, d, c);
-        }
-      }
+        // 3. Отвір вушка
+        const dHole = Math.hypot(x, z - tabCenterZ) - holeR;
 
-      // 3. ЧОТИРИ БІЧНІ СТІНКИ (Side Walls)
-      // Стінка 1: Північ (j = 0, Z = -halfD, нормаль 0, 0, -1)
-      for (let i = 0; i < resX - 1; i++) {
-        const topA = i;
-        const topB = i + 1;
-        const botA = topCount + i;
-        const botB = topCount + i + 1;
-        indices.push(topA, topB, botB);
-        indices.push(topA, botB, botA);
-      }
+        // Плавне об'єднання тіла та язичка (smooth minimum з радіусом 2.0 мм)
+        const k = 2.0;
+        const h = Math.max(0, Math.min(1, 0.5 + 0.5 * (dTabSolid - dBody) / k));
+        const dFused = (dTabSolid * (1 - h) + dBody * h) - k * h * (1 - h);
 
-      // Стінка 2: Південь (j = resY - 1, Z = +halfD, нормаль 0, 0, +1)
-      const southTopRow = (resY - 1) * resX;
-      const southBotRow = topCount + southTopRow;
-      for (let i = 0; i < resX - 1; i++) {
-        const topA = southTopRow + i;
-        const topB = southTopRow + i + 1;
-        const botA = southBotRow + i;
-        const botB = southBotRow + i + 1;
-        indices.push(topA, botB, topB);
-        indices.push(topA, botA, botB);
-      }
+        // Віднімання отвору: max(dFused, -dHole)
+        return Math.max(dFused, -dHole);
+      };
 
-      // Стінка 3: Захід (i = 0, X = -halfW, нормаль -1, 0, 0)
-      for (let j = 0; j < resY - 1; j++) {
-        const topA = j * resX;
-        const topB = (j + 1) * resX;
-        const botA = topCount + topA;
-        const botB = topCount + topB;
-        indices.push(topA, botA, topB);
-        indices.push(topB, botA, botB);
-      }
-
-      // Стінка 4: Схід (i = resX - 1, X = +halfW, нормаль +1, 0, 0)
-      for (let j = 0; j < resY - 1; j++) {
-        const topA = j * resX + (resX - 1);
-        const topB = (j + 1) * resX + (resX - 1);
-        const botA = topCount + topA;
-        const botB = topCount + topB;
-        indices.push(topA, topB, botB);
-        indices.push(topA, botB, botA);
-      }
-
-      const geom = new THREE.BufferGeometry();
-      geom.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-      geom.setIndex(indices);
-      geom.computeVertexNormals();
-
-      const mat = new THREE.MeshStandardMaterial({
-        color: 0x94a3b8, // Чіткий сріблясто-платиновий рельєф (slate-400)
-        roughness: 0.35,
-        metalness: 0.15,
-        side: THREE.DoubleSide
-      });
-
-      const mesh = new THREE.Mesh(geom, mat);
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      mesh.userData.exportable = true;
-      return mesh;
-    }
-
-    // -------------------------------------------------------------------------
-    // КРУГЛИЙ SOLID MESH (МЕДАЛЬЙОН / МОНЕТА): Полярна сітка + Циліндрична стінка
-    // -------------------------------------------------------------------------
-    _buildCircularSolidMesh({ radius, reliefHeight, baseThickness, frame, heights, resX, resY }) {
-      const rings = Math.max(24, Math.floor(resX * 0.45));
-      const sectors = Math.max(48, Math.floor(resX * 0.85));
-      const frameRadius = radius * 0.88;
+      // Функція зчитування висоти барельєфа в точці (x, z)
+      const frameThickness = Math.max(2.0, width * 0.04);
       const frameElevation = baseThickness + reliefHeight + 0.6;
 
-      const vertices = [];
-      const indices = [];
+      const heightAt = (x, z) => {
+        if (keychain) {
+          const distToHoleCenter = Math.hypot(x, z - tabCenterZ);
+          if (distToHoleCenter <= tabR + 0.8 && z < edgeZ + 1.0) {
+            return tabHeight;
+          }
+        }
 
-      // Функція білінійної вибірки висоти з квадратної карти (UV)
-      const sampleBilinear = (u, v) => {
-        const cu = Math.max(0, Math.min(1, u));
-        const cv = Math.max(0, Math.min(1, v));
-        const fx = cu * (resX - 1);
-        const fy = cv * (resY - 1);
+        if (frame) {
+          let distToEdge = 0;
+          if (shape === 'circle') {
+            distToEdge = radius - Math.sqrt(x * x + z * z);
+          } else {
+            distToEdge = Math.min(halfW - Math.abs(x), halfD - Math.abs(z));
+          }
+
+          if (distToEdge <= frameThickness) {
+            const t = Math.max(0, Math.min(1, distToEdge / frameThickness));
+            return frameElevation * (1.0 - t * 0.05);
+          }
+        }
+
+        const u = (x / width) + 0.5;
+        const v = (z / depth) + 0.5;
+
+        if (u < 0 || u > 1 || v < 0 || v > 1) {
+          return baseThickness;
+        }
+
+        const fx = u * (resX - 1);
+        const fy = v * (resY - 1);
         const x0 = Math.floor(fx);
         const y0 = Math.floor(fy);
         const x1 = Math.min(resX - 1, x0 + 1);
         const y1 = Math.min(resY - 1, y0 + 1);
         const wx = fx - x0;
         const wy = fy - y0;
+
         const h00 = heights[y0 * resX + x0];
         const h10 = heights[y0 * resX + x1];
         const h01 = heights[y1 * resX + x0];
         const h11 = heights[y1 * resX + x1];
-        return (1 - wx) * (1 - wy) * h00 + wx * (1 - wy) * h10 + (1 - wx) * wy * h01 + wx * wy * h11;
+        const hNorm = (1 - wx) * (1 - wy) * h00 + wx * (1 - wy) * h10 + (1 - wx) * wy * h01 + wx * wy * h11;
+
+        return baseThickness + hNorm * reliefHeight;
       };
 
-      // 1. ВЕРХНІ ВЕРШИНИ
-      // Центр (індекс 0)
-      const centerH = heights[Math.floor(resY / 2) * resX + Math.floor(resX / 2)];
-      vertices.push(0, baseThickness + centerH * reliefHeight, 0);
-
-      // Кільця від 1 до rings
-      for (let rIdx = 1; rIdx <= rings; rIdx++) {
-        const curR = (rIdx / rings) * radius;
-        const isBorder = frame && curR >= frameRadius;
-        for (let sIdx = 0; sIdx < sectors; sIdx++) {
-          const theta = (sIdx / sectors) * Math.PI * 2;
-          const x = curR * Math.cos(theta);
-          const z = curR * Math.sin(theta);
-          let y = 0;
-          if (isBorder) {
-            y = frameElevation;
-          } else {
-            // Мапимо коло в UV карти [0, 1]
-            const u = (x / radius + 1) * 0.5;
-            const v = (z / radius + 1) * 0.5;
-            const hNorm = sampleBilinear(u, v);
-            y = baseThickness + hNorm * reliefHeight;
+      const cellInside = new Uint8Array(gridCols * gridRows);
+      for (let r = 0; r < gridRows - 1; r++) {
+        const cz = minZ + (r + 0.5) * cellSize;
+        for (let c = 0; c < gridCols - 1; c++) {
+          const cx = minX + (c + 0.5) * cellSize;
+          if (sdfAt(cx, cz) <= 0) {
+            cellInside[r * gridCols + c] = 1;
           }
-          vertices.push(x, y, z);
         }
       }
 
-      // ТРИКУТНИКИ ВЕРХНЬОГО ДИСКА
-      // Центральний віяловий сектор (кільце 1)
-      for (let sIdx = 0; sIdx < sectors; sIdx++) {
-        const next = (sIdx + 1) % sectors;
-        indices.push(0, 1 + sIdx, 1 + next);
-      }
-      // Решта кілець
-      for (let rIdx = 1; rIdx < rings; rIdx++) {
-        const r1Start = 1 + (rIdx - 1) * sectors;
-        const r2Start = 1 + rIdx * sectors;
-        for (let sIdx = 0; sIdx < sectors; sIdx++) {
-          const next = (sIdx + 1) % sectors;
-          const a = r1Start + sIdx;
-          const b = r1Start + next;
-          const c = r2Start + sIdx;
-          const d = r2Start + next;
-          indices.push(a, c, d);
-          indices.push(a, d, b);
+      for (let r = 0; r < gridRows - 2; r++) {
+        for (let c = 0; c < gridCols - 2; c++) {
+          const c00 = cellInside[r * gridCols + c];
+          const c10 = cellInside[r * gridCols + c + 1];
+          const c01 = cellInside[(r + 1) * gridCols + c];
+          const c11 = cellInside[(r + 1) * gridCols + c + 1];
+          if (c00 && c11 && !c10 && !c01) {
+            cellInside[r * gridCols + c + 1] = 1;
+          } else if (!c00 && !c11 && c10 && c01) {
+            cellInside[r * gridCols + c] = 1;
+          }
         }
       }
 
-      // 2. НИЖНІ ВЕРШИНИ (ДНО на Y = 0)
-      const topCount = 1 + rings * sectors;
-      const botCenterIdx = topCount;
-      vertices.push(0, 0, 0);
-
-      for (let rIdx = 1; rIdx <= rings; rIdx++) {
-        const curR = (rIdx / rings) * radius;
-        for (let sIdx = 0; sIdx < sectors; sIdx++) {
-          const theta = (sIdx / sectors) * Math.PI * 2;
-          vertices.push(curR * Math.cos(theta), 0, curR * Math.sin(theta));
-        }
-      }
-
-      // ТРИКУТНИКИ ДНА (нормалі ВНИЗ)
-      for (let sIdx = 0; sIdx < sectors; sIdx++) {
-        const next = (sIdx + 1) % sectors;
-        indices.push(botCenterIdx, botCenterIdx + 1 + next, botCenterIdx + 1 + sIdx);
-      }
-      for (let rIdx = 1; rIdx < rings; rIdx++) {
-        const r1Start = botCenterIdx + 1 + (rIdx - 1) * sectors;
-        const r2Start = botCenterIdx + 1 + rIdx * sectors;
-        for (let sIdx = 0; sIdx < sectors; sIdx++) {
-          const next = (sIdx + 1) % sectors;
-          const a = r1Start + sIdx;
-          const b = r1Start + next;
-          const c = r2Start + sIdx;
-          const d = r2Start + next;
-          indices.push(a, d, c);
-          indices.push(a, b, d);
-        }
-      }
-
-      // 3. БІЧНА ЦИЛІНДРИЧНА СТІНКА (З'єднує зовнішнє кільце верху з дном)
-      const outerRingTop = 1 + (rings - 1) * sectors;
-      const outerRingBot = botCenterIdx + 1 + (rings - 1) * sectors;
-      for (let sIdx = 0; sIdx < sectors; sIdx++) {
-        const next = (sIdx + 1) % sectors;
-        const topA = outerRingTop + sIdx;
-        const topB = outerRingTop + next;
-        const botA = outerRingBot + sIdx;
-        const botB = outerRingBot + next;
-        // Нормалі назовні циліндра
-        indices.push(topA, botA, botB);
-        indices.push(topA, botB, topB);
-      }
-
-      const geom = new THREE.BufferGeometry();
-      geom.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-      geom.setIndex(indices);
-      geom.computeVertexNormals();
-
-      const mat = new THREE.MeshStandardMaterial({
-        color: 0x94a3b8,
-        roughness: 0.35,
-        metalness: 0.15,
-        side: THREE.DoubleSide
-      });
-
-      const mesh = new THREE.Mesh(geom, mat);
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      mesh.userData.exportable = true;
-      return mesh;
-    }
-
-    // -------------------------------------------------------------------------
-    // ВУШКО ДЛЯ БРЕЛОКА (Solid Loop for Keychain)
-    // -------------------------------------------------------------------------
-    _buildKeychainLoop({ shape, width, depth, baseThickness }) {
-      const outerR = 5.0; // 10 мм ширина вушка
-      const holeR = 2.4;  // 4.8 мм діаметр отвору (легко заходить шнурок або кільце)
-      const height = baseThickness; // Заввишки з основу
-      const segments = 24;
-
-      // Розташування: верхня точка моделі
-      const attachZ = shape === 'circle' ? -(width / 2) : -(depth / 2);
-      const centerZ = attachZ - (outerR - 1.2);
-
+      const topVertexIndices = new Int32Array(gridRows * gridCols).fill(-1);
+      const botVertexIndices = new Int32Array(gridRows * gridCols).fill(-1);
       const vertices = [];
       const indices = [];
 
-      // Створюємо плоске кільце (дугу 360) з верхньою, нижньою поверхнею та 2 стінками
-      for (let s = 0; s < segments; s++) {
-        const theta = (s / segments) * Math.PI * 2;
-        const cos = Math.cos(theta);
-        const sin = Math.sin(theta);
-        // Верхнє зовнішнє
-        vertices.push(cos * outerR, height, centerZ + sin * outerR);
-        // Верхнє внутрішнє (отвір)
-        vertices.push(cos * holeR, height, centerZ + sin * holeR);
-        // Нижнє зовнішнє
-        vertices.push(cos * outerR, 0, centerZ + sin * outerR);
-        // Нижнє внутрішнє
-        vertices.push(cos * holeR, 0, centerZ + sin * holeR);
+      const getOrCreateNode = (c, r) => {
+        const idx = r * gridCols + c;
+        if (topVertexIndices[idx] !== -1) {
+          return { top: topVertexIndices[idx], bot: botVertexIndices[idx] };
+        }
+
+        let x = minX + c * cellSize;
+        let z = minZ + r * cellSize;
+
+        const d = sdfAt(x, z);
+        if (Math.abs(d) < cellSize * 0.75) {
+          const eps = 0.05;
+          const dx = (sdfAt(x + eps, z) - sdfAt(x - eps, z)) / (2 * eps);
+          const dz = (sdfAt(x, z + eps) - sdfAt(x, z - eps)) / (2 * eps);
+          const len = Math.hypot(dx, dz) || 1.0;
+          const shift = Math.max(-cellSize * 0.45, Math.min(cellSize * 0.45, d));
+          x -= (dx / len) * shift;
+          z -= (dz / len) * shift;
+        }
+
+        const topY = heightAt(x, z);
+        const topIdx = vertices.length / 3;
+        vertices.push(x, topY, z);
+
+        const botIdx = vertices.length / 3;
+        vertices.push(x, 0.0, z);
+
+        topVertexIndices[idx] = topIdx;
+        botVertexIndices[idx] = botIdx;
+        return { top: topIdx, bot: botIdx };
+      };
+
+      // 1. ВЕРХ ТА ДНО
+      for (let r = 0; r < gridRows - 1; r++) {
+        for (let c = 0; c < gridCols - 1; c++) {
+          if (!cellInside[r * gridCols + c]) continue;
+
+          const nodeA = getOrCreateNode(c, r);
+          const nodeB = getOrCreateNode(c + 1, r);
+          const nodeC = getOrCreateNode(c, r + 1);
+          const nodeD = getOrCreateNode(c + 1, r + 1);
+
+          // Верхня поверхня (A -> C -> B та C -> D -> B, нормалі дивляться ВГОРУ +Y назовні):
+          indices.push(nodeA.top, nodeC.top, nodeB.top);
+          indices.push(nodeC.top, nodeD.top, nodeB.top);
+
+          // Дно (C_bot -> A_bot -> D_bot та A_bot -> B_bot -> D_bot, нормалі дивляться ВНИЗ -Y назовні):
+          indices.push(nodeC.bot, nodeA.bot, nodeD.bot);
+          indices.push(nodeA.bot, nodeB.bot, nodeD.bot);
+        }
       }
 
-      for (let s = 0; s < segments; s++) {
-        const next = (s + 1) % segments;
-        const tOutA = s * 4;
-        const tInA = s * 4 + 1;
-        const bOutA = s * 4 + 2;
-        const bInA = s * 4 + 3;
+      // 2. БІЧНІ СТІНКИ (Side Walls)
+      // Горизонтальні ребра: між рядками r-1 та r
+      for (let r = 0; r < gridRows; r++) {
+        for (let c = 0; c < gridCols - 1; c++) {
+          const below = r > 0 ? cellInside[(r - 1) * gridCols + c] : 0;
+          const above = r < gridRows - 1 ? cellInside[r * gridCols + c] : 0;
 
-        const tOutB = next * 4;
-        const tInB = next * 4 + 1;
-        const bOutB = next * 4 + 2;
-        const bInB = next * 4 + 3;
+          if (below !== above) {
+            const nodeLeft = getOrCreateNode(c, r);
+            const nodeRight = getOrCreateNode(c + 1, r);
 
-        // Верхній торець
-        indices.push(tOutA, tInA, tInB);
-        indices.push(tOutA, tInB, tOutB);
+            if (below && !above) {
+              // Тіло знизу (менший Z), стінка дивиться на +Z назовні
+              indices.push(nodeLeft.top, nodeLeft.bot, nodeRight.top);
+              indices.push(nodeLeft.bot, nodeRight.bot, nodeRight.top);
+            } else {
+              // Тіло зверху (більший Z), стінка дивиться на -Z назовні
+              indices.push(nodeRight.top, nodeRight.bot, nodeLeft.top);
+              indices.push(nodeRight.bot, nodeLeft.bot, nodeLeft.top);
+            }
+          }
+        }
+      }
 
-        // Нижній торець
-        indices.push(bOutA, bInB, bInA);
-        indices.push(bOutA, bOutB, bInB);
+      // Вертикальні ребра: між стовпчиками c-1 та c
+      for (let r = 0; r < gridRows - 1; r++) {
+        for (let c = 0; c < gridCols; c++) {
+          const left = c > 0 ? cellInside[r * gridCols + c - 1] : 0;
+          const right = c < gridCols - 1 ? cellInside[r * gridCols + c] : 0;
 
-        // Зовнішня бічна стінка
-        indices.push(tOutA, bOutA, bOutB);
-        indices.push(tOutA, bOutB, tOutB);
+          if (left !== right) {
+            const nodeBot = getOrCreateNode(c, r);
+            const nodeTop = getOrCreateNode(c, r + 1);
 
-        // Внутрішня стінка отвору
-        indices.push(tInA, tInB, bInB);
-        indices.push(tInA, bInB, bInA);
+            if (left && !right) {
+              // Тіло ліворуч (менший X), стінка дивиться на +X назовні
+              indices.push(nodeTop.top, nodeTop.bot, nodeBot.top);
+              indices.push(nodeTop.bot, nodeBot.bot, nodeBot.top);
+            } else {
+              // Тіло праворуч (більший X), стінка дивиться на -X назовні
+              indices.push(nodeBot.top, nodeBot.bot, nodeTop.top);
+              indices.push(nodeBot.bot, nodeTop.bot, nodeTop.top);
+            }
+          }
+        }
       }
 
       const geom = new THREE.BufferGeometry();
@@ -737,7 +752,7 @@
         color: 0x94a3b8,
         roughness: 0.35,
         metalness: 0.15,
-        side: THREE.DoubleSide
+        side: THREE.FrontSide
       });
 
       const mesh = new THREE.Mesh(geom, mat);

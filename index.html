@@ -72,7 +72,7 @@
       <div class="brand-title">
         <div class="brand-title-row">
           <h1>3D КУЗНЯ ЧУДЕС</h1>
-          <span id="app-version-pill" class="version-pill" title="Версія програми: v2.1.0">v2.1.0</span>
+          <span id="app-version-pill" class="version-pill" title="Версія програми: v2.2.0">v2.2.0</span>
         </div>
         <p class="brand-subtitle">Minecraft &amp; Print-Safe 3D Генератор • Tinkercad / Makers Empire / 3D-Принтер</p>
       </div>
@@ -733,6 +733,11 @@
           </summary>
 
           <div class="collapsible-card-content">
+            <label class="checkbox-row" style="margin-bottom: 8px;">
+              <input id="hm-auto-levels" type="checkbox" checked aria-label="Автоматичний контраст: оптимізує діапазон тіней і світла" />
+              <span>⚡ <b>Автоконтраст деталей</b> (проявляє дрібні контури)</span>
+            </label>
+
             <div class="control-row">
               <div class="control-label">
                 <span>Контрастність (виразність ліній):</span>
@@ -751,7 +756,15 @@
 
             <div class="control-row">
               <div class="control-label">
-                <span>Згладжування (прибрати піксельний шум):</span>
+                <span>Глибина тіней (гамма):</span>
+                <span id="val-hm-gamma" class="control-val">1.0</span>
+              </div>
+              <input id="hm-gamma" type="range" min="0.5" max="2.0" step="0.1" value="1.0" aria-label="Глибина тіней і середніх тонів" />
+            </div>
+
+            <div class="control-row">
+              <div class="control-label">
+                <span>Згладжування (крайовий двосторонній фільтр):</span>
                 <span id="val-hm-smooth" class="control-val">Вимк</span>
               </div>
               <input id="hm-smooth" type="range" min="0" max="3" step="1" value="0" aria-label="Згладжування рельєфу" />
@@ -803,6 +816,7 @@
               <option value="64">⚡ Швидка (64×64 — для слабких ПК)</option>
               <option value="128" selected>✨ Стандартна (128×128 — гладенький друк)</option>
               <option value="192">💎 Висока (192×192 — максимальна чіткість)</option>
+              <option value="256">🔬 Ультра (256×256 — фото-деталізація)</option>
             </select>
           </div>
 
@@ -813,8 +827,14 @@
 
           <label class="checkbox-row">
             <input id="hm-keychain" type="checkbox" aria-label="Вушко з отвором для брелока" />
-            <span>🎒 Вушко для брелока (отвір 4.8 мм для шнурка чи кільця)</span>
+            <span>🎒 Вушко для брелока (отвір 4.8 мм, монолітне зрощення)</span>
           </label>
+
+          <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-soft);">
+            <div id="hm-geom-check" class="connectivity-pill bridged" title="Топологічна перевірка 3D-моделі на водонепроникність (watertight)">
+              🛡️ Модель: перевірка...
+            </div>
+          </div>
         </div>
       </section>
 
@@ -885,8 +905,8 @@
           <a id="author-badge-link" class="author-corner-badge" href="https://sivochka.com/" target="_blank" rel="noopener" title="Автор: Ігор Сівочка (sivochka.com) — уроки 3D-моделювання та програмування">
             👨‍🏫 Ігор Сівочка • sivochka.com ↗
           </a>
-          <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • v2.1.0 Friendly Arcade: Фото-Барельєф, єдиний дитячий стиль, одноколірні пригоди та пошук за темами">
-            ⚒️ v2.1.0
+          <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • v2.2.0 Friendly Arcade: Фото-Барельєф, монолітна SDF геометрія, інтегроване вушко брелока, топологічна валідація MeshValidator">
+            ⚒️ v2.2.0
           </div>
         </div>
       </div>
@@ -1191,29 +1211,30 @@
 
   <!-- ПІДКЛЮЧЕННЯ СКРИПТІВ (Працює 100% офлайн без інтернету та серверів!) -->
   <script src="lib/three.min.js"></script>
-  <script src="src/voxelFont.js?v=2.1.0"></script>
-  <script src="src/soundEffects.js?v=2.1.0"></script>
-  <script src="src/safeStorage.js?v=2.1.0"></script>
-  <script src="src/historyManager.js?v=2.1.0"></script>
-  <script src="src/contentRegistry.js?v=2.1.0"></script>
-  <script src="src/missionManager.js?v=2.1.0"></script>
-  <script src="src/projectState.js?v=2.1.0"></script>
-  <script src="src/modalFocus.js?v=2.1.0"></script>
-  <script src="src/snapshotCompareController.js?v=2.1.0"></script>
-  <script src="src/passportPrintController.js?v=2.1.0"></script>
-  <script src="src/generators/minecraftForge.js?v=2.1.0"></script>
-  <script src="src/generators/dualIllusion.js?v=2.1.0"></script>
-  <script src="src/generators/physicsMechanics.js?v=2.1.0"></script>
-  <script src="src/generators/mobMutator.js?v=2.1.0"></script>
-  <script src="src/generators/heightmapRelief.js?v=2.1.0"></script>
-  <script src="src/content/adventurePack.js?v=2.1.0"></script>
-  <script src="src/content/funReliefs.js?v=2.1.0"></script>
-  <script src="src/content/funDiscoveries.js?v=2.1.0"></script>
-  <script src="src/content/funEngineering.js?v=2.1.0"></script>
-  <script src="src/adventureShelf.js?v=2.1.0"></script>
-  <script src="src/pixelEditorTools.js?v=2.1.0"></script>
-  <script src="src/lessonCompanion.js?v=2.1.0"></script>
-  <script src="src/sceneManager.js?v=2.1.0"></script>
-  <script src="src/app.js?v=2.1.0"></script>
+  <script src="src/voxelFont.js?v=2.2.0"></script>
+  <script src="src/soundEffects.js?v=2.2.0"></script>
+  <script src="src/safeStorage.js?v=2.2.0"></script>
+  <script src="src/historyManager.js?v=2.2.0"></script>
+  <script src="src/meshValidator.js?v=2.2.0"></script>
+  <script src="src/contentRegistry.js?v=2.2.0"></script>
+  <script src="src/missionManager.js?v=2.2.0"></script>
+  <script src="src/projectState.js?v=2.2.0"></script>
+  <script src="src/modalFocus.js?v=2.2.0"></script>
+  <script src="src/snapshotCompareController.js?v=2.2.0"></script>
+  <script src="src/passportPrintController.js?v=2.2.0"></script>
+  <script src="src/generators/minecraftForge.js?v=2.2.0"></script>
+  <script src="src/generators/dualIllusion.js?v=2.2.0"></script>
+  <script src="src/generators/physicsMechanics.js?v=2.2.0"></script>
+  <script src="src/generators/mobMutator.js?v=2.2.0"></script>
+  <script src="src/generators/heightmapRelief.js?v=2.2.0"></script>
+  <script src="src/content/adventurePack.js?v=2.2.0"></script>
+  <script src="src/content/funReliefs.js?v=2.2.0"></script>
+  <script src="src/content/funDiscoveries.js?v=2.2.0"></script>
+  <script src="src/content/funEngineering.js?v=2.2.0"></script>
+  <script src="src/adventureShelf.js?v=2.2.0"></script>
+  <script src="src/pixelEditorTools.js?v=2.2.0"></script>
+  <script src="src/lessonCompanion.js?v=2.2.0"></script>
+  <script src="src/sceneManager.js?v=2.2.0"></script>
+  <script src="src/app.js?v=2.2.0"></script>
 </body>
 </html>
