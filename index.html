@@ -746,9 +746,20 @@
             </div>
           </div>
 
-          <!-- Ч/Б 2D Прев'ю -->
-          <div class="hm-preview-row">
-            <canvas id="hm-preview-canvas" width="128" height="128" class="hm-preview-canvas" title="Ч/Б Прев'ю висот рельєфу"></canvas>
+          <!-- Ч/Б 2D Прев'ю Карти Висот -->
+          <div class="hm-preview-card">
+            <div class="hm-preview-header">
+              <span class="hm-preview-title">🗺️ 2D Карта висот</span>
+              <button id="btn-toggle-hm-hud" class="hm-hud-trigger-btn" type="button" title="Відкрити або сховати плаваюче вікно карти висот у 3D сцені">🪟 У сцену</button>
+            </div>
+            <div class="hm-canvas-wrap">
+              <canvas id="hm-preview-canvas" width="256" height="256" class="hm-preview-canvas" title="Ч/Б Прев'ю висот рельєфу"></canvas>
+            </div>
+            <div class="hm-height-scale" aria-hidden="true">
+              <span class="hm-scale-lbl">0 мм (основа)</span>
+              <div class="hm-scale-gradient"></div>
+              <span class="hm-scale-lbl">Max (пік)</span>
+            </div>
             <div class="hm-preview-info">
               <label class="checkbox-row" style="margin:0;">
                 <input id="hm-invert" type="checkbox" aria-label="Інвертувати висоти: чорне стає опуклим, біле — заглибленим" />
@@ -901,6 +912,27 @@
                 <input id="slicer-time-input" class="hud-input" type="text" maxlength="28" placeholder="Запис зі слайсера (напр.: 14 хв, PLA 0.2)" aria-label="Запис фактичного часу та профілю зі слайсера" />
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ПЛАВАЮЧИЙ ВІДЖЕТ 2D-КАРТИ ВИСОТ ДЛЯ БАРЕЛЬЄФА -->
+      <div id="hm-floating-hud" class="hm-floating-hud" style="display:none;" aria-label="Плаваюче 2D-прев'ю висот барельєфа">
+        <div class="hm-floating-hud-header">
+          <span class="hm-floating-hud-title">🗺️ 2D Карта висот</span>
+          <div class="hm-floating-hud-actions">
+            <button id="btn-hm-hud-size" class="hm-hud-btn" type="button" title="Змінити розмір вікна (компактний / звичайний)" aria-label="Змінити розмір">🗖</button>
+            <button id="btn-hm-hud-close" class="hm-hud-btn" type="button" title="Закрити плаваюче вікно" aria-label="Закрити вікно">✕</button>
+          </div>
+        </div>
+        <div class="hm-floating-hud-body">
+          <div class="hm-hud-canvas-wrap">
+            <canvas id="hm-hud-preview-canvas" width="256" height="256" class="hm-hud-canvas" title="Ч/Б Прев'ю карти висот"></canvas>
+          </div>
+          <div class="hm-height-scale" aria-hidden="true">
+            <span class="hm-scale-lbl">0 мм</span>
+            <div class="hm-scale-gradient"></div>
+            <span class="hm-scale-lbl">Max</span>
           </div>
         </div>
       </div>
