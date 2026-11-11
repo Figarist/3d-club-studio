@@ -3648,37 +3648,229 @@ select:focus, input[type="text"]:focus {
   text-overflow: ellipsis;
 }
 
-.hm-preview-row {
+.hm-preview-row,
+.hm-preview-card {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 10px;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
   background: var(--surface);
   border-radius: var(--r-md);
   border: var(--border-width-control) solid var(--card-border, #3a3a5a);
-  margin-top: 8px;
+  margin-top: 10px;
+}
+
+.hm-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.hm-preview-title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.hm-hud-trigger-btn {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  border: var(--border-width-control) solid var(--card-border, #3a3a5a);
+  background: var(--surface2);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.hm-hud-trigger-btn:hover {
+  background: var(--surface3);
+  border-color: var(--cyan);
+}
+
+.hm-hud-trigger-btn.active {
+  background: var(--cyan);
+  color: var(--bg);
+  border-color: var(--cyan);
+  font-weight: 700;
+}
+
+.hm-hud-trigger-btn:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+.hm-canvas-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background: #000000;
+  border-radius: var(--r-md);
+  padding: 6px;
+  border: 1px solid var(--card-border, #3a3a5a);
+  box-sizing: border-box;
 }
 
 .hm-preview-canvas {
-  width: 64px;
-  height: 64px;
-  min-width: 64px;
-  border-radius: var(--r-md);
-  border: var(--border-width-control) solid var(--card-border, #3a3a5a);
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  border-radius: calc(var(--r-md) - 2px);
   background: #000000;
-  image-rendering: pixelated;
+  display: block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.hm-height-scale {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.hm-scale-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.hm-scale-gradient {
+  flex: 1;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: linear-gradient(to right, #000000, #555555, #aaaaaa, #ffffff);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .hm-preview-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  flex: 1;
-  min-width: 0;
+  width: 100%;
 }
 
 .hm-preview-hint {
   font-size: var(--text-xs);
   color: var(--text-muted);
   line-height: 1.25;
+}
+
+/* ==========================================================================
+   ПЛАВАЮЧИЙ ВІДЖЕТ 2D КАРТИ ВИСОТ У 3D В'ЮПОРТІ (HUD PIP)
+   ========================================================================== */
+.hm-floating-hud {
+  position: absolute;
+  top: 76px;
+  right: 18px;
+  z-index: 25;
+  width: 260px;
+  background: rgba(18, 22, 36, 0.94);
+  backdrop-filter: blur(10px);
+  border: var(--border-width-control) solid var(--cyan, #00f0ff);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-modal, 0 10px 30px rgba(0, 0, 0, 0.6));
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s ease;
+  user-select: none;
+}
+
+.hm-floating-hud.compact {
+  width: 160px;
+}
+
+.hm-floating-hud-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 6px;
+}
+
+.hm-floating-hud-title {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.3px;
+}
+
+.hm-floating-hud-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hm-hud-btn {
+  background: var(--surface2);
+  border: 1px solid var(--card-border, #3a3a5a);
+  color: var(--text-main);
+  border-radius: var(--r-sm, 4px);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.12s ease;
+}
+
+.hm-hud-btn:hover {
+  background: var(--surface3);
+  border-color: var(--cyan);
+}
+
+.hm-hud-btn:focus-visible {
+  outline: 2px solid var(--cyan);
+}
+
+.hm-floating-hud-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hm-hud-canvas-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background: #000000;
+  border-radius: var(--r-md);
+  padding: 4px;
+  border: 1px solid var(--card-border, #3a3a5a);
+  box-sizing: border-box;
+}
+
+.hm-hud-canvas {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  display: block;
+  border-radius: calc(var(--r-md) - 2px);
+  background: #000000;
+}
+
+@media (max-width: 1024px) {
+  .hm-floating-hud {
+    top: 60px;
+    right: 10px;
+    width: 200px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-floating-hud,
+  .hm-hud-trigger-btn {
+    transition: none !important;
+  }
 }
