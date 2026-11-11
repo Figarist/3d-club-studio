@@ -266,6 +266,11 @@
       this.bindCameraControls();
       this.bindWorkflowStepper();
 
+      if (window.ResponsiveToolbar) {
+        this.responsiveToolbar = new window.ResponsiveToolbar();
+        this.responsiveToolbar.init();
+      }
+
       // Відновлюємо автозбереження або рендеримо стартову модель
       const restored = this.restoreAutosave();
       if (this.adventureShelf) this.adventureShelf.selectMission(this.missions.activeMissionId);
@@ -382,9 +387,9 @@
         }
         this.compare.setV1(state.v1Snapshot);
         clearTimeout(this._snapshotLabelTimer);
-        if (dom.btnCompareV1V2) dom.btnCompareV1V2.style.display = state.v1Snapshot ? 'inline-block' : 'none';
+        if (dom.btnCompareV1V2) dom.btnCompareV1V2.style.display = state.v1Snapshot ? 'inline-flex' : 'none';
         if (dom.btnCompareV1V2) dom.btnCompareV1V2.classList.toggle('has-v1', !!state.v1Snapshot);
-        if (dom.btnSnapshotV1) dom.btnSnapshotV1.textContent = state.v1Snapshot ? '📸 V1 збережено ✅' : '📸 Фіксувати V1';
+        this._setSnapshotButtonState(!!state.v1Snapshot);
         this.safeStorage.setItem('3d_kuznya_pair_code', state.studentPairCode);
         if (dom.cardPairInput) dom.cardPairInput.value = state.studentPairCode;
         if (state.missionChecks && typeof state.missionChecks === 'object') {
@@ -527,19 +532,68 @@
       this.history.updateUI(dom.btnUndo, dom.btnRedo, dom.btnMcUndo);
     }
 
+    _setButtonLabel(btn, ico, text) {
+      if (!btn) return;
+      const icoEl = btn.querySelector('.btn-ico');
+      const lblEl = btn.querySelector('.btn-lbl');
+      if (icoEl && lblEl) {
+        icoEl.textContent = ico;
+        lblEl.textContent = text;
+      } else {
+        btn.textContent = `${ico} ${text}`;
+      }
+    }
+
+    _setSnapshotButtonState(hasV1, transientText = '') {
+      const btn = this._domCache?.btnSnapshotV1;
+      if (!btn) return;
+      btn.classList.toggle('has-v1', Boolean(hasV1));
+      const lblEl = btn.querySelector('.btn-lbl');
+      if (transientText) {
+        this._setButtonLabel(btn, '📸', transientText);
+        return;
+      }
+      if (hasV1) {
+        this._setButtonLabel(btn, '📸', 'V1 ✓');
+        btn.title = 'Версію 1 (Ескіз) зафіксовано. Натисніть, щоб оновити ескіз';
+      } else if (lblEl) {
+        const icoEl = btn.querySelector('.btn-ico');
+        if (icoEl) icoEl.textContent = '📸';
+        lblEl.innerHTML = 'V1 <span class="lbl-ext">(Ескіз)</span>';
+        btn.title = 'Зафіксувати поточну модель як Версію 1 (Ескіз)';
+      } else {
+        btn.textContent = '📸 V1 (Ескіз)';
+      }
+    }
+
+    _updateAutosaveTag(shortText, detailText, tooltipText) {
+      const tag = this._domCache?.autosaveTag;
+      if (!tag) return;
+      const shortEl = tag.querySelector('.autosave-short');
+      const fullEl = tag.querySelector('.autosave-full');
+      if (shortEl && fullEl) {
+        shortEl.textContent = shortText;
+        fullEl.textContent = detailText;
+      } else {
+        tag.textContent = `💾 ${tooltipText}`;
+      }
+      tag.title = tooltipText;
+      tag.setAttribute('aria-label', tooltipText);
+      tag.classList.remove('pulse-saved');
+      void tag.offsetWidth;
+      tag.classList.add('pulse-saved');
+    }
+
     autosave() {
       if (this._isRestoring) return;
       try {
         const payload = JSON.stringify(this.serializeState());
         this.safeStorage.setItem(STORAGE_KEY, payload);
-        const dom = this._domCache || {};
-        if (dom.autosaveTag) {
-          const now = new Date();
-          const hh = String(now.getHours()).padStart(2, '0');
-          const mm = String(now.getMinutes()).padStart(2, '0');
-          const ss = String(now.getSeconds()).padStart(2, '0');
-          dom.autosaveTag.textContent = `💾 Автозбережено о ${hh}:${mm}:${ss}`;
-        }
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        const ss = String(now.getSeconds()).padStart(2, '0');
+        this._updateAutosaveTag('Авто', `• ${hh}:${mm}:${ss}`, `Автозбережено о ${hh}:${mm}:${ss} у пам'яті браузера`);
       } catch (_) {}
     }
 
@@ -550,10 +604,7 @@
         const parsed = JSON.parse(raw);
         if (!parsed || parsed.app !== '3d-club-studio') return false;
         this.applyState(parsed, false);
-        const dom = this._domCache || {};
-        if (dom.autosaveTag) {
-          dom.autosaveTag.textContent = '💾 Відновлено попередній проєкт';
-        }
+        this._updateAutosaveTag('Авто', '• Відновлено', 'Відновлено попередній проєкт із пам\'яті браузера');
         return true;
       } catch (_) {
         return false;
@@ -623,7 +674,8 @@
       const dom = this._domCache || {};
       if (dom.btnToggleMono) {
         dom.btnToggleMono.classList.toggle('active', active);
-        dom.btnToggleMono.textContent = active ? '🪨 1 Пластик: УВІМК' : '🪨 1 Пластик';
+        dom.btnToggleMono.setAttribute('aria-pressed', active ? 'true' : 'false');
+        this._setButtonLabel(dom.btnToggleMono, '🪨', active ? '1 Пластик ✓' : '1 Пластик');
       }
       if (dom.btnHudMono) {
         dom.btnHudMono.classList.toggle('active', active);
@@ -795,16 +847,16 @@
       if (snap) {
         const dom = this._domCache || {};
         if (dom.btnCompareV1V2) {
-          dom.btnCompareV1V2.style.display = 'inline-block';
+          dom.btnCompareV1V2.style.display = 'inline-flex';
           dom.btnCompareV1V2.disabled = false;
           dom.btnCompareV1V2.classList.add('has-v1');
           dom.btnCompareV1V2.title = `V1 зафіксовано о ${snap.displayTime}. Натисніть для порівняння!`;
         }
         if (dom.btnSnapshotV1) {
-          dom.btnSnapshotV1.textContent = '📸 V1 збережено ✅';
+          this._setSnapshotButtonState(true, 'V1 ✓');
           clearTimeout(this._snapshotLabelTimer);
           this._snapshotLabelTimer = setTimeout(() => {
-            if (dom.btnSnapshotV1) dom.btnSnapshotV1.textContent = '📸 Оновити V1';
+            this._setSnapshotButtonState(true);
           }, 2200);
         }
         this.showToast('📸 V1 (Ескіз) зафіксовано для порівняння!');
@@ -1329,6 +1381,9 @@
       if (btnMenu && menuDropdown) {
         const toggleMenu = (open) => {
           const isOpen = open !== undefined ? open : !menuDropdown.classList.contains('show');
+          if (isOpen && this.responsiveToolbar) {
+            this.responsiveToolbar.closeMenu();
+          }
           menuDropdown.classList.toggle('show', isOpen);
           btnMenu.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
           btnMenu.classList.toggle('active', isOpen);
@@ -1402,15 +1457,23 @@
         });
       }
 
+      if (dom.autosaveTag) {
+        dom.autosaveTag.addEventListener('click', () => {
+          this.autosave();
+          this.showToast(`💾 ${dom.autosaveTag.title || 'Проєкт збережено у пам\'яті браузера'}`);
+          window.StudioSound?.playPop?.(520);
+        });
+      }
+
       const btnSim = document.getElementById('btn-simulate-print');
       if (btnSim) {
         btnSim.addEventListener('click', () => {
           const active = this.sceneManager.startSlicerSimulation();
           if (active) {
-            btnSim.textContent = '⏹️ Зупинити симуляцію';
+            this._setButtonLabel(btnSim, '⏹️', 'Стоп');
             if (window.StudioSound) window.StudioSound.playSimStart();
           } else {
-            btnSim.textContent = '🔥 Симуляція';
+            this._setButtonLabel(btnSim, '🔥', 'Симуляція');
           }
         });
       }

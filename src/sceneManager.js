@@ -683,7 +683,14 @@
       const btn = document.getElementById('btn-simulate-print');
       if (btn) {
         btn.classList.remove('active-sim');
-        btn.textContent = '🔥 Симуляція 3D-Принтера';
+        const ico = btn.querySelector('.btn-ico');
+        const lbl = btn.querySelector('.btn-lbl');
+        if (ico && lbl) {
+          ico.textContent = '🔥';
+          lbl.textContent = 'Симуляція';
+        } else {
+          btn.textContent = '🔥 Симуляція';
+        }
       }
     }
 
