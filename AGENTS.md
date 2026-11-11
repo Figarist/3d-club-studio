@@ -31,10 +31,10 @@
 
 ~~~text
 lib/three.min.js
-src/voxelFont.js → src/soundEffects.js → src/safeStorage.js → src/historyManager.js
+src/voxelFont.js → src/soundEffects.js → src/safeStorage.js → src/historyManager.js → src/meshValidator.js
 src/contentRegistry.js → src/missionManager.js → src/projectState.js
 src/modalFocus.js → src/snapshotCompareController.js → src/passportPrintController.js
-src/generators/minecraftForge.js → dualIllusion.js → physicsMechanics.js → mobMutator.js
+src/generators/minecraftForge.js → dualIllusion.js → physicsMechanics.js → mobMutator.js → heightmapRelief.js
 src/content/adventurePack.js → funReliefs.js → funDiscoveries.js → funEngineering.js
 src/adventureShelf.js → src/pixelEditorTools.js → src/lessonCompanion.js
 src/sceneManager.js → src/app.js

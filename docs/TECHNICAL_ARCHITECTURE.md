@@ -15,10 +15,10 @@
 Теги в index.html формують граф залежностей. Зберігайте чинний порядок і завантаження app.js останнім:
 
 1. lib/three.min.js
-2. src/voxelFont.js, src/soundEffects.js, src/safeStorage.js, src/historyManager.js
+2. src/voxelFont.js, src/soundEffects.js, src/safeStorage.js, src/historyManager.js, src/meshValidator.js
 3. src/contentRegistry.js, src/missionManager.js, src/projectState.js
 4. src/modalFocus.js, src/snapshotCompareController.js, src/passportPrintController.js
-5. чотири файли з src/generators/
+5. п'ять файлів з src/generators/ (minecraftForge.js, dualIllusion.js, physicsMechanics.js, mobMutator.js, heightmapRelief.js)
 6. src/content/adventurePack.js, src/content/funReliefs.js, src/content/funDiscoveries.js, src/content/funEngineering.js
 7. src/adventureShelf.js, src/pixelEditorTools.js, src/lessonCompanion.js
 8. src/sceneManager.js
