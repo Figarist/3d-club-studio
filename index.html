@@ -167,7 +167,6 @@
       <div class="bar-separator" aria-hidden="true"></div>
 
       <div class="view-mode-group" aria-label="Режим робочого простору">
-        <button class="view-btn" data-view-mode="editor" title="Лише панель параметрів">🛠️ Редактор</button>
         <button class="view-btn active" data-view-mode="split" title="Редактор ліворуч, 3D сцена праворуч">🌗 Редактор + 3D</button>
         <button class="view-btn" data-view-mode="viewport" title="Тільки 3D сцена для проєктора або демонстрації">🧊 Тільки 3D</button>
       </div>
@@ -208,7 +207,7 @@
     <aside class="sidebar" id="app-sidebar">
 
       <!-- КОМПАКТНА КАРТКА ПОТОЧНОЇ МІСІЇ НАД РЕДАКТОРОМ (можна згорнути або повністю закрити) -->
-      <div id="active-mission-card" class="mission-compact-card">
+      <div id="active-mission-card" class="mission-compact-card" style="display:none;">
         <div class="mission-compact-top">
           <span id="active-mission-badge" class="mission-cat-pill">🗺️ Місія #1 • Рельєфи</span>
           <div class="mission-compact-actions">
@@ -845,25 +844,28 @@
       <div id="viewport-container" role="region" aria-label="Інтерактивна 3D-сцена столу принтера"></div>
 
       <!-- ВЕРХНІ ІНФОРМАЦІЙНІ БЕЙДЖІ (ЧЕСНА ДІАГНОСТИКА ТА СТАТУС ПЕРЕВІРКИ) -->
-      <div class="viewport-hud-top">
+      <div class="viewport-hud-top" id="viewport-hud-top">
         <div id="model-dimensions-badge" class="hud-badge">
           📐 Габарит: 56 × 56 × 8 мм | ⏱️ Час: перевір у слайсері
         </div>
-        <div id="print-verification-badge" class="hud-badge verification-badge status-generated">
-          <div class="verification-row">
-            <span id="geom-check-pill" class="geom-check-pill">🔍 Перевірка геометрії...</span>
-            <button id="btn-toggle-slicer-notes" class="hud-notes-toggle" type="button" title="Показати/сховати статус друку та нотатки слайсера">🧾 Нотатки друку ▾</button>
-          </div>
-          <div id="slicer-notes-panel" class="slicer-notes-panel" style="display:none;">
+        <div class="hud-top-right-group">
+          <button id="btn-toggle-hud" class="hud-toggle-btn" title="Згорнути або показати інформаційні плашки розмірів та статусу друку" aria-label="Перемкнути видимість плашок">👁️ Інфо</button>
+          <div id="print-verification-badge" class="hud-badge verification-badge status-generated">
             <div class="verification-row">
-              <select id="verification-status-select" class="hud-select" aria-label="Статус перевірки моделі для друку">
-                <option value="generated" selected>🧪 Статус: Згенеровано (не перевірено)</option>
-                <option value="sliced">🔍 Статус: Перевірено у слайсері</option>
-                <option value="printed">🖨️ Статус: Надруковано на принтері</option>
-              </select>
+              <span id="geom-check-pill" class="geom-check-pill">🔍 Перевірка геометрії...</span>
+              <button id="btn-toggle-slicer-notes" class="hud-notes-toggle" type="button" title="Показати/сховати статус друку та нотатки слайсера">🧾 Нотатки друку ▾</button>
             </div>
-            <div class="verification-row slicer-note-row">
-              <input id="slicer-time-input" class="hud-input" type="text" maxlength="28" placeholder="Запис зі слайсера (напр.: 14 хв, PLA 0.2)" aria-label="Запис фактичного часу та профілю зі слайсера" />
+            <div id="slicer-notes-panel" class="slicer-notes-panel" style="display:none;">
+              <div class="verification-row">
+                <select id="verification-status-select" class="hud-select" aria-label="Статус перевірки моделі для друку">
+                  <option value="generated" selected>🧪 Статус: Згенеровано (не перевірено)</option>
+                  <option value="sliced">🔍 Статус: Перевірено у слайсері</option>
+                  <option value="printed">🖨️ Статус: Надруковано на принтері</option>
+                </select>
+              </div>
+              <div class="verification-row slicer-note-row">
+                <input id="slicer-time-input" class="hud-input" type="text" maxlength="28" placeholder="Запис зі слайсера (напр.: 14 хв, PLA 0.2)" aria-label="Запис фактичного часу та профілю зі слайсера" />
+              </div>
             </div>
           </div>
         </div>

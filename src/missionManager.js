@@ -388,7 +388,7 @@
       this.missionFilter = 'all';
       this.missionChecks = { connected: false, mono: false, size: false };
       this.bodyCollapsed = false;
-      this.cardVisible = options.initialCardVisible !== undefined ? !!options.initialCardVisible : true;
+      this.cardVisible = options.initialCardVisible !== undefined ? !!options.initialCardVisible : false;
       this.onMissionChange = options.onMissionChange || null;
       this.onChecklistChange = options.onChecklistChange || null;
     }

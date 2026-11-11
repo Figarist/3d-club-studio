@@ -17,6 +17,7 @@
       });
       this.missions = new window.MissionManager({
         initialMissionId: 1,
+        initialCardVisible: false,
         onMissionChange: (m) => this.onMissionSelected(m),
         onChecklistChange: () => this.autosave()
       });
@@ -73,6 +74,8 @@
         verificationBadge: document.getElementById('print-verification-badge'),
         verificationSelect: document.getElementById('verification-status-select'),
         slicerTimeInput: document.getElementById('slicer-time-input'),
+        viewportHudTop: document.getElementById('viewport-hud-top'),
+        btnToggleHud: document.getElementById('btn-toggle-hud'),
         geomCheckPill: document.getElementById('geom-check-pill'),
         mcConnectivityStatus: document.getElementById('mc-connectivity-status'),
         illusionCameraBar: document.getElementById('illusion-camera-bar'),
@@ -292,7 +295,7 @@
         activeTab: this.activeTab,
         activeMissionId: this.missions.activeMissionId,
         activeMissionKey: this.missions.getActiveMission()?.key,
-        activeMissionVisible: this.missions ? this.missions.cardVisible : true,
+        activeMissionVisible: this.missions ? this.missions.cardVisible : false,
         activeMissionCollapsed: this.missions ? this.missions.bodyCollapsed : false,
         isOrthographic: this.sceneManager ? this.sceneManager.isOrthographic : false,
         v1Snapshot: this.compare.getV1(),
@@ -367,6 +370,8 @@
         this.missions.applyState({ activeMissionId: state.activeMissionId, activeMissionKey: state.activeMissionKey });
         if (typeof state.activeMissionVisible === 'boolean') {
           this.missions.setCardVisibility(state.activeMissionVisible);
+        } else {
+          this.missions.setCardVisibility(false);
         }
         if (typeof state.activeMissionCollapsed === 'boolean') {
           this.missions.setBodyCollapse(state.activeMissionCollapsed);
@@ -631,6 +636,7 @@
     }
 
     setViewMode(mode) {
+      if (mode === 'editor') mode = 'split';
       this.viewMode = mode;
       const dom = this._domCache || {};
       if (dom.workspace) {
@@ -641,7 +647,10 @@
         b.classList.toggle('active', b.getAttribute('data-view-mode') === mode);
       });
       if (this.sceneManager) {
-        requestAnimationFrame(() => this.sceneManager.onResize());
+        requestAnimationFrame(() => {
+          this.sceneManager.onResize();
+          this.sceneManager.fitModelView();
+        });
       }
     }
 
@@ -1616,6 +1625,13 @@
 
     bindVerificationControls() {
       const dom = this._domCache || {};
+      if (dom.btnToggleHud && dom.viewportHudTop) {
+        dom.btnToggleHud.addEventListener('click', () => {
+          const isCollapsed = dom.viewportHudTop.classList.toggle('hud-collapsed');
+          dom.btnToggleHud.textContent = isCollapsed ? '👁️ Показати інфо' : '👁️ Інфо';
+          if (window.StudioSound) window.StudioSound.playPop(420);
+        });
+      }
       if (dom.verificationSelect) {
         dom.verificationSelect.addEventListener('change', () => {
           this.syncVerificationBadgeUI();
