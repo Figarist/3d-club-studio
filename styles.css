@@ -150,20 +150,20 @@ button {
 }
 
 /* ==========================================================================
-   ВЕРХНЯ ПАНЕЛЬ (ШАПКА СТУДІЇ)
+   ВЕРХНЯ ПАНЕЛЬ (АДАПТИВНА КОМАНДНА ШАПКА СТУДІЇ)
    ========================================================================== */
 
 .topbar {
-  min-height: 46px;
-  height: 46px;
-  background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 50%, #0f3460 100%);
-  border-bottom: 2px solid var(--surface2);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  min-height: 48px;
+  height: auto;
+  background: var(--header-bg);
+  border-bottom: var(--border-width-control) solid var(--surface2);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 12px;
-  z-index: 100;
+  padding: 5px 14px;
+  z-index: 80;
   gap: 10px;
   flex-shrink: 0;
   position: relative;
@@ -175,30 +175,33 @@ button {
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 .brand-logo {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: var(--r-md);
   background: var(--card);
-  border: 2px solid var(--surface2);
-  display: flex;
+  border: var(--border-width-control) solid var(--surface2);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 17px;
+  font-size: 18px;
   cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  transition: transform var(--transition-fast), border-color var(--transition-fast);
+  flex-shrink: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 2px 0 rgba(0, 0, 0, 0.28);
+  transition: transform var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
 }
 
 .brand-logo:hover {
-  transform: scale(1.08);
+  transform: scale(1.08) rotate(-8deg);
   border-color: var(--yellow);
+  background: var(--card-hover);
 }
 
 .brand-logo:active {
-  transform: scale(0.94);
+  transform: scale(0.94) rotate(6deg);
 }
 
 .brand-title-row {
@@ -210,10 +213,11 @@ button {
 .brand-title h1 {
   font-size: 14px;
   font-weight: 900;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
   color: var(--text-main);
   text-transform: uppercase;
   white-space: nowrap;
+  line-height: 1.1;
 }
 
 .brand-subtitle,
@@ -227,7 +231,7 @@ button {
 
 .version-pill {
   background: rgba(0, 210, 106, 0.16);
-  border: 2px solid var(--green);
+  border: var(--border-width-control) solid var(--green);
   color: var(--green);
   font-family: var(--font-mono);
   font-size: 10.5px;
@@ -235,33 +239,48 @@ button {
   padding: 1px 7px;
   border-radius: var(--r-pill);
   letter-spacing: 0.2px;
+  flex-shrink: 0;
 }
 
-/* --- ТАБИ ГЕНЕРАТОРІВ (СЕГМЕНТОВАНЕ ПЕРЕМИКАННЯ) --- */
+/* --- ТАБИ ГЕНЕРАТОРІВ (АДАПТИВНИЙ АРКАДНИЙ ДОК) --- */
 .gen-tabs {
   display: flex;
   align-items: center;
   background: var(--bg2);
   padding: 3px;
   border-radius: var(--r-pill);
-  border: 2px solid var(--surface2);
+  border: var(--border-width-control) solid var(--surface2);
   gap: 3px;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 .gen-tab-btn {
   background: transparent;
   color: var(--text-muted);
-  border: 2px solid transparent;
+  border: var(--border-width-control) solid transparent;
   border-radius: var(--r-pill);
   padding: 5px 11px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   transition: all var(--transition-fast);
   white-space: nowrap;
+  min-width: 0;
+}
+
+.gen-tab-ico {
+  flex-shrink: 0;
+  line-height: 1;
+  transition: transform var(--transition-fast);
+}
+
+.gen-tab-btn:hover .gen-tab-ico {
+  transform: scale(1.14) translateY(-1px);
 }
 
 .gen-tab-btn:hover {
@@ -273,8 +292,12 @@ button {
   background: var(--surface2);
   color: #fff;
   border-color: var(--cyan);
-  box-shadow: 0 2px 10px rgba(0, 210, 255, 0.25);
+  box-shadow: 0 2px 12px rgba(0, 210, 255, 0.28);
   font-weight: 800;
+}
+
+.gen-tab-btn.active .gen-tab-ico {
+  transform: scale(1.08);
 }
 
 .btn-missions-tab {
@@ -297,34 +320,46 @@ button {
   box-shadow: 0 0 12px rgba(255, 195, 18, 0.35);
 }
 
+/* --- АДАПТИВНІ ПІДПИСИ КНОПОК --- */
+.lbl-short {
+  display: none;
+}
+
+.btn-ico {
+  flex-shrink: 0;
+  line-height: 1;
+}
+
 /* --- СИСТЕМНІ ТА ІНСТРУМЕНТАЛЬНІ ДІЇ У ШАПЦІ --- */
 .top-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 .top-action-group {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   background: var(--bg2);
-  padding: 3px 6px;
+  padding: 3px 4px;
   border-radius: var(--r-pill);
-  border: 2px solid var(--surface2);
+  border: var(--border-width-control) solid var(--surface2);
 }
 
 .btn-action {
   background: var(--card);
   color: var(--text-secondary);
-  border: 2px solid var(--surface2);
+  border: var(--border-width-control) solid var(--surface2);
   border-radius: var(--r-pill);
-  padding: 5px 12px;
-  font-size: var(--text-sm);
+  padding: 5px 11px;
+  font-size: 12.5px;
   font-weight: 700;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
   transition: all var(--transition-fast);
   white-space: nowrap;
@@ -476,15 +511,16 @@ button {
 }
 
 
-/* --- ВИПАДНЕ МЕНЮ НАЛАШТУВАНЬ ТА ОПЦІЙ У ШАПЦІ --- */
-.menu-dropdown-wrapper {
+/* --- ВИПАДНІ МЕНЮ НАЛАШТУВАНЬ, ОПЦІЙ ТА ПЕРЕПОВНЕННЯ --- */
+.menu-dropdown-wrapper,
+.subbar-overflow-wrapper {
   position: relative;
 }
 
 .btn-menu-toggle {
-  background: var(--bg-card);
+  background: var(--card);
   color: var(--text-secondary);
-  border: 1px solid var(--border-subtle);
+  border: var(--border-width-control) solid var(--surface2);
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -493,30 +529,90 @@ button {
 
 .btn-menu-toggle:hover,
 .btn-menu-toggle.active {
-  background: var(--bg-card-hover);
+  background: var(--card-hover);
   color: var(--text-main);
-  border-color: var(--border-default);
+  border-color: var(--cyan);
 }
 
 .top-dropdown-menu {
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
-  min-width: 200px;
-  background: #0e1726;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55), 0 4px 10px rgba(0, 0, 0, 0.35);
+  min-width: 205px;
+  max-width: calc(100vw - 16px);
+  background: var(--surface);
+  border: var(--border-width-control) solid var(--surface2);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-lg);
   padding: 6px;
   display: none;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   z-index: 1000;
-  animation: dropdownFadeIn 0.15s ease-out;
+  animation: dropdownFadeIn 0.15s var(--ease-spring);
 }
 
 .top-dropdown-menu.show {
   display: flex;
+}
+
+/* Інструменти, що перенесені з робочої смуги в меню переповнення */
+.subbar-overflow-menu .view-btn,
+.subbar-overflow-menu .view-btn.btn-action {
+  width: 100%;
+  height: auto;
+  min-height: 36px;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 7px 12px;
+  font-size: var(--text-sm);
+  border-radius: var(--r-sm);
+  gap: 8px;
+}
+
+.subbar-overflow-menu .lbl-ext {
+  display: inline !important;
+}
+
+.btn-subbar-more {
+  background: var(--card);
+  color: var(--text2);
+  border: var(--border-width-control) solid var(--surface2);
+  padding: 2px 9px;
+}
+
+.btn-subbar-more:hover,
+.btn-subbar-more.active {
+  background: var(--card-hover);
+  color: var(--text);
+  border-color: var(--yellow);
+}
+
+.btn-subbar-more.has-active-tool {
+  border-color: var(--cyan);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(0, 210, 255, 0.25);
+}
+
+.overflow-count-badge {
+  background: var(--surface2);
+  color: var(--yellow);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  border-radius: var(--r-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.btn-subbar-more.has-active-tool .overflow-count-badge {
+  background: var(--cyan);
+  color: var(--on-cyan);
 }
 
 .dropdown-item {
@@ -593,24 +689,19 @@ button {
    ========================================================================== */
 
 .view-mode-bar {
-  min-height: 34px;
-  height: 34px;
+  min-height: 36px;
+  height: auto;
   background: var(--bg2);
-  border-bottom: 2px solid var(--surface2);
+  border-bottom: var(--border-width-control) solid var(--surface2);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 12px;
+  padding: 4px 14px;
   flex-shrink: 0;
   gap: 8px;
-  z-index: 25;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-}
-
-.view-mode-bar::-webkit-scrollbar {
-  display: none;
+  z-index: 60;
+  overflow: visible;
+  position: relative;
 }
 
 .workspace-bar-left,
@@ -619,19 +710,21 @@ button {
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 .workspace-bar-group {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
 }
 
 .bar-separator {
-  width: 1px;
+  width: 2px;
   height: 16px;
-  background: var(--border-subtle);
-  margin: 0 3px;
+  background: var(--surface2);
+  border-radius: var(--r-pill);
+  margin: 0 2px;
   flex-shrink: 0;
 }
 
@@ -642,7 +735,7 @@ button {
   background: var(--bg);
   padding: 2px 3px;
   border-radius: var(--r-pill);
-  border: 2px solid var(--surface2);
+  border: var(--border-width-control) solid var(--surface2);
 }
 
 .view-btn {
@@ -650,8 +743,8 @@ button {
   color: var(--text-muted);
   border: 1px solid transparent;
   border-radius: var(--r-pill);
-  padding: 2px 8px;
-  font-size: 11px;
+  padding: 3px 9px;
+  font-size: 11.5px;
   font-weight: 700;
   transition: all var(--transition-fast);
   display: inline-flex;
@@ -659,7 +752,7 @@ button {
   gap: 4px;
   white-space: nowrap;
   cursor: pointer;
-  height: 24px;
+  height: 25px;
   line-height: 1;
 }
 
@@ -677,29 +770,66 @@ button {
 
 .view-btn.btn-action {
   border-radius: var(--r-pill);
-  padding: 2px 8px;
-  font-size: 11px;
-  height: 24px;
+  border-width: var(--border-width-control);
+  padding: 3px 9px;
+  font-size: 11.5px;
+  height: 25px;
 }
 
 .view-btn.btn-missions-tab {
   border-radius: var(--r-pill);
-  padding: 2px 9px;
-  font-size: 11px;
-  height: 24px;
+  border-width: var(--border-width-control);
+  padding: 3px 10px;
+  font-size: 11.5px;
+  height: 25px;
 }
 
 .autosave-tag {
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--text-dim);
-  display: flex;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 2px 6px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: var(--radius-xs);
-  border: 1px solid transparent;
+  gap: 5px;
+  padding: 3px 9px;
+  height: 25px;
+  background: rgba(0, 210, 106, 0.08);
+  border-radius: var(--r-pill);
+  border: 1px solid rgba(0, 210, 106, 0.28);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.autosave-tag:hover {
+  background: rgba(0, 210, 106, 0.16);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.autosave-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--r-pill);
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  flex-shrink: 0;
+}
+
+.autosave-full {
+  display: none;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+@keyframes autosavePulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 210, 106, 0.55); }
+  100% { box-shadow: 0 0 0 8px rgba(0, 210, 106, 0); }
+}
+
+.autosave-tag.pulse-saved {
+  animation: autosavePulse 0.65s ease-out;
 }
 
 /* ==========================================================================
@@ -1566,9 +1696,10 @@ select:focus, input[type="text"]:focus {
   left: 12px;
   right: 12px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 12px;
+  gap: 8px 12px;
   pointer-events: none;
   z-index: 15;
 }
@@ -1585,13 +1716,17 @@ select:focus, input[type="text"]:focus {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  max-width: 100%;
 }
 
 .hud-top-right-group {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
+  justify-content: flex-end;
   gap: 8px;
   pointer-events: auto;
+  max-width: 100%;
 }
 
 .hud-toggle-btn {
@@ -1624,14 +1759,15 @@ select:focus, input[type="text"]:focus {
 }
 
 #model-dimensions-badge {
-  min-width: 240px;
+  min-width: 0;
 }
 
 .hud-dim-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px 8px;
 }
 
 .hud-status-chip {
@@ -1639,6 +1775,7 @@ select:focus, input[type="text"]:focus {
   font-weight: 700;
   padding: 1px 7px;
   border-radius: var(--radius-full);
+  white-space: nowrap;
 }
 .chip-ok { background: var(--status-ok-bg); color: var(--status-ok); border: 1px solid rgba(34, 197, 94, 0.3); }
 .chip-warn { background: var(--status-warn-bg); color: var(--status-warn); border: 1px solid rgba(245, 158, 11, 0.3); }
@@ -1648,6 +1785,7 @@ select:focus, input[type="text"]:focus {
   font-size: var(--text-xs);
   color: var(--accent-sky);
   font-family: var(--font-mono);
+  white-space: nowrap;
 }
 
 .hud-dim-primary {
@@ -1763,8 +1901,10 @@ select:focus, input[type="text"]:focus {
   left: 12px;
   right: 12px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-end;
+  gap: 8px;
   pointer-events: none;
   z-index: 15;
 }
@@ -1777,8 +1917,10 @@ select:focus, input[type="text"]:focus {
   border-radius: var(--radius-md);
   padding: 4px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 4px;
+  max-width: 100%;
   box-shadow: var(--shadow-md);
   pointer-events: auto;
 }
@@ -1881,7 +2023,7 @@ select:focus, input[type="text"]:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: 200;
   padding: 20px;
 }
 
@@ -2670,72 +2812,74 @@ select:focus, input[type="text"]:focus {
 }
 
 /* ==========================================================================
-   АДАПТИВНІСТЬ ТА ШКІЛЬНІ ЕКРАНИ
+   АДАПТИВНІСТЬ ТА ШКІЛЬНІ ЕКРАНИ (ПОВНА РЕСПОНСИВНІСТЬ 320px – 2560px)
    ========================================================================== */
 
-/* 1. Шкільний проєктор / Desktop: 1920 × 1080 */
+/* 1. Шкільний проєктор / Широкий Desktop: >= 1520px */
+@media (min-width: 1520px) {
+  .autosave-full {
+    display: inline;
+  }
+}
+
 @media (min-width: 1600px) {
   .sidebar {
     width: 480px;
     padding: 16px 20px;
   }
   .brand-title h1 {
-    font-size: 17px;
+    font-size: 16.5px;
   }
   .gen-tab-btn {
-    padding: 8px 14px;
+    padding: 7px 14px;
     font-size: var(--text-base);
   }
 }
 
-/* 2. Великі лептопи та планшети у ландшафті: < 1550px */
-@media (max-width: 1550px) {
-  .brand-subtitle {
+/* 2. Великі лептопи та стандартні монітори: <= 1480px */
+@media (max-width: 1480px) {
+  .lbl-extra {
     display: none;
   }
+  .brand-subtitle,
   .about-pill-btn {
     display: none;
-  }
-  .gen-tab-btn {
-    padding: 6px 10px;
-    font-size: var(--text-xs);
-  }
-  .btn-action {
-    padding: 5px 8px;
-    font-size: var(--text-xs);
   }
 }
 
 /* 3. Типовий ноутбук учня/вчителя: 1366 × 768 */
 @media (max-width: 1366px) {
   .topbar {
-    padding: 0 12px;
+    padding: 4px 12px;
     gap: 8px;
-    height: 48px;
-    min-height: 48px;
   }
   .brand-title h1 {
     font-size: 13.5px;
   }
   .sidebar {
-    width: 360px;
-    min-width: 320px;
+    width: 356px;
+    min-width: 310px;
   }
   .step-arrow {
     display: none;
   }
   .step-btn {
-    padding: 4px 2px;
+    flex-direction: column;
+    gap: 2px;
+    padding: 5px 3px;
+    font-size: 11px;
+  }
+  .step-num {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
   }
   .hud-dim-meta {
     display: none;
   }
-  #model-dimensions-badge {
-    min-width: 190px;
-  }
   .gen-tab-btn {
-    padding: 5px 8px;
-    font-size: 11.5px;
+    padding: 5px 9px;
+    font-size: 12px;
     gap: 4px;
   }
   .top-action-group {
@@ -2743,62 +2887,48 @@ select:focus, input[type="text"]:focus {
     gap: 2px;
   }
   .btn-action {
-    padding: 4px 7px;
-    font-size: 11.5px;
+    padding: 4px 8px;
+    font-size: 12px;
     gap: 4px;
   }
   .top-actions {
-    gap: 4px;
+    gap: 5px;
   }
   .view-mode-bar {
-    padding: 0 12px;
+    padding: 4px 12px;
   }
-  .view-btn {
-    padding: 3px 7px;
-    font-size: 11.5px;
+  .view-btn,
+  .view-btn.btn-action,
+  .view-btn.btn-missions-tab {
+    padding: 3px 8px;
+    font-size: 11px;
   }
 }
 
-/* 4. Планшет / Інтерактивна дошка / Вузьке вікно: <= 1120px */
-@media (max-width: 1120px) {
-  .topbar {
-    height: 48px;
-    min-height: 48px;
-    padding: 0 10px;
-    gap: 6px;
-  }
-  .brand {
-    flex-shrink: 0;
-  }
-  .brand-title h1 {
-    font-size: 12.5px;
-  }
-  .gen-tab-btn {
-    padding: 4px 6px;
-    font-size: 11px;
-    gap: 3px;
-  }
-  .btn-action {
-    padding: 4px 6px;
-    font-size: 11px;
-    gap: 3px;
-  }
-  .top-actions {
-    gap: 3px;
-  }
-  .view-mode-bar {
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 0 10px;
-    gap: 6px;
-    scrollbar-width: none;
-  }
-  .view-mode-bar::-webkit-scrollbar {
+/* 4. Планшет у ландшафті / Шкільний екран 1024 × 768: <= 1260px */
+@media (max-width: 1260px) {
+  .brand-name-extra,
+  .lbl-ext {
     display: none;
+  }
+}
+
+@media (max-width: 1180px) {
+  .top-project-group .btn-lbl {
+    display: none;
+  }
+  .top-project-group .btn-action {
+    padding: 4px 8px;
+  }
+  .view-mode-group .lbl-full {
+    display: none;
+  }
+  .view-mode-group .lbl-short {
+    display: inline;
   }
   .sidebar {
     width: 330px;
-    min-width: 290px;
+    min-width: 285px;
   }
   .viewport-hud-top {
     top: 8px;
@@ -2807,13 +2937,13 @@ select:focus, input[type="text"]:focus {
     gap: 6px;
   }
   .hud-badge {
-    padding: 5px 8px;
+    padding: 6px 9px;
   }
   .hud-dim-primary {
     font-size: 14px;
   }
-  #model-dimensions-badge {
-    min-width: 170px;
+  .geom-check-pill {
+    white-space: normal;
   }
   .cam-btn {
     padding: 4px 7px;
@@ -2828,77 +2958,63 @@ select:focus, input[type="text"]:focus {
   }
 }
 
-/* Квадратний аспект екрана або портретні пропорції (<= 1.33) */
-@media (max-aspect-ratio: 4/3) {
-  .sidebar {
-    width: 330px;
-    min-width: 280px;
-  }
+/* 5. Звужене вікно / Інтерактивна дошка / Половина екрана: <= 960px */
+@media (max-width: 960px) {
   .topbar {
-    padding: 0 8px;
-    gap: 6px;
+    flex-wrap: wrap;
+    padding: 6px 10px;
+    row-gap: 6px;
+    column-gap: 8px;
+  }
+  .brand {
+    order: 1;
+    margin-right: auto;
+  }
+  .top-actions {
+    order: 2;
+    gap: 4px;
   }
   .gen-tabs {
-    gap: 2px;
-    padding: 2px;
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    border-radius: var(--r-md);
+    padding: 3px;
   }
   .gen-tab-btn {
-    padding: 4px 7px;
-    font-size: 11px;
-    gap: 3px;
+    flex: 1 1 0;
+    justify-content: center;
+    padding: 6px 6px;
+    font-size: 12px;
   }
-  .btn-action {
-    padding: 4px 6px;
-    font-size: 11px;
+  .view-mode-bar {
+    padding: 4px 10px;
+    gap: 6px;
   }
-  .step-arrow {
-    display: none;
+}
+
+/* Квадратний аспект або портретні пропорції (<= 1.33) на великих екранах */
+@media (max-aspect-ratio: 4/3) {
+  .sidebar {
+    width: 325px;
+    min-width: 275px;
   }
   .hud-dim-meta {
     display: none;
-  }
-  #model-dimensions-badge {
-    min-width: 170px;
   }
   .author-corner-badge {
     display: none;
   }
 }
 
-/* 5. Мобільний огляд: 390 × 844 */
+/* 6. Планшет портрет / Мобільний: <= 768px */
 @media (max-width: 768px) {
-  .topbar {
-    flex-direction: column;
-    align-items: stretch;
-    height: auto;
-    min-height: 48px;
-    padding: 8px;
-    gap: 8px;
-  }
-  .brand {
-    justify-content: space-between;
-    width: 100%;
-  }
-  .gen-tabs {
-    width: 100%;
-    overflow-x: auto;
-    justify-content: flex-start;
-    padding: 4px;
-  }
-  .top-actions {
-    overflow-x: visible;
-    width: 100%;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 4px;
-  }
   .view-mode-bar {
-    overflow-x: auto;
-    overflow-y: hidden;
     padding: 4px 8px;
-    height: auto;
-    min-height: 38px;
-    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .btn-badge-num {
+    display: none;
   }
   .workspace {
     flex-direction: column;
@@ -2924,12 +3040,78 @@ select:focus, input[type="text"]:focus {
     right: 8px;
     left: 8px;
   }
+  .hud-top-right-group {
+    justify-content: flex-start;
+  }
   .viewport-hud-bottom {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
     left: 8px;
     right: 8px;
+  }
+}
+
+/* 7. Смартфони (390 × 844 і вужче): <= 540px */
+@media (max-width: 540px) {
+  .topbar {
+    padding: 6px 8px;
+    row-gap: 6px;
+  }
+  .brand-logo {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+  }
+  .brand-title h1 {
+    font-size: 12.5px;
+  }
+  #btn-top-menu .btn-lbl {
+    display: none;
+  }
+  .top-actions {
+    gap: 3px;
+  }
+  .btn-action {
+    padding: 4px 7px;
+    font-size: 11.5px;
+  }
+  .btn-history {
+    padding: 4px 6px;
+    font-size: 12.5px;
+  }
+  .gen-tabs {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 2px;
+    padding: 3px;
+  }
+  .gen-tab-btn {
+    flex-direction: column;
+    gap: 2px;
+    padding: 5px 2px;
+    font-size: 10px;
+    border-radius: var(--r-sm);
+    min-height: 42px;
+  }
+  .gen-tab-ico {
+    font-size: 15px;
+  }
+  .gen-tab-lbl {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 460px) {
+  .brand-name-lead,
+  .version-pill,
+  .autosave-short {
+    display: none;
+  }
+  .autosave-tag {
+    padding: 3px 7px;
   }
 }
 

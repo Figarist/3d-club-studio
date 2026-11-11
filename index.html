@@ -58,41 +58,46 @@
   </script>
 
   <link rel="stylesheet" href="vendor/friendly-arcade/tokens.css" />
-  <link rel="stylesheet" href="styles.css?v=2.1.0" />
+  <link rel="stylesheet" href="styles.css?v=2.2.0" />
   <link rel="stylesheet" href="adventure-shelf.css" />
   <link rel="stylesheet" href="pixel-editor-tools.css" />
   <link rel="stylesheet" href="lesson-companion.css" />
 </head>
 <body>
 
-  <!-- ВЕРХНЯ ПАНЕЛЬ (ШАПКА СТУДІЇ) -->
-  <header class="topbar">
+  <!-- ВЕРХНЯ ПАНЕЛЬ (АДАПТИВНА КОМАНДНА ШАПКА СТУДІЇ) -->
+  <header class="topbar" id="studio-topbar">
     <div class="brand">
-      <div class="brand-logo" title="Дзенькнути молотом по ковадлу! ⚒️">⚒️</div>
+      <button type="button" class="brand-logo" title="Дзенькнути молотом по ковадлу! ⚒️" aria-label="3D Кузня Чудес — дзенькнути молотом по ковадлу">⚒️</button>
       <div class="brand-title">
         <div class="brand-title-row">
-          <h1>3D КУЗНЯ ЧУДЕС</h1>
+          <h1><span class="brand-name-lead">3D </span><span class="brand-name-main">КУЗНЯ</span><span class="brand-name-extra"> ЧУДЕС</span></h1>
           <span id="app-version-pill" class="version-pill" title="Версія програми: v2.2.0">v2.2.0</span>
         </div>
       </div>
     </div>
 
-    <!-- ПЕРЕМИКАЧ 5 ГЕНЕРАТОРІВ (КОМПАКТНІ ПІГУЛКИ) -->
+    <!-- ПЕРЕМИКАЧ 5 ГЕНЕРАТОРІВ (АДАПТИВНИЙ АРКАДНИЙ ДОК) -->
     <nav class="gen-tabs" aria-label="3D Генератори">
       <button class="gen-tab-btn active" data-tab="minecraft" title="Майнкрафт-Кузня: створення воксельних моделей, значків і підставок">
-        ⛏️ Кузня
+        <span class="gen-tab-ico" aria-hidden="true">⛏️</span>
+        <span class="gen-tab-lbl">Кузня</span>
       </button>
       <button class="gen-tab-btn" data-tab="illusion" title="Оптичний Перевертень: два слова в одному суцільному 3D-тілі">
-        🔮 Ілюзія
+        <span class="gen-tab-ico" aria-hidden="true">🔮</span>
+        <span class="gen-tab-lbl">Ілюзія</span>
       </button>
       <button class="gen-tab-btn" data-tab="physics" title="Катапульта і Баланс: фізичні механізми з пружиною чи балансиром">
-        🎯 Механіка
+        <span class="gen-tab-ico" aria-hidden="true">🎯</span>
+        <span class="gen-tab-lbl">Механіка</span>
       </button>
       <button class="gen-tab-btn" data-tab="mob" title="Мутатор Мобів: конструктор ігрових персонажів та бойових мобів">
-        👾 Моби
+        <span class="gen-tab-ico" aria-hidden="true">👾</span>
+        <span class="gen-tab-lbl">Моби</span>
       </button>
       <button class="gen-tab-btn" data-tab="heightmap" title="Фото-Барельєф: перетворення фото чи значка на рельєфний STL">
-        🖼️ Барельєф
+        <span class="gen-tab-ico" aria-hidden="true">🖼️</span>
+        <span class="gen-tab-lbl">Барельєф</span>
       </button>
     </nav>
 
@@ -101,35 +106,40 @@
       <!-- Група: Історія дій -->
       <div class="top-action-group" aria-label="Історія дій">
         <button id="btn-undo" class="btn-action btn-history" title="Скасувати останню дію (Ctrl+Z)" aria-label="Скасувати останню дію">
-          ↩️
+          <span aria-hidden="true">↩️</span>
         </button>
         <button id="btn-redo" class="btn-action btn-history" title="Повернути скасовану дію (Ctrl+Y)" aria-label="Повернути скасовану дію">
-          ↪️
+          <span aria-hidden="true">↪️</span>
         </button>
       </div>
 
       <!-- Група: Проєкт -->
-      <div class="top-action-group" aria-label="Файли проєкту">
-        <button id="btn-save-project" class="btn-action btn-project" title="Зберегти проєкт у .json (Ctrl+S)">
-          📥 Зберегти
+      <div class="top-action-group top-project-group" aria-label="Файли проєкту">
+        <button id="btn-save-project" class="btn-action btn-project" title="Зберегти проєкт у .json (Ctrl+S)" aria-label="Зберегти проєкт у .json">
+          <span class="btn-ico" aria-hidden="true">📥</span>
+          <span class="btn-lbl">Зберегти</span>
         </button>
-        <button id="btn-load-project" class="btn-action btn-project" title="Відкрити файл .json">
-          📂 Відкрити
+        <button id="btn-load-project" class="btn-action btn-project" title="Відкрити файл проєкту .json" aria-label="Відкрити файл проєкту .json">
+          <span class="btn-ico" aria-hidden="true">📂</span>
+          <span class="btn-lbl">Відкрити</span>
         </button>
         <input id="input-load-project" type="file" accept=".json" style="display:none;" aria-hidden="true" />
       </div>
 
       <!-- Група: Головний експорт для 3D-друку -->
-      <div class="top-action-group" aria-label="Головний експорт">
+      <div class="top-action-group top-export-group" aria-label="Головний експорт">
         <button id="btn-export-stl" class="btn-action btn-export" title="Експортувати бінарний .STL для слайсера 3D-принтера">
-          💾 .STL
+          <span class="btn-ico" aria-hidden="true">💾</span>
+          <span class="btn-lbl"><span class="lbl-extra">Експорт </span>.STL</span>
         </button>
       </div>
 
       <!-- Група: Меню опцій (звук, музика, мутація, інформація) -->
       <div class="top-action-group menu-dropdown-wrapper">
-        <button id="btn-top-menu" class="btn-action btn-menu-toggle" aria-haspopup="true" aria-expanded="false" title="Додаткові опції: Звук, Музика, Мутація, Інформація">
-          ⚙️ Опції ▾
+        <button id="btn-top-menu" class="btn-action btn-menu-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="top-dropdown-menu" title="Додаткові опції: Звук, Музика, Мутація, Інформація" aria-label="Додаткові опції">
+          <span class="btn-ico" aria-hidden="true">⚙️</span>
+          <span class="btn-lbl">Опції</span>
+          <span class="btn-caret" aria-hidden="true">▾</span>
         </button>
         <div id="top-dropdown-menu" class="top-dropdown-menu" role="menu" aria-label="Додаткові опції студії">
           <button id="btn-random-wow" class="dropdown-item btn-action btn-random" role="menuitem" title="Випадкова генерація / Мутація!">
@@ -156,46 +166,71 @@
     <div class="workspace-bar-left">
       <div class="workspace-bar-group" aria-label="Навчання в гуртку">
         <button id="btn-open-missions" class="view-btn btn-missions-tab" title="Відкрити каталог навчальних місій гуртка (72 місії для 2–6 класів)">
-          🗺️ Місії (72)
+          <span class="btn-ico" aria-hidden="true">🗺️</span>
+          <span class="btn-lbl">Місії <span class="btn-badge-num" data-missions-count>(72)</span></span>
         </button>
         <button id="btn-open-lesson" class="view-btn btn-missions-tab" title="План години, таймер та творчі виклики для гуртка">
-          ⏱️ Заняття
+          <span class="btn-ico" aria-hidden="true">⏱️</span>
+          <span class="btn-lbl">Заняття</span>
         </button>
       </div>
 
       <div class="bar-separator" aria-hidden="true"></div>
 
       <div class="view-mode-group" aria-label="Режим робочого простору">
-        <button class="view-btn active" data-view-mode="split" title="Редактор ліворуч, 3D сцена праворуч">🌗 Редактор + 3D</button>
-        <button class="view-btn" data-view-mode="viewport" title="Тільки 3D сцена для проєктора або демонстрації">🧊 Тільки 3D</button>
+        <button class="view-btn active" data-view-mode="split" title="Редактор ліворуч, 3D сцена праворуч">
+          <span class="btn-ico" aria-hidden="true">🌗</span>
+          <span class="btn-lbl"><span class="lbl-full">Редактор + 3D</span><span class="lbl-short">Спліт</span></span>
+        </button>
+        <button class="view-btn" data-view-mode="viewport" title="Тільки 3D сцена для проєктора або демонстрації">
+          <span class="btn-ico" aria-hidden="true">🧊</span>
+          <span class="btn-lbl"><span class="lbl-full">Тільки 3D</span><span class="lbl-short">3D</span></span>
+        </button>
       </div>
     </div>
 
-    <!-- Права частина: Контроль якості, підготовка друку та автозбереження -->
+    <!-- Права частина: Контроль якості, підготовка друку (Priority+ адаптивна) та автозбереження -->
     <div class="workspace-bar-right">
-      <div class="workspace-bar-group" aria-label="Перевірка та підготовка до 3D-друку">
+      <div id="workspace-tools-group" class="workspace-bar-group workspace-tools-group" aria-label="Перевірка та підготовка до 3D-друку">
         <button id="btn-toggle-mono" class="view-btn btn-action btn-mono" title="Перемкнути: кольори прев'ю чи реальний вигляд одним пластиком">
-          🪨 1 Пластик
+          <span class="btn-ico" aria-hidden="true">🪨</span>
+          <span class="btn-lbl">1 Пластик</span>
         </button>
         <button id="btn-snapshot-v1" class="view-btn btn-action btn-v1" title="Зафіксувати поточну модель як Версію 1 (Ескіз)">
-          📸 V1 (Ескіз)
+          <span class="btn-ico" aria-hidden="true">📸</span>
+          <span class="btn-lbl">V1 <span class="lbl-ext">(Ескіз)</span></span>
         </button>
         <button id="btn-compare-v1v2" class="view-btn btn-action btn-v1" title="Порівняння поступу: V1 (Ескіз) ↔ V2 (Фінал)" style="display:none;">
-          ⚖️ V1 ↔ V2
+          <span class="btn-ico" aria-hidden="true">⚖️</span>
+          <span class="btn-lbl">V1 ↔ V2</span>
         </button>
         <button id="btn-print-card" class="view-btn btn-action btn-card" title="Створити картку для черги 3D-друку (Паспорт деталі)">
-          📋 Паспорт
+          <span class="btn-ico" aria-hidden="true">📋</span>
+          <span class="btn-lbl">Паспорт</span>
         </button>
         <button id="btn-simulate-print" class="view-btn btn-action btn-sim" title="Симуляція пошарового друку для FDM-принтера">
-          🔥 Симуляція
+          <span class="btn-ico" aria-hidden="true">🔥</span>
+          <span class="btn-lbl">Симуляція</span>
         </button>
       </div>
 
-      <div class="bar-separator" aria-hidden="true"></div>
-
-      <div id="autosave-tag" class="autosave-tag" title="Стан автоматично зберігається у пам'яті браузера">
-        💾 Авто
+      <div id="subbar-overflow-wrapper" class="subbar-overflow-wrapper" hidden>
+        <button type="button" id="btn-subbar-overflow" class="view-btn btn-action btn-subbar-more" aria-haspopup="true" aria-expanded="false" aria-controls="subbar-overflow-menu" title="Ще інструменти перевірки та друку">
+          <span class="btn-ico" aria-hidden="true">🧰</span>
+          <span class="btn-lbl">Ще</span>
+          <span id="subbar-overflow-count" class="overflow-count-badge">0</span>
+          <span class="btn-caret" aria-hidden="true">▾</span>
+        </button>
+        <div id="subbar-overflow-menu" class="top-dropdown-menu subbar-overflow-menu" role="menu" aria-label="Додаткові інструменти панелі"></div>
       </div>
+
+      <div id="subbar-tools-separator" class="bar-separator" aria-hidden="true"></div>
+
+      <button type="button" id="autosave-tag" class="autosave-tag" title="Стан автоматично зберігається у пам'яті браузера">
+        <span class="autosave-dot" aria-hidden="true"></span>
+        <span class="autosave-short">Авто</span>
+        <span class="autosave-full"></span>
+      </button>
     </div>
   </div>
 
@@ -1236,6 +1271,7 @@
   <script src="src/pixelEditorTools.js?v=2.2.0"></script>
   <script src="src/lessonCompanion.js?v=2.2.0"></script>
   <script src="src/sceneManager.js?v=2.2.0"></script>
+  <script src="src/responsiveToolbar.js?v=2.2.0"></script>
   <script src="src/app.js?v=2.2.0"></script>
 </body>
 </html>
