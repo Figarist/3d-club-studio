@@ -156,8 +156,10 @@
         hmFileInput: document.getElementById('hm-file-input'),
         hmPreviewCanvas: document.getElementById('hm-preview-canvas'),
         hmInvert: document.getElementById('hm-invert'),
+        hmAutoLevels: document.getElementById('hm-auto-levels'),
         hmContrast: document.getElementById('hm-contrast'),
         hmBrightness: document.getElementById('hm-brightness'),
+        hmGamma: document.getElementById('hm-gamma'),
         hmSmooth: document.getElementById('hm-smooth'),
         hmWidth: document.getElementById('hm-width'),
         hmReliefHeight: document.getElementById('hm-relief-height'),
@@ -168,10 +170,12 @@
         hmKeychain: document.getElementById('hm-keychain'),
         valHmContrast: document.getElementById('val-hm-contrast'),
         valHmBrightness: document.getElementById('val-hm-brightness'),
+        valHmGamma: document.getElementById('val-hm-gamma'),
         valHmSmooth: document.getElementById('val-hm-smooth'),
         valHmWidth: document.getElementById('val-hm-width'),
         valHmReliefHeight: document.getElementById('val-hm-relief-height'),
         valHmBaseThickness: document.getElementById('val-hm-base-thickness'),
+        hmGeomCheck: document.getElementById('hm-geom-check'),
 
         // V1 та Порівняння V1 ↔ V2
         btnSnapshotV1: document.getElementById('btn-snapshot-v1'),
@@ -282,7 +286,7 @@
       const savedPair = this.safeStorage.getItem('3d_kuznya_pair_code') || '';
       return {
         app: '3d-club-studio',
-        version: '2.1.0',
+        version: '2.2.0',
         schemaVersion: 1,
         savedAt: new Date().toISOString(),
         activeTab: this.activeTab,
@@ -333,8 +337,10 @@
           phDesign: dom.phDesign?.value || 'classic',
           hmPreset: this.heightmapGen ? this.heightmapGen.currentPresetKey : 'cat',
           hmInvert: dom.hmInvert ? !!dom.hmInvert.checked : false,
+          hmAutoLevels: dom.hmAutoLevels ? !!dom.hmAutoLevels.checked : true,
           hmContrast: dom.hmContrast?.value || '1',
           hmBrightness: dom.hmBrightness?.value || '0',
+          hmGamma: dom.hmGamma?.value || '1',
           hmSmooth: dom.hmSmooth?.value || '0',
           hmWidth: dom.hmWidth?.value || '60',
           hmReliefHeight: dom.hmReliefHeight?.value || '3.5',
@@ -433,8 +439,10 @@
         ['mobDesign', 'ilDesign', 'phDesign'].forEach(key => setVal(dom[key], c[key], 'classic'));
 
         setChk(dom.hmInvert, c.hmInvert, false);
+        setChk(dom.hmAutoLevels, c.hmAutoLevels, true);
         setVal(dom.hmContrast, c.hmContrast, '1');
         setVal(dom.hmBrightness, c.hmBrightness, '0');
+        setVal(dom.hmGamma, c.hmGamma, '1');
         setVal(dom.hmSmooth, c.hmSmooth, '0');
         setVal(dom.hmWidth, c.hmWidth, '60');
         setVal(dom.hmReliefHeight, c.hmReliefHeight, '3.5');
@@ -1677,21 +1685,45 @@
       if (!triggerAction) return;
 
       const dom = this._domCache || {};
+      const isHeightmap = (this.activeTab === 'heightmap');
+
       if (stepNum === 1) {
         if (window.StudioSound) window.StudioSound.playPop(380);
-        const target = document.querySelector('.panel-section.active .card') || document.getElementById('adventure-shelf');
-        target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (isHeightmap) {
+          const target = dom.hmDropzone || document.querySelector('#panel-heightmap .card');
+          target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          this.showToast('🖼️ Крок 1: Завантаж картинку або обери дитячий значок нижче.');
+        } else {
+          const target = document.querySelector('.panel-section.active .card') || document.getElementById('adventure-shelf');
+          target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       } else if (stepNum === 2) {
         if (window.StudioSound) window.StudioSound.playPop(440);
-        const target = document.querySelector('.panel-section.active .pixel-grid-wrapper') ||
-                       document.querySelector('.panel-section.active .card:nth-of-type(2)');
-        target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (isHeightmap) {
+          const target = document.querySelector('#panel-heightmap .collapsible-card') ||
+                         document.querySelector('#panel-heightmap .card:nth-of-type(3)');
+          target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          this.showToast('🎛️ Крок 2: Налаштуй чіткість, контраст і розміри під свій 3D-принтер.');
+        } else {
+          const target = document.querySelector('.panel-section.active .pixel-grid-wrapper') ||
+                         document.querySelector('.panel-section.active .card:nth-of-type(2)');
+          target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       } else if (stepNum === 3) {
         if (window.StudioSound) window.StudioSound.playPop(520);
         this.setMonochromeMode(true);
-        const target = dom.mcConnectivityStatus || dom.geomCheckPill;
-        target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        this.showToast('🔍 Перевірка: поглянь чи деталі з\'єднані та як модель виглядає одним пластиком.');
+        if (this.sceneManager) {
+          this.sceneManager.setCameraView('iso');
+        }
+        if (isHeightmap) {
+          const target = dom.hmGeomCheck || dom.geomCheckPill;
+          target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          this.showToast('🔍 Крок 3: Перевір вигляд одним пластиком і монолітність оболонки.');
+        } else {
+          const target = dom.mcConnectivityStatus || dom.geomCheckPill;
+          target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          this.showToast('🔍 Перевірка: поглянь чи деталі з\'єднані та як модель виглядає одним пластиком.');
+        }
       } else if (stepNum === 4) {
         if (window.StudioSound) window.StudioSound.playPop(620);
         const btnExport = dom.btnExportStl || document.getElementById('btn-export-stl');
@@ -1701,7 +1733,11 @@
           btnExport.classList.add('pulse-highlight');
           setTimeout(() => btnExport.classList.remove('pulse-highlight'), 2600);
         }
-        this.showToast('🚀 Модель готова! Натисни зелену кнопку «Експорт STL» угорі.');
+        if (isHeightmap) {
+          this.showToast('🚀 Фото-барельєф готовий! Натисни зелену кнопку «Експорт STL» угорі.');
+        } else {
+          this.showToast('🚀 Модель готова! Натисни зелену кнопку «Експорт STL» угорі.');
+        }
       }
     }
 
@@ -2097,7 +2133,7 @@
 
       // Слухачі налаштувань
       const ids = [
-        'hm-invert', 'hm-contrast', 'hm-brightness', 'hm-smooth',
+        'hm-invert', 'hm-auto-levels', 'hm-contrast', 'hm-brightness', 'hm-gamma', 'hm-smooth',
         'hm-width', 'hm-relief-height', 'hm-base-thickness',
         'hm-shape', 'hm-resolution', 'hm-frame', 'hm-keychain'
       ];
@@ -2125,10 +2161,38 @@
       if (!dom.hmPreviewCanvas || !this.heightmapGen) return;
       this.heightmapGen.render2DPreview(dom.hmPreviewCanvas, {
         invert: dom.hmInvert?.checked,
+        autoLevels: dom.hmAutoLevels ? dom.hmAutoLevels.checked : true,
         contrast: dom.hmContrast?.value,
         brightness: dom.hmBrightness?.value,
+        gamma: dom.hmGamma?.value,
         smooth: dom.hmSmooth?.value
       });
+    }
+
+    updateHeightmapMeshValidation(group) {
+      const dom = this._domCache || {};
+      if (!dom.hmGeomCheck) return;
+      if (!window.MeshValidator || !group) {
+        dom.hmGeomCheck.className = 'connectivity-pill bridged';
+        dom.hmGeomCheck.textContent = '🛡️ Модель сформовано';
+        return;
+      }
+
+      const res = window.MeshValidator.analyze(group);
+      if (res.ok) {
+        dom.hmGeomCheck.className = 'connectivity-pill';
+        dom.hmGeomCheck.textContent = `🛡️ Монолітна суцільна оболонка (${res.triangles} поліг.) ✅`;
+        dom.hmGeomCheck.title = 'Модель замкнена, не має дірок і повністю готова до слайсера (Cura / PrusaSlicer)';
+      } else {
+        dom.hmGeomCheck.className = 'connectivity-pill warn';
+        if (!res.isWatertight) {
+          dom.hmGeomCheck.textContent = `⚠️ Незамкнена оболонка (дірки: ${res.boundaryEdges})`;
+        } else if (!res.hasConsistentNormals) {
+          dom.hmGeomCheck.textContent = `⚠️ Вивернуті грані (${res.flippedEdges})`;
+        } else {
+          dom.hmGeomCheck.textContent = '⚠️ Потребує перевірки';
+        }
+      }
     }
 
     _playControlFeedback(el) {
@@ -2174,6 +2238,9 @@
       }
       if (dom.valHmBrightness && dom.hmBrightness) {
         dom.valHmBrightness.textContent = dom.hmBrightness.value;
+      }
+      if (dom.valHmGamma && dom.hmGamma) {
+        dom.valHmGamma.textContent = Number(dom.hmGamma.value).toFixed(1);
       }
       if (dom.valHmSmooth && dom.hmSmooth) {
         dom.valHmSmooth.textContent = dom.hmSmooth.value === '0' ? 'Вимк' : dom.hmSmooth.value + ' px';
@@ -2324,8 +2391,10 @@
       } else if (this.activeTab === 'heightmap') {
         group = this.heightmapGen.build3D({
           invert: dom.hmInvert ? dom.hmInvert.checked : false,
+          autoLevels: dom.hmAutoLevels ? dom.hmAutoLevels.checked : true,
           contrast: dom.hmContrast?.value || '1',
           brightness: dom.hmBrightness?.value || '0',
+          gamma: dom.hmGamma?.value || '1',
           smooth: dom.hmSmooth?.value || '0',
           width: dom.hmWidth?.value || '60',
           reliefHeight: dom.hmReliefHeight?.value || '3.5',
@@ -2336,6 +2405,7 @@
           keychain: dom.hmKeychain ? dom.hmKeychain.checked : false
         });
         this.updateHeightmapPreview2D();
+        this.updateHeightmapMeshValidation(group);
       }
 
       if (group) {
