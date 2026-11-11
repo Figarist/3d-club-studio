@@ -44,7 +44,6 @@
       this.slicerMaxY = 40;
       this.clipPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 500);
       this.nozzleMesh = null;
-      this.sliceCapMesh = null;
       this._simLayerIndex = 0;
       this._simTotalLayers = 1;
       this._simLastPtIdx = -1;
@@ -315,21 +314,6 @@
       group.visible = false;
       this.nozzleMesh = group;
       this.scene.add(this.nozzleMesh);
-
-      // 5. Динамічний суцільний свіжий шар пластику на розрізі (Solid Hot Slice Cap)
-      const capGeo = new THREE.PlaneGeometry(210, 210);
-      capGeo.rotateX(-Math.PI / 2);
-      const capMat = new THREE.MeshStandardMaterial({
-        color: 0xcfd6df, // Відтінок свіжого гарячого пластику
-        roughness: 0.65,
-        metalness: 0.05,
-        side: THREE.DoubleSide
-      });
-      this.sliceCapMesh = new THREE.Mesh(capGeo, capMat);
-      this.sliceCapMesh.position.y = 0;
-      this.sliceCapMesh.visible = false;
-      this.sliceCapMesh.renderOrder = 1;
-      this.scene.add(this.sliceCapMesh);
     }
 
     setupControls() {
@@ -758,10 +742,6 @@
       this._simLayerIndex = 0;
 
       if (this.nozzleMesh) this.nozzleMesh.visible = true;
-      if (this.sliceCapMesh) {
-        this.sliceCapMesh.visible = true;
-        this.sliceCapMesh.position.y = this._simLayerHeight;
-      }
 
       // Тимчасово вмикаємо двосторонній рендер на моделях, щоб внутрішні порожнини зрізу не провалювалися в чорну дірку
       this.modelGroup.traverse((child) => {
@@ -782,7 +762,6 @@
       this.slicerActive = false;
       this.clipPlane.constant = 500;
       if (this.nozzleMesh) this.nozzleMesh.visible = false;
-      if (this.sliceCapMesh) this.sliceCapMesh.visible = false;
 
       // Повертаємо початковий side матеріалам моделі
       this.modelGroup.traverse((child) => {
@@ -1085,10 +1064,6 @@
 
           this._simLayerIndex = currentLayerIdx;
           this.clipPlane.constant = currentH;
-
-          if (this.sliceCapMesh) {
-            this.sliceCapMesh.position.y = currentH;
-          }
 
           // Отримуємо реалістичні межі моделі (X та Z)
           const halfX = Math.max(8, (this.dimensions.x || 30) * 0.48);
