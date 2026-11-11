@@ -56,7 +56,12 @@
       const count = missions.length;
       const top = document.getElementById('btn-open-missions');
       if (top) {
-        top.textContent = `🗺️ Місії гуртка (${count})`;
+        const countEl = top.querySelector('[data-missions-count]');
+        if (countEl) {
+          countEl.textContent = `(${count})`;
+        } else {
+          top.textContent = `🗺️ Місії (${count})`;
+        }
         top.title = `Каталог ${count} навчальних місій для 2–6 класів`;
       }
       const inline = document.getElementById('btn-open-missions-inline');
