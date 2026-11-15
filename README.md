@@ -1,6 +1,10 @@
 # ⚒️ 3D Кузня Чудес — 3D Club Studio v2.2.0 Friendly Arcade Edition
 
-Офлайн вебстудія для створення навчальних 3D-моделей у шкільних гуртках. Інтерфейс, генератори та бібліотека Three.js зберігаються локально; студія не потребує зовнішніх CDN або runtime-пакетів. Основний робочий процес — створити модель, перевірити форму в сцені, зберегти проєкт і за потреби передати STL до слайсера чи редактора. Дизайн-система узгоджена з дитячим каталогом **LEGO WeDo 2.0 Catalog** («Friendly Arcade»).
+- **🌐 Живий вебдодаток (Live Web App):** [sivochka.com/3d-club-studio/](https://sivochka.com/3d-club-studio/)
+- **📖 Детальний гайд у блозі:** [3D Кузня Чудес: процедурний 3D-генератор без підтримок (UK)](https://sivochka.com/uk/blog/3d-club-studio-minecraft-print-safe/) · [English Guide (EN)](https://sivochka.com/blog/3d-club-studio-minecraft-print-safe/)
+- **👨‍🏫 Автор та 1-на-1 менторство:** [Ігор Сівочка — sivochka.com](https://sivochka.com/uk/) · [sivochka.com з програмування та 3D](https://sivochka.com/)
+
+Офлайн вебстудія для створення навчальних 3D-моделей у шкільних гуртках від **Ігоря Сівочки (Ihor Sivochka / Figarist)**. Інтерфейс, генератори та бібліотека Three.js зберігаються локально; студія не потребує зовнішніх CDN або runtime-пакетів. Основний робочий процес — створити модель, перевірити форму в сцені, зберегти проєкт і за потреби передати STL до слайсера чи редактора. Дизайн-система узгоджена з дитячим каталогом **LEGO WeDo 2.0 Catalog** («Friendly Arcade»).
 
 Масштаб сцени заданий у міліметрах: 1 одиниця Three.js відповідає 1 мм. Цей масштаб і наявність експорту не підтверджують придатність конкретної моделі до друку.
 
@@ -74,4 +78,14 @@
 └── verification/             # ізольовані перевірки та маніфести
 ```
 
-\n
+## 👨‍🏫 Автор та екосистема (`Ihor Sivochka / Figarist`)
+
+Створено **Ігорем Сівочкою (`Ihor Sivochka / Figarist`)** — учителем інформатики, сертифікованим розробником Unity та творцем освітніх вебінструментів.
+
+- 🌐 **Головний сайт і блог:** [sivochka.com](https://sivochka.com/uk/) · [3D Кузня Чудес: процедурний 3D-генератор без підтримок](https://sivochka.com/uk/blog/3d-club-studio-minecraft-print-safe/)
+- 🎓 **Індивідуальне 1-на-1 менторство (Unity/C#, Python, Scratch, інформатика, 3D):** [sivochka.com/](https://sivochka.com/) · [English](https://sivochka.com/)
+- 🎛️ **OGCruncher:** [sivochka.com/OGCruncher/](https://sivochka.com/OGCruncher/) ([Repo](https://github.com/Figarist/OGCruncher)) — браузерний 8-bit/16-bit біткрашер та оптимізатор звуку для ігор
+- 🧱 **Каталог LEGO WeDo 2.0:** [sivochka.com/lego-catalog/](https://sivochka.com/lego-catalog/) ([Repo](https://github.com/Figarist/lego-catalog)) — 597 PDF-інструкцій робототехніки у 26 категоріях
+- 🤫 **Тихий Клас (`Quiet Class / Bouncy Balls Pro`):** [sivochka.com/bouncy/](https://sivochka.com/bouncy/) ([Repo](https://github.com/Figarist/bouncy)) — гейміфікований шумомір для школи та смарт-дошок
+- 🎨 **Дизайн-система Friendly Arcade UI:** [Figarist/friendly-arcade](https://github.com/Figarist/friendly-arcade)
+- 📺 **YouTube:** [Figarist](https://sivochka.com/) · 💬 **Info:** [Figarist](https://sivochka.com/) · 💻 **GitHub:** [@Figarist](https://github.com/Figarist)
