@@ -3874,3 +3874,60 @@ select:focus, input[type="text"]:focus {
     transition: none !important;
   }
 }
+
+/* ==========================================================================
+   SEO FAQ АКОРДЕОН У ВІКНІ «ПРО ПРОЄКТ»
+   ========================================================================== */
+.about-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.about-faq-item {
+  background: var(--bg2);
+  border: 1px solid var(--surface2);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+
+.about-faq-item summary {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.about-faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.about-faq-item summary::after {
+  content: "+";
+  color: var(--accent-gold);
+  font-size: 15px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.about-faq-item[open] summary::after {
+  content: "−";
+}
+
+.about-faq-item summary:focus-visible {
+  outline: 2px solid var(--cyan, #38bdf8);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.about-faq-item p {
+  margin-top: 8px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
