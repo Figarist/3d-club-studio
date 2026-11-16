@@ -6,8 +6,7 @@ available; full visual release acceptance is **incomplete**, not silently waived
 At the clean documentation baseline `6546bec`, runtime source and all manifest
 hashes still matched the pinned implementation. Documentation-only commits do
 not change that source proof. This update does not refresh captures or rewrite
-evidence. For current priorities see
-[NEXT_AGENT_HANDOFF.md](NEXT_AGENT_HANDOFF.md).
+evidence.
 
 ## Implemented scope
 

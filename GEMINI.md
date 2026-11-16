@@ -1,6 +1,6 @@
 # GEMINI.md — правила для Gemini та Antigravity
 
-Цей файл доповнює обов'язкові правила [AGENTS.md](AGENTS.md). Технічна карта й передача актуальної роботи містяться у [TECHNICAL_ARCHITECTURE.md](docs/TECHNICAL_ARCHITECTURE.md), [EXTENSIONS.md](docs/EXTENSIONS.md) і [NEXT_AGENT_HANDOFF.md](docs/NEXT_AGENT_HANDOFF.md).
+Цей файл доповнює обов'язкові правила [AGENTS.md](AGENTS.md). Технічна карта й контракти розширень містяться у [TECHNICAL_ARCHITECTURE.md](docs/TECHNICAL_ARCHITECTURE.md) та [EXTENSIONS.md](docs/EXTENSIONS.md).
 
 ## Мова та стиль
 

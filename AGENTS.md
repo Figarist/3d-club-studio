@@ -1,6 +1,6 @@
 # AGENTS.md — правила роботи в 3D Club Studio
 
-Ці правила доповнюють технічні контракти у [docs/TECHNICAL_ARCHITECTURE.md](docs/TECHNICAL_ARCHITECTURE.md), [docs/EXTENSIONS.md](docs/EXTENSIONS.md) і [docs/NEXT_AGENT_HANDOFF.md](docs/NEXT_AGENT_HANDOFF.md). Перед зміною вихідного коду перевірте Git status, поточну реалізацію та вузькі файли-власники. Не перезаписуйте незв'язану роботу.
+Ці правила доповнюють технічні контракти у [docs/TECHNICAL_ARCHITECTURE.md](docs/TECHNICAL_ARCHITECTURE.md) і [docs/EXTENSIONS.md](docs/EXTENSIONS.md). Перед зміною вихідного коду перевірте Git status, поточну реалізацію та вузькі файли-власники. Не перезаписуйте незв'язану роботу.
 
 Технічні ідентифікатори, код і коміти пишіть англійською; спілкуйтеся з користувачем українською.
 
@@ -119,12 +119,9 @@ SceneManager створює Binary STL, центрує X/Y і ставить н�
 
 Ключові джерела для наступних змін:
 
-- [Передача наступному агенту](docs/NEXT_AGENT_HANDOFF.md)
 - [Технічна архітектура](docs/TECHNICAL_ARCHITECTURE.md)
 - [Контракти розширень](docs/EXTENSIONS.md)
-- [План контенту](docs/FUN_CONTENT_PLAN.md)
 - [Звіт і межі перевірок контенту](docs/FUN_CONTENT_REVIEW.md)
-- [Аудит архітектури](docs/ARCHITECTURE_AUDIT.md)
 
 Для зовнішніх бібліотек чи сервісів використовуйте офіційну документацію, якщо потрібна перевірка сумісності чи API; локальні символи й код спершу шукайте у репозиторії.
 
