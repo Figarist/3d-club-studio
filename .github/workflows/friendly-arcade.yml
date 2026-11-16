@@ -8,3 +8,14 @@ on:
 jobs:
   verify:
     uses: Figarist/friendly-arcade/.github/workflows/verify-vendored.yml@v2
+
+  notify_failure:
+    name: Notify Info on failure
+    if: failure()
+    needs: [verify]
+    uses: Figarist/figarist.github.io/.github/workflows/notify-telegram.yml@main
+    with:
+      title: "3d-club-studio CI failed on ${{ github.ref_name }}"
+      status: "error"
+      details: "Commit ${{ github.sha }}"
+    secrets: inherit
