@@ -42,12 +42,9 @@
 
 - [Спільна дизайн-система Friendly Arcade](docs/DESIGN_SYSTEM.md)
 - [Інструкції для агентів і контракти репозиторію](AGENTS.md)
-- [Наступний агент: передача UI/UX, моделей і функцій](docs/NEXT_AGENT_HANDOFF.md)
 - [Правила Gemini та Antigravity](GEMINI.md)
 - [Технічна архітектура](docs/TECHNICAL_ARCHITECTURE.md)
 - [Додавання контент-паків, генераторів і полів проєкту](docs/EXTENSIONS.md)
-- [Огляд архітектури та перевірок](docs/ARCHITECTURE_AUDIT.md)
-- [План авторського контенту](docs/FUN_CONTENT_PLAN.md)
 - [Звіт про авторський контент](docs/FUN_CONTENT_REVIEW.md)
 - [Профілі слайсера](docs/SLICER_PROFILES.md)
 - [Посібник викладача](docs/TEACHER_GUIDE.md)
