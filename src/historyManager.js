@@ -89,7 +89,7 @@
       }
     }
 
-    updateUI(btnUndo, btnRedo, btnMcUndo) {
+    updateUI(btnUndo, btnRedo) {
       const u = this.canUndo();
       const r = this.canRedo();
       if (btnUndo) {
@@ -99,10 +99,6 @@
       if (btnRedo) {
         btnRedo.disabled = !r;
         btnRedo.classList.toggle('disabled', !r);
-      }
-      if (btnMcUndo) {
-        btnMcUndo.disabled = !u;
-        btnMcUndo.classList.toggle('disabled', !u);
       }
     }
   }

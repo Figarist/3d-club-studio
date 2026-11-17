@@ -1,5 +1,12 @@
 // Менеджер навчальних місій (12 місій гуртка, чек-листи, фільтри) для студії «3D Кузня Чудес»
 (function () {
+  // Missions whose every row in verification/content-evidence/manifest.json is PASS
+  // (rows link to missions via row.missionKeys). All others show the experimental badge.
+  const ACCEPTED_MISSION_KEYS = [
+    'studio-fun-reliefs:funrelief_compass_treasure_map',
+    'studio-fun-discoveries:character-iron-mole',
+    'studio-fun-engineering:ballista-bow'
+  ];
   const STUDIO_MISSIONS = [
     // === 4 РЕЛЬЄФИ ===
     {
@@ -608,6 +615,7 @@
               <span class="mission-card-difficulty" title="Рекомендований вік">${stars}</span>
               <span class="mission-card-size">📏 ${m.targetSize}</span>
             </div>
+            ${ACCEPTED_MISSION_KEYS.indexOf(m.key) === -1 ? '<span class="mission-experimental-badge" title="Ще не пройшла фінальну перевірку друку" aria-label="Експериментальна: ще не пройшла фінальну перевірку друку">🧪 Експериментальна</span>' : ''}
             <h3 class="mission-card-title">${m.title}</h3>
             <div class="mission-riddle-box">💡 <b>Загадка:</b> ${m.riddle}</div>
             <div class="mission-grades-row">

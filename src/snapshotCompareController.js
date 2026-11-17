@@ -93,15 +93,39 @@
       };
     }
 
-    openCompareModal(domCache, sceneManager, mcGen, activeTab, mission, slicerTimeInput) {
+    // Синхронізує кроки «Мій виріб»: чернетка V1 → порівняння → паспорт
+    syncSteps(domCache) {
+      const dom = domCache || {};
+      const v1 = this.v1Snapshot;
+      if (dom.btnReSnapshotV1) {
+        dom.btnReSnapshotV1.textContent = v1 ? '📸 Оновити чернетку' : '📸 Зберегти чернетку';
+      }
+      if (dom.pieceV1Status) {
+        dom.pieceV1Status.textContent = v1
+          ? `Чернетку V1 збережено о ${v1.displayTime}. Можна зберегти нову, вона замінить стару.`
+          : 'Чернетки ще немає. Збережи поточну модель, щоб потім побачити, що змінилось.';
+      }
+      if (dom.btnRunCompare) dom.btnRunCompare.disabled = !v1;
+      if (dom.pieceCompareHint) {
+        dom.pieceCompareHint.textContent = v1
+          ? 'Покажу чернетку V1 поруч із поточною моделлю та різницю габаритів.'
+          : 'Спершу збережи чернетку (крок 1), потім змінюй модель і порівнюй.';
+      }
+      if (!v1 && dom.compareResults) dom.compareResults.hidden = true;
+    }
+
+    openCompareModal(domCache) {
       const dom = domCache || {};
       if (!dom.compareModal) return;
+      this.syncSteps(dom);
+      dom.compareModal.style.display = 'flex';
+      if (window.StudioSound) window.StudioSound.playPop(520);
+    }
 
-      if (!this.v1Snapshot) {
-        this.captureV1(sceneManager, mcGen, activeTab, mission, slicerTimeInput, true);
-      }
-
+    renderComparison(domCache, sceneManager, mcGen, activeTab, mission, slicerTimeInput) {
+      const dom = domCache || {};
       const v1 = this.v1Snapshot;
+      if (!dom.compareModal || !v1) return;
       if (sceneManager && sceneManager.renderer) {
         if (sceneManager.popAnimBlocks && sceneManager.popAnimBlocks.length > 0) {
           sceneManager.popAnimBlocks.forEach((item) => {
@@ -184,8 +208,7 @@
         `;
       }
 
-      dom.compareModal.style.display = 'flex';
-      if (window.StudioSound) window.StudioSound.playPop(520);
+      if (dom.compareResults) dom.compareResults.hidden = false;
     }
 
     closeCompareModal(domCache) {

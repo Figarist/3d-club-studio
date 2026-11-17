@@ -1,0 +1,48 @@
+3D Club Studio («3D Кузня Чудес»)
+Copyright (c) 2026 Ihor Sivochka (Ігор Сівочка). All rights reserved.
+
+ENGLISH
+
+This repository is published so that its source code can be viewed. It is NOT
+open source. No license to copy, modify, merge, publish, distribute,
+sublicense, host, or sell this software or any part of it is granted, except
+as stated below.
+
+Permission for education:
+Teachers, schools, clubs and students may, free of charge and for
+non-commercial educational purposes only:
+  1. use the studio at its official address (https://sivochka.com/3d-club-studio/);
+  2. keep an unmodified local copy of this repository to run the studio
+     offline in their own classroom;
+  3. print, share and keep the 3D models and project files they create with
+     the studio.
+
+This permission does not allow modifying the software, publishing or hosting
+it (in original or modified form) on any other website, store or platform,
+removing author or copyright notices, or using it in a paid product or
+service. Any other use requires prior written permission from the author.
+
+Third-party components keep their own licenses: lib/three.min.js (Three.js,
+MIT License) and vendor/friendly-arcade/ (see its own notice).
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING FITNESS FOR A PARTICULAR PURPOSE. Successful STL export
+does not guarantee a successful 3D print. IN NO EVENT SHALL THE AUTHOR BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE USE OF THE
+SOFTWARE.
+
+УКРАЇНСЬКОЮ
+
+Вихідний код опубліковано для перегляду. Це НЕ відкрите програмне
+забезпечення. Копіювати, змінювати, публікувати, розміщувати на інших сайтах,
+поширювати чи продавати студію або її частини без письмового дозволу автора
+заборонено, крім випадків нижче.
+
+Вчителі, школи, гуртки та учні можуть безкоштовно й лише з некомерційною
+навчальною метою:
+  1. користуватися студією за офіційною адресою;
+  2. зберігати незмінену локальну копію репозиторію для офлайн-уроків у своєму класі;
+  3. друкувати, поширювати й зберігати власні 3D-моделі та файли проєктів,
+     створені в студії.
+
+Сторонні компоненти мають власні ліцензії: Three.js (MIT) і Friendly Arcade.

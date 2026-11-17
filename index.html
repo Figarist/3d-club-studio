@@ -161,11 +161,9 @@
   </script>
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%92%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="vendor/friendly-arcade/tokens.css?v=2.2.1" />
-  <link rel="stylesheet" href="styles.css?v=2.2.1" />
-  <link rel="stylesheet" href="adventure-shelf.css?v=2.2.1" />
-  <link rel="stylesheet" href="pixel-editor-tools.css?v=2.2.1" />
-  <link rel="stylesheet" href="lesson-companion.css?v=2.2.1" />
+  <link rel="stylesheet" href="vendor/friendly-arcade/tokens.css?v=2.3.0" />
+  <link rel="stylesheet" href="styles.css?v=2.3.0" />
+  <link rel="stylesheet" href="pixel-editor-tools.css?v=2.3.0" />
 </head>
 <body>
   <a class="skip-link" href="#main-workspace">Перейти до редактора</a>
@@ -174,11 +172,11 @@
   <!-- ВЕРХНЯ ПАНЕЛЬ (АДАПТИВНА КОМАНДНА ШАПКА СТУДІЇ) -->
   <header class="topbar" id="studio-topbar">
     <div class="brand">
-      <button type="button" class="brand-logo" title="Дзенькнути молотом по ковадлу! ⚒️" aria-label="3D Кузня Чудес — дзенькнути молотом по ковадлу">⚒️</button>
+      <button type="button" class="brand-logo" tabindex="-1" title="Дзенькнути молотом по ковадлу! ⚒️" aria-label="3D Кузня Чудес — дзенькнути молотом по ковадлу">⚒️</button>
       <div class="brand-title">
         <div class="brand-title-row">
           <h1><span class="brand-name-lead">3D </span><span class="brand-name-main">КУЗНЯ</span><span class="brand-name-extra"> ЧУДЕС</span></h1>
-          <span id="app-version-pill" class="version-pill" title="Версія програми: v2.2.1">v2.2.1</span>
+          <span id="app-version-pill" class="version-pill" title="Версія програми: v2.3.0">v2.3.0</span>
         </div>
       </div>
     </div>
@@ -232,6 +230,35 @@
         <input id="input-load-project" type="file" accept=".json" style="display:none;" aria-hidden="true" />
       </div>
 
+      <!-- Група: Мій виріб (чернетка V1 → порівняння → паспорт) -->
+      <div class="top-action-group top-piece-group" aria-label="Мій виріб">
+        <button id="btn-my-piece" class="btn-action btn-v1" aria-haspopup="dialog" aria-label="Мій виріб" title="Мій виріб: чернетка V1, порівняння з поточною моделлю та паспорт деталі">
+          <span class="btn-ico" aria-hidden="true">📦</span>
+          <span class="btn-lbl">Мій виріб</span>
+        </button>
+      </div>
+
+      <!-- Група: меню «Друк» (симуляція, нотатки слайсера, один пластик, інфо-плашки) -->
+      <div class="top-action-group menu-dropdown-wrapper top-print-group">
+        <button id="btn-print-menu" class="btn-action btn-menu-toggle" aria-label="Друк" aria-haspopup="true" aria-expanded="false" aria-controls="print-dropdown-menu" title="Інструменти друку: симуляція, нотатки слайсера, один пластик">
+          <span class="btn-ico" aria-hidden="true">🖨️</span>
+          <span class="btn-lbl">Друк</span>
+          <span class="btn-caret" aria-hidden="true">▾</span>
+        </button>
+        <div id="print-dropdown-menu" class="top-dropdown-menu" role="menu" aria-label="Інструменти друку">
+          <button id="btn-simulate-print" class="dropdown-item btn-action btn-sim" role="menuitem" title="Симуляція пошарового друку для FDM-принтера">
+            <span class="btn-ico" aria-hidden="true">🔥</span>
+            <span class="btn-lbl">Симуляція</span>
+          </button>
+          <button id="btn-toggle-slicer-notes" class="dropdown-item btn-action" type="button" role="menuitem" title="Показати/сховати статус друку та нотатки слайсера">🧾 Нотатки друку ▾</button>
+          <button id="btn-toggle-mono" class="dropdown-item btn-action btn-mono" role="menuitemcheckbox" aria-checked="true" title="Перемкнути: кольори прев'ю чи реальний вигляд одним пластиком">
+            <span class="btn-ico" aria-hidden="true">🪨</span>
+            <span class="btn-lbl">1 Пластик</span>
+          </button>
+          <button id="btn-toggle-hud" class="dropdown-item btn-action" type="button" role="menuitem" title="Згорнути або показати інформаційні плашки розмірів та статусу друку">👁️ Інфо</button>
+        </div>
+      </div>
+
       <!-- Група: Головний експорт для 3D-друку -->
       <div class="top-action-group top-export-group" aria-label="Головний експорт">
         <button id="btn-export-stl" class="btn-action btn-export" title="Експортувати бінарний .STL для слайсера 3D-принтера">
@@ -242,15 +269,12 @@
 
       <!-- Група: Меню опцій (звук, музика, мутація, інформація) -->
       <div class="top-action-group menu-dropdown-wrapper">
-        <button id="btn-top-menu" class="btn-action btn-menu-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="top-dropdown-menu" title="Додаткові опції: Звук, Музика, Мутація, Інформація" aria-label="Додаткові опції">
+        <button id="btn-top-menu" class="btn-action btn-menu-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="top-dropdown-menu" title="Додаткові опції: Звук, Музика, Інформація" aria-label="Додаткові опції">
           <span class="btn-ico" aria-hidden="true">⚙️</span>
           <span class="btn-lbl">Опції</span>
           <span class="btn-caret" aria-hidden="true">▾</span>
         </button>
         <div id="top-dropdown-menu" class="top-dropdown-menu" role="menu" aria-label="Додаткові опції студії">
-          <button id="btn-random-wow" class="dropdown-item btn-action btn-random" role="menuitem" title="Випадкова генерація / Мутація!">
-            🎲 ВАУ! Мутація
-          </button>
           <button id="btn-toggle-sound" class="dropdown-item btn-action btn-sound" role="menuitemcheckbox" aria-checked="true" title="Увімкнути/вимкнути звукові ефекти" aria-label="Звукові ефекти">
             🔊 Звук
           </button>
@@ -258,7 +282,7 @@
             🎵 Музика
           </button>
           <div class="dropdown-divider"></div>
-          <button id="btn-open-about" class="dropdown-item btn-action btn-about" role="menuitem" title="Про автора, відкритий проєкт та уроки 3D / IT (Ігор Сівочка)">
+          <button id="btn-open-about" class="dropdown-item btn-action btn-about" role="menuitem" title="Про автора та уроки 3D / IT (Ігор Сівочка)">
             👨‍🏫 Про автора
           </button>
         </div>
@@ -274,10 +298,6 @@
         <button id="btn-open-missions" class="view-btn btn-missions-tab" title="Відкрити каталог навчальних місій гуртка (72 місії для 2–6 класів)">
           <span class="btn-ico" aria-hidden="true">🗺️</span>
           <span class="btn-lbl">Місії <span class="btn-badge-num" data-missions-count>(72)</span></span>
-        </button>
-        <button id="btn-open-lesson" class="view-btn btn-missions-tab" title="План години, таймер та творчі виклики для гуртка">
-          <span class="btn-ico" aria-hidden="true">⏱️</span>
-          <span class="btn-lbl">Заняття</span>
         </button>
       </div>
 
@@ -297,41 +317,6 @@
 
     <!-- Права частина: Контроль якості, підготовка друку (Priority+ адаптивна) та автозбереження -->
     <div class="workspace-bar-right">
-      <div id="workspace-tools-group" class="workspace-bar-group workspace-tools-group" aria-label="Перевірка та підготовка до 3D-друку">
-        <button id="btn-toggle-mono" class="view-btn btn-action btn-mono" title="Перемкнути: кольори прев'ю чи реальний вигляд одним пластиком">
-          <span class="btn-ico" aria-hidden="true">🪨</span>
-          <span class="btn-lbl">1 Пластик</span>
-        </button>
-        <button id="btn-snapshot-v1" class="view-btn btn-action btn-v1" title="Зафіксувати поточну модель як Версію 1 (Ескіз)">
-          <span class="btn-ico" aria-hidden="true">📸</span>
-          <span class="btn-lbl">V1 <span class="lbl-ext">(Ескіз)</span></span>
-        </button>
-        <button id="btn-compare-v1v2" class="view-btn btn-action btn-v1" title="Порівняння поступу: V1 (Ескіз) ↔ V2 (Фінал)" style="display:none;">
-          <span class="btn-ico" aria-hidden="true">⚖️</span>
-          <span class="btn-lbl">V1 ↔ V2</span>
-        </button>
-        <button id="btn-print-card" class="view-btn btn-action btn-card" title="Створити картку для черги 3D-друку (Паспорт деталі)">
-          <span class="btn-ico" aria-hidden="true">📋</span>
-          <span class="btn-lbl">Паспорт</span>
-        </button>
-        <button id="btn-simulate-print" class="view-btn btn-action btn-sim" title="Симуляція пошарового друку для FDM-принтера">
-          <span class="btn-ico" aria-hidden="true">🔥</span>
-          <span class="btn-lbl">Симуляція</span>
-        </button>
-      </div>
-
-      <div id="subbar-overflow-wrapper" class="subbar-overflow-wrapper" hidden>
-        <button type="button" id="btn-subbar-overflow" class="view-btn btn-action btn-subbar-more" aria-haspopup="true" aria-expanded="false" aria-controls="subbar-overflow-menu" title="Ще інструменти перевірки та друку">
-          <span class="btn-ico" aria-hidden="true">🧰</span>
-          <span class="btn-lbl">Ще</span>
-          <span id="subbar-overflow-count" class="overflow-count-badge">0</span>
-          <span class="btn-caret" aria-hidden="true">▾</span>
-        </button>
-        <div id="subbar-overflow-menu" class="top-dropdown-menu subbar-overflow-menu" role="menu" aria-label="Додаткові інструменти панелі"></div>
-      </div>
-
-      <div id="subbar-tools-separator" class="bar-separator" aria-hidden="true"></div>
-
       <button type="button" id="autosave-tag" class="autosave-tag" title="Стан автоматично зберігається у пам'яті браузера">
         <span class="autosave-dot" aria-hidden="true"></span>
         <span class="autosave-short">Авто</span>
@@ -346,6 +331,13 @@
     <!-- ЛІВА ПАНЕЛЬ НАЛАШТУВАНЬ -->
     <aside class="sidebar" id="app-sidebar">
 
+      <!-- ВАУ! Мутація: одна спільна кнопка для всіх вкладок генераторів -->
+      <div class="sidebar-wow-bar">
+        <button id="btn-random-wow" class="btn-wow" type="button" title="Випадкова генерація / Мутація для поточної вкладки!">
+          <span aria-hidden="true">🎲</span> ВАУ! Мутація
+        </button>
+      </div>
+
       <!-- КОМПАКТНА КАРТКА ПОТОЧНОЇ МІСІЇ НАД РЕДАКТОРОМ (можна згорнути або повністю закрити) -->
       <div id="active-mission-card" class="mission-compact-card" style="display:none;">
         <div class="mission-compact-top">
@@ -353,7 +345,6 @@
           <div class="mission-compact-actions">
             <button id="btn-prev-mission" class="mission-nav-btn" title="Попередня місія">◀</button>
             <button id="btn-next-mission" class="mission-nav-btn" title="Наступна місія">▶</button>
-            <button id="btn-open-missions-inline" class="mission-small-btn highlight" title="Відкрити всі навчальні місії гуртка">🗺️ Усі місії</button>
             <button id="btn-toggle-mission-body" class="mission-small-btn" title="Згорнути або розгорнути опис місії">🔼 Згорнути</button>
             <button id="btn-close-active-mission" class="mission-nav-btn mission-close-btn" title="Сховати панель місії" aria-label="Сховати панель місії">✕</button>
           </div>
@@ -402,41 +393,12 @@
         </div>
       </div>
 
-      <!-- 4-КРОКОВИЙ НАВІГАТОР ДЛЯ ДІТЕЙ ТА ПОЧАТКІВЦІВ -->
-      <nav class="workflow-stepper" id="workflow-stepper" aria-label="Кроки роботи над 3D-моделлю">
-        <button class="step-btn active" data-step="1" title="Крок 1: Обери шаблон або заготовку">
-          <span class="step-num">1</span>
-          <span class="step-text">Обери</span>
-        </button>
-        <span class="step-arrow" aria-hidden="true">→</span>
-        <button class="step-btn" data-step="2" title="Крок 2: Зміни деталі або намалюй 3D-висоту">
-          <span class="step-num">2</span>
-          <span class="step-text">Зміни</span>
-        </button>
-        <span class="step-arrow" aria-hidden="true">→</span>
-        <button class="step-btn" data-step="3" title="Крок 3: Перевір міцність та вигляд в одному кольорі">
-          <span class="step-num">3</span>
-          <span class="step-text">Перевір</span>
-        </button>
-        <span class="step-arrow" aria-hidden="true">→</span>
-        <button class="step-btn" data-step="4" title="Крок 4: Завантаж STL для 3D-принтера">
-          <span class="step-num">4</span>
-          <span class="step-text">Друкуй</span>
-        </button>
-      </nav>
-
       <!-- ===================================================================
            ВКЛАДКА 1: МАЙНКРАФТ-КУЗНЯ (ВОКСЕЛЬНИЙ 3D-РЕЛЬЄФ)
            =================================================================== -->
       <section id="panel-minecraft" class="panel-section active">
         <div class="printer-safe-tip">
-          🛡️ <b>Порада:</b> Кожен шар має свою висоту. Перевіряй виразність рельєфу кнопкою «🪨 1 Пластик»!
-        </div>
-
-        <div class="card">
-          <div class="card-header"><span>🧭 Майстерня пригод</span></div>
-          <p class="adventure-shelf-intro">Обери заготовку, зміни її й розкажи свою історію. Колір замінюють форма, висота та тінь.</p>
-          <div id="adventure-shelf"></div>
+          🛡️ <b>Порада:</b> Кожен шар має свою висоту. Перевіряй виразність рельєфу кнопкою «🪨 1 Пластик» у меню «🖨️ Друк»!
         </div>
 
         <div class="card">
@@ -473,7 +435,6 @@
           <div class="card-header">
             <span>🎨 Малюй 3D-Висоту (16×16 блоків)</span>
             <div class="card-header-actions">
-              <button id="btn-mc-undo" class="sym-btn" title="Скасувати останню дію (Ctrl+Z)">↩️ Скасувати</button>
               <button id="btn-mc-clear" class="sym-btn" title="Очистити полотно">🗑️ Очистити</button>
             </div>
           </div>
@@ -500,7 +461,6 @@
         <details class="card collapsible-card">
           <summary class="card-header">
             <span>⚙️ Додаткові налаштування друку</span>
-            <button id="btn-mc-mini-preset" class="btn-subtle" title="Встановити воксель 2.0 мм для швидкого міні-значка 28–32 мм">🎯 Міні (~30 мм)</button>
           </summary>
 
           <div class="collapsible-card-content">
@@ -567,7 +527,6 @@
         <div class="card">
           <div class="card-header">
             <span>⚡ Швидкі Шаблони Ілюзій</span>
-            <button id="btn-il-short-mode" class="btn-subtle" title="Короткий знак із 2 символів (~28 мм) для швидкого друку">⚡ Короткий знак (1–2 літери)</button>
           </div>
           <div class="preset-grid">
             <button class="preset-btn preset-mini-btn" data-il-preset="short" data-w1="3D" data-w2="★!" data-voxel="2.2">⚡ 3D ↔ ★! (~28 мм)</button>
@@ -856,7 +815,6 @@
           <div class="hm-preview-card">
             <div class="hm-preview-header">
               <span class="hm-preview-title">🗺️ 2D Карта висот</span>
-              <button id="btn-toggle-hm-hud" class="hm-hud-trigger-btn" type="button" title="Відкрити або сховати плаваюче вікно карти висот у 3D сцені">🪟 У сцену</button>
             </div>
             <div class="hm-canvas-wrap">
               <canvas id="hm-preview-canvas" width="256" height="256" class="hm-preview-canvas" title="Ч/Б Прев'ю висот рельєфу"></canvas>
@@ -1000,11 +958,9 @@
           📐 Габарит: 56 × 56 × 8 мм | ⏱️ Час: перевір у слайсері
         </div>
         <div class="hud-top-right-group">
-          <button id="btn-toggle-hud" class="hud-toggle-btn" title="Згорнути або показати інформаційні плашки розмірів та статусу друку" aria-label="Перемкнути видимість плашок">👁️ Інфо</button>
           <div id="print-verification-badge" class="hud-badge verification-badge status-generated">
             <div class="verification-row">
               <span id="geom-check-pill" class="geom-check-pill">🔍 Перевірка геометрії...</span>
-              <button id="btn-toggle-slicer-notes" class="hud-notes-toggle" type="button" title="Показати/сховати статус друку та нотатки слайсера">🧾 Нотатки друку ▾</button>
             </div>
             <div id="slicer-notes-panel" class="slicer-notes-panel" style="display:none;">
               <div class="verification-row">
@@ -1018,27 +974,6 @@
                 <input id="slicer-time-input" class="hud-input" type="text" maxlength="28" placeholder="Запис зі слайсера (напр.: 14 хв, PLA 0.2)" aria-label="Запис фактичного часу та профілю зі слайсера" />
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ПЛАВАЮЧИЙ ВІДЖЕТ 2D-КАРТИ ВИСОТ ДЛЯ БАРЕЛЬЄФА -->
-      <div id="hm-floating-hud" class="hm-floating-hud" style="display:none;" aria-label="Плаваюче 2D-прев'ю висот барельєфа">
-        <div class="hm-floating-hud-header">
-          <span class="hm-floating-hud-title">🗺️ 2D Карта висот</span>
-          <div class="hm-floating-hud-actions">
-            <button id="btn-hm-hud-size" class="hm-hud-btn" type="button" title="Змінити розмір вікна (компактний / звичайний)" aria-label="Змінити розмір">🗖</button>
-            <button id="btn-hm-hud-close" class="hm-hud-btn" type="button" title="Закрити плаваюче вікно" aria-label="Закрити вікно">✕</button>
-          </div>
-        </div>
-        <div class="hm-floating-hud-body">
-          <div class="hm-hud-canvas-wrap">
-            <canvas id="hm-hud-preview-canvas" width="256" height="256" class="hm-hud-canvas" title="Ч/Б Прев'ю карти висот"></canvas>
-          </div>
-          <div class="hm-height-scale" aria-hidden="true">
-            <span class="hm-scale-lbl">0 мм</span>
-            <div class="hm-scale-gradient"></div>
-            <span class="hm-scale-lbl">Max</span>
           </div>
         </div>
       </div>
@@ -1076,11 +1011,8 @@
 
         <!-- Кутовий бейдж версії програми та автора -->
         <div class="version-corner-group">
-          <a id="author-badge-link" class="author-corner-badge" href="https://sivochka.com/" target="_blank" rel="noopener" title="Освітній проєкт: уроки 3D-моделювання та програмування (sivochka.com)">
-            🌐 sivochka.com ↗
-          </a>
-          <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • v2.2.1 Friendly Arcade: Фото-Барельєф, монолітна SDF геометрія, інтегроване вушко брелока, топологічна валідація MeshValidator">
-            ⚒️ v2.2.1
+          <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • v2.3.0 Friendly Arcade: Фото-Барельєф, монолітна SDF геометрія, інтегроване вушко брелока, топологічна валідація MeshValidator">
+            ⚒️ v2.3.0
           </div>
         </div>
       </div>
@@ -1131,7 +1063,7 @@
             </a>
             <a href="https://github.com/Figarist/3d-club-studio" target="_blank" rel="noopener" class="about-card-link">
               <span class="link-icon">⭐️</span>
-              <span class="link-text"><strong>GitHub Репозиторій</strong><small>Відкритий код проєкту</small></span>
+              <span class="link-text"><strong>GitHub Репозиторій</strong><small>Код доступний для перегляду</small></span>
               <span class="link-arrow">↗</span>
             </a>
             <a href="https://github.com/Figarist/friendly-arcade" target="_blank" rel="noopener" class="about-card-link">
@@ -1211,61 +1143,84 @@
     </div>
   </div>
 
-  <!-- МОДАЛЬНЕ ВІКНО: ГАЛЕРЕЯ ІНЖЕНЕРНОГО ПОСТУПУ (ПОРІВНЯННЯ V1 ↔ V2) -->
+  <!-- МОДАЛЬНЕ ВІКНО: МІЙ ВИРІБ (1 чернетка V1 → 2 порівняння → 3 паспорт) -->
   <div id="compare-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="compare-modal-title" style="display:none;">
     <div class="modal-window compare-window">
       <div class="modal-header">
         <div>
-          <h2 id="compare-modal-title">⚖️ Інженерний поступ: Порівняння Версія 1 (Ескіз) ↔ Версія 2 (Фінал)</h2>
+          <h2 id="compare-modal-title">📦 Мій виріб</h2>
           <p class="modal-subtitle">
-            Порівняй задум, габарити та зміни. Придатність STL і час друку перевір у слайсері.
+            Три кроки: збережи чернетку, порівняй із тим, що зараз, і надрукуй паспорт. Придатність STL і час друку перевір у слайсері.
           </p>
         </div>
-        <button id="btn-close-compare" class="modal-close-btn" title="Закрити (Esc)" aria-label="Закрити вікно порівняння">✕</button>
+        <button id="btn-close-compare" class="modal-close-btn" title="Закрити (Esc)" aria-label="Закрити вікно «Мій виріб»">✕</button>
       </div>
 
+      <ol class="piece-steps">
+        <li class="piece-step">
+          <span class="piece-step-num" aria-hidden="true">1</span>
+          <div class="piece-step-body">
+            <h3>Зберегти чернетку (V1)</h3>
+            <p id="piece-v1-status" class="piece-step-hint">Чернетки ще немає. Збережи поточну модель, щоб потім побачити, що змінилось.</p>
+          </div>
+          <button id="btn-re-snapshot-v1" class="btn-action btn-v1">📸 Зберегти чернетку</button>
+        </li>
+        <li class="piece-step">
+          <span class="piece-step-num" aria-hidden="true">2</span>
+          <div class="piece-step-body">
+            <h3>Порівняти з тим, що зараз</h3>
+            <p id="piece-compare-hint" class="piece-step-hint">Спершу збережи чернетку (крок 1), потім змінюй модель і порівнюй.</p>
+          </div>
+          <button id="btn-run-compare" class="btn-action btn-v1" disabled>⚖️ Порівняти</button>
+        </li>
+        <li class="piece-step">
+          <span class="piece-step-num" aria-hidden="true">3</span>
+          <div class="piece-step-body">
+            <h3>Надрукувати паспорт</h3>
+            <p class="piece-step-hint">Картка для черги 3D-друку: можна роздрукувати або зберегти як PNG.</p>
+          </div>
+          <button id="btn-compare-to-passport" class="btn-action btn-card">📋 Паспорт деталі</button>
+        </li>
+      </ol>
+
+      <div id="compare-results" hidden>
       <!-- ЗВЕДЕНИЙ БАНЕР ПОСТУПУ -->
-      <div id="compare-summary-banner" class="compare-summary-banner"></div>
-
-      <!-- ДВІ КАРТКИ ПОРІВНЯННЯ ПОРУЧ -->
-      <div class="compare-grid">
-        <div class="compare-col v1-col">
-          <div class="compare-card-header">
-            <span class="version-tag v1-tag">Версія 1 (Ескіз)</span>
-            <span id="v1-timestamp" class="compare-time">--:--:--</span>
+        <div id="compare-summary-banner" class="compare-summary-banner"></div>
+  
+        <!-- ДВІ КАРТКИ ПОРІВНЯННЯ ПОРУЧ -->
+        <div class="compare-grid">
+          <div class="compare-col v1-col">
+            <div class="compare-card-header">
+              <span class="version-tag v1-tag">Версія 1 (Ескіз)</span>
+              <span id="v1-timestamp" class="compare-time">--:--:--</span>
+            </div>
+            <div class="compare-img-wrap">
+              <img id="v1-preview-img" alt="Прев'ю моделі V1" class="compare-preview-img" />
+            </div>
+            <div id="v1-metrics" class="compare-metrics-list"></div>
           </div>
-          <div class="compare-img-wrap">
-            <img id="v1-preview-img" alt="Прев'ю моделі V1" class="compare-preview-img" />
+  
+          <div class="compare-col v2-col">
+            <div class="compare-card-header">
+              <span class="version-tag v2-tag">Версія 2 (Поточна модель)</span>
+              <span id="v2-timestamp" class="compare-time">Зараз</span>
+            </div>
+            <div class="compare-img-wrap">
+              <img id="v2-preview-img" alt="Прев'ю моделі V2" class="compare-preview-img" />
+            </div>
+            <div id="v2-metrics" class="compare-metrics-list"></div>
           </div>
-          <div id="v1-metrics" class="compare-metrics-list"></div>
         </div>
-
-        <div class="compare-col v2-col">
-          <div class="compare-card-header">
-            <span class="version-tag v2-tag">Версія 2 (Поточна модель)</span>
-            <span id="v2-timestamp" class="compare-time">Зараз</span>
-          </div>
-          <div class="compare-img-wrap">
-            <img id="v2-preview-img" alt="Прев'ю моделі V2" class="compare-preview-img" />
-          </div>
-          <div id="v2-metrics" class="compare-metrics-list"></div>
+  
+        <!-- ІНЖЕНЕРНА РЕФЛЕКСІЯ ДЛЯ 52–60 ХВИЛИН УРОКУ -->
+        <div class="reflection-box">
+          <h4>💡 Інженерна рефлексія пари (хвилини 52–60):</h4>
+          <ul>
+            <li><b>Зв'язність:</b> перевір суміжність клітинок у редакторі, а цілісність 3D-сітки — у слайсері.</li>
+            <li><b>Силует і тінь:</b> чи достатньо контрастні сходинки висоти, коли колір пластику один?</li>
+            <li><b>Час друку:</b> порівняй фактичні записи зі слайсера для двох версій, якщо вони є.</li>
+          </ul>
         </div>
-      </div>
-
-      <!-- ІНЖЕНЕРНА РЕФЛЕКСІЯ ДЛЯ 52–60 ХВИЛИН УРОКУ -->
-      <div class="reflection-box">
-        <h4>💡 Інженерна рефлексія пари (хвилини 52–60):</h4>
-        <ul>
-          <li><b>Зв'язність:</b> перевір суміжність клітинок у редакторі, а цілісність 3D-сітки — у слайсері.</li>
-          <li><b>Силует і тінь:</b> чи достатньо контрастні сходинки висоти, коли колір пластику один?</li>
-          <li><b>Час друку:</b> порівняй фактичні записи зі слайсера для двох версій, якщо вони є.</li>
-        </ul>
-      </div>
-
-      <div class="modal-footer">
-        <button id="btn-compare-to-passport" class="btn-action btn-card">📋 Створити Паспорт деталі з V2</button>
-        <button id="btn-re-snapshot-v1" class="btn-subtle">📸 Оновити V1 (перезаписати ескіз)</button>
-        <button id="btn-close-compare-footer" class="view-btn">Закрити</button>
       </div>
     </div>
   </div>
@@ -1405,31 +1360,28 @@
 
   <!-- ПІДКЛЮЧЕННЯ СКРИПТІВ (Працює 100% офлайн без інтернету та серверів!) -->
   <script src="lib/three.min.js"></script>
-  <script src="src/voxelFont.js?v=2.2.1"></script>
-  <script src="src/soundEffects.js?v=2.2.1"></script>
-  <script src="src/safeStorage.js?v=2.2.1"></script>
-  <script src="src/historyManager.js?v=2.2.1"></script>
-  <script src="src/meshValidator.js?v=2.2.1"></script>
-  <script src="src/contentRegistry.js?v=2.2.1"></script>
-  <script src="src/missionManager.js?v=2.2.1"></script>
-  <script src="src/projectState.js?v=2.2.1"></script>
-  <script src="src/modalFocus.js?v=2.2.1"></script>
-  <script src="src/snapshotCompareController.js?v=2.2.1"></script>
-  <script src="src/passportPrintController.js?v=2.2.1"></script>
-  <script src="src/generators/minecraftForge.js?v=2.2.1"></script>
-  <script src="src/generators/dualIllusion.js?v=2.2.1"></script>
-  <script src="src/generators/physicsMechanics.js?v=2.2.1"></script>
-  <script src="src/generators/mobMutator.js?v=2.2.1"></script>
-  <script src="src/generators/heightmapRelief.js?v=2.2.1"></script>
-  <script src="src/content/adventurePack.js?v=2.2.1"></script>
-  <script src="src/content/funReliefs.js?v=2.2.1"></script>
-  <script src="src/content/funDiscoveries.js?v=2.2.1"></script>
-  <script src="src/content/funEngineering.js?v=2.2.1"></script>
-  <script src="src/adventureShelf.js?v=2.2.1"></script>
-  <script src="src/pixelEditorTools.js?v=2.2.1"></script>
-  <script src="src/lessonCompanion.js?v=2.2.1"></script>
-  <script src="src/sceneManager.js?v=2.2.1"></script>
-  <script src="src/responsiveToolbar.js?v=2.2.1"></script>
-  <script src="src/app.js?v=2.2.1"></script>
+  <script src="src/voxelFont.js?v=2.3.0"></script>
+  <script src="src/soundEffects.js?v=2.3.0"></script>
+  <script src="src/safeStorage.js?v=2.3.0"></script>
+  <script src="src/historyManager.js?v=2.3.0"></script>
+  <script src="src/meshValidator.js?v=2.3.0"></script>
+  <script src="src/contentRegistry.js?v=2.3.0"></script>
+  <script src="src/missionManager.js?v=2.3.0"></script>
+  <script src="src/projectState.js?v=2.3.0"></script>
+  <script src="src/modalFocus.js?v=2.3.0"></script>
+  <script src="src/snapshotCompareController.js?v=2.3.0"></script>
+  <script src="src/passportPrintController.js?v=2.3.0"></script>
+  <script src="src/generators/minecraftForge.js?v=2.3.0"></script>
+  <script src="src/generators/dualIllusion.js?v=2.3.0"></script>
+  <script src="src/generators/physicsMechanics.js?v=2.3.0"></script>
+  <script src="src/generators/mobMutator.js?v=2.3.0"></script>
+  <script src="src/generators/heightmapRelief.js?v=2.3.0"></script>
+  <script src="src/content/adventurePack.js?v=2.3.0"></script>
+  <script src="src/content/funReliefs.js?v=2.3.0"></script>
+  <script src="src/content/funDiscoveries.js?v=2.3.0"></script>
+  <script src="src/content/funEngineering.js?v=2.3.0"></script>
+  <script src="src/pixelEditorTools.js?v=2.3.0"></script>
+  <script src="src/sceneManager.js?v=2.3.0"></script>
+  <script src="src/app.js?v=2.3.0"></script>
 </body>
 </html>

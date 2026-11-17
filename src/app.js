@@ -62,12 +62,10 @@
       // Кеш DOM-елементів (єдина точка правди)
       this._domCache = {
         workspace: document.getElementById('main-workspace'),
-        workflowStepper: document.getElementById('workflow-stepper'),
         btnExportStl: document.getElementById('btn-export-stl'),
         autosaveTag: document.getElementById('autosave-tag'),
         btnUndo: document.getElementById('btn-undo'),
         btnRedo: document.getElementById('btn-redo'),
-        btnMcUndo: document.getElementById('btn-mc-undo'),
         btnToggleMono: document.getElementById('btn-toggle-mono'),
         monoColorPicker: document.getElementById('mono-color-picker'),
         verificationBadge: document.getElementById('print-verification-badge'),
@@ -157,11 +155,6 @@
         hmDropzone: document.getElementById('hm-dropzone'),
         hmFileInput: document.getElementById('hm-file-input'),
         hmPreviewCanvas: document.getElementById('hm-preview-canvas'),
-        hmFloatingHud: document.getElementById('hm-floating-hud'),
-        hmHudPreviewCanvas: document.getElementById('hm-hud-preview-canvas'),
-        btnToggleHmHud: document.getElementById('btn-toggle-hm-hud'),
-        btnHmHudClose: document.getElementById('btn-hm-hud-close'),
-        btnHmHudSize: document.getElementById('btn-hm-hud-size'),
         hmInvert: document.getElementById('hm-invert'),
         hmAutoLevels: document.getElementById('hm-auto-levels'),
         hmContrast: document.getElementById('hm-contrast'),
@@ -185,12 +178,13 @@
         hmGeomCheck: document.getElementById('hm-geom-check'),
 
         // V1 та Порівняння V1 ↔ V2
-        btnSnapshotV1: document.getElementById('btn-snapshot-v1'),
-        btnCompareV1V2: document.getElementById('btn-compare-v1v2'),
-        btnPrintCard: document.getElementById('btn-print-card'),
+        btnMyPiece: document.getElementById('btn-my-piece'),
+        btnRunCompare: document.getElementById('btn-run-compare'),
+        compareResults: document.getElementById('compare-results'),
+        pieceV1Status: document.getElementById('piece-v1-status'),
+        pieceCompareHint: document.getElementById('piece-compare-hint'),
         compareModal: document.getElementById('compare-modal'),
         btnCloseCompare: document.getElementById('btn-close-compare'),
-        btnCloseCompareFooter: document.getElementById('btn-close-compare-footer'),
         btnReSnapshotV1: document.getElementById('btn-re-snapshot-v1'),
         btnCompareToPassport: document.getElementById('btn-compare-to-passport'),
         compareSummaryBanner: document.getElementById('compare-summary-banner'),
@@ -223,14 +217,6 @@
         pCardChecklist: document.getElementById('p-card-checklist')
       };
 
-      if (window.StudioAdventurePack && window.AdventureShelf) {
-        this.adventureShelf = new window.AdventureShelf({
-          pack: window.StudioAdventurePack,
-          onSelectMission: (id) => this.startMission(id)
-        });
-        this.adventureShelf.mount(document.getElementById('adventure-shelf'));
-      }
-
       if (window.PixelEditorTools) {
         this.pixelTools = new window.PixelEditorTools({
           generator: this.mcGen,
@@ -245,17 +231,6 @@
         this.pixelTools.mount(document.getElementById('pixel-editor-tools'));
       }
 
-      if (window.LessonCompanion) {
-        this.lessonCompanion = new window.LessonCompanion({
-          onSelectMission: (id) => {
-            this.startMission(id);
-            this.lessonCompanion.close();
-          }
-        });
-        this.lessonCompanion.init();
-        document.getElementById('btn-open-lesson')?.addEventListener('click', () => this.lessonCompanion.open());
-      }
-
       this.bindTabs();
       this.bindModelCatalog();
       this.bindTopActions();
@@ -268,23 +243,18 @@
       this.bindMobControls();
       this.bindHeightmapControls();
       this.bindCameraControls();
-      this.bindWorkflowStepper();
-
-      if (window.ResponsiveToolbar) {
-        this.responsiveToolbar = new window.ResponsiveToolbar();
-        this.responsiveToolbar.init();
-      }
 
       // Відновлюємо автозбереження або рендеримо стартову модель
       const restored = this.restoreAutosave();
-      if (this.adventureShelf) this.adventureShelf.selectMission(this.missions.activeMissionId);
       this.missions.updateActiveMissionUI(this._domCache);
       this.missions.renderMissionsModal(this._domCache, (id) => this.startMission(id));
       if (!restored) {
+        // Свіжий старт: прев'ю одним пластиком (збережені проєкти зберігають власне значення)
+        this.setMonochromeMode(true);
         this.mcGen.renderCanvasUI();
         this.rebuildCurrentModel(true);
       }
-      this.history.updateUI(this._domCache.btnUndo, this._domCache.btnRedo, this._domCache.btnMcUndo);
+      this.history.updateUI(this._domCache.btnUndo, this._domCache.btnRedo);
       if (window.location.hash === '#about') {
         setTimeout(() => this.openAboutModal(), 150);
       }
@@ -298,7 +268,7 @@
       const savedPair = this.safeStorage.getItem('3d_kuznya_pair_code') || '';
       return {
         app: '3d-club-studio',
-        version: '2.2.1',
+        version: '2.3.0',
         schemaVersion: 1,
         savedAt: new Date().toISOString(),
         activeTab: this.activeTab,
@@ -391,8 +361,6 @@
         }
         this.compare.setV1(state.v1Snapshot);
         clearTimeout(this._snapshotLabelTimer);
-        if (dom.btnCompareV1V2) dom.btnCompareV1V2.style.display = state.v1Snapshot ? 'inline-flex' : 'none';
-        if (dom.btnCompareV1V2) dom.btnCompareV1V2.classList.toggle('has-v1', !!state.v1Snapshot);
         this._setSnapshotButtonState(!!state.v1Snapshot);
         this.safeStorage.setItem('3d_kuznya_pair_code', state.studentPairCode);
         if (dom.cardPairInput) dom.cardPairInput.value = state.studentPairCode;
@@ -502,7 +470,6 @@
         const targetTab = state.activeTab || 'minecraft';
         this.switchTab(targetTab, true);
         this.rebuildCurrentModel(animatePop, true);
-        if (this.adventureShelf) this.adventureShelf.selectMission(this.missions.activeMissionId);
       } finally {
         this._isRestoring = false;
       }
@@ -567,7 +534,7 @@
 
     updateHistoryButtons(canUndo, canRedo) {
       const dom = this._domCache || {};
-      this.history.updateUI(dom.btnUndo, dom.btnRedo, dom.btnMcUndo);
+      this.history.updateUI(dom.btnUndo, dom.btnRedo);
     }
 
     _setButtonLabel(btn, ico, text) {
@@ -582,26 +549,15 @@
       }
     }
 
-    _setSnapshotButtonState(hasV1, transientText = '') {
-      const btn = this._domCache?.btnSnapshotV1;
-      if (!btn) return;
-      btn.classList.toggle('has-v1', Boolean(hasV1));
-      const lblEl = btn.querySelector('.btn-lbl');
-      if (transientText) {
-        this._setButtonLabel(btn, '📸', transientText);
-        return;
+    _setSnapshotButtonState(hasV1) {
+      const dom = this._domCache || {};
+      if (dom.btnMyPiece) {
+        dom.btnMyPiece.classList.toggle('has-v1', Boolean(hasV1));
+        dom.btnMyPiece.title = hasV1
+          ? `Мій виріб: чернетку V1 збережено${this.compare.getV1()?.displayTime ? ` о ${this.compare.getV1().displayTime}` : ''}`
+          : 'Мій виріб: чернетка V1, порівняння з поточною моделлю та паспорт деталі';
       }
-      if (hasV1) {
-        this._setButtonLabel(btn, '📸', 'V1 ✓');
-        btn.title = 'Версію 1 (Ескіз) зафіксовано. Натисніть, щоб оновити ескіз';
-      } else if (lblEl) {
-        const icoEl = btn.querySelector('.btn-ico');
-        if (icoEl) icoEl.textContent = '📸';
-        lblEl.innerHTML = 'V1 <span class="lbl-ext">(Ескіз)</span>';
-        btn.title = 'Зафіксувати поточну модель як Версію 1 (Ескіз)';
-      } else {
-        btn.textContent = '📸 V1 (Ескіз)';
-      }
+      this.compare.syncSteps(dom);
     }
 
     _updateAutosaveTag(shortText, detailText, tooltipText) {
@@ -767,10 +723,8 @@
       if (dom.btnToggleMono) {
         dom.btnToggleMono.classList.toggle('active', active);
         dom.btnToggleMono.setAttribute('aria-pressed', active ? 'true' : 'false');
+        dom.btnToggleMono.setAttribute('aria-checked', active ? 'true' : 'false');
         this._setButtonLabel(dom.btnToggleMono, '🪨', active ? '1 Пластик ✓' : '1 Пластик');
-      }
-      if (active) {
-        this.setWorkflowStep(3);
       }
       return active;
     }
@@ -877,13 +831,6 @@
       if (physicsActionBar) physicsActionBar.style.display = tabName === 'physics' ? 'flex' : 'none';
 
       const dom = this._domCache || {};
-      if (dom.hmFloatingHud) {
-        dom.hmFloatingHud.style.display = (tabName === 'heightmap' && this._hmHudUserEnabled) ? 'flex' : 'none';
-        if (tabName === 'heightmap' && this._hmHudUserEnabled) {
-          this.updateHeightmapPreview2D();
-        }
-      }
-
       if (tabName === 'illusion') {
         this.sceneManager.setCameraView('front');
         if (!this._isRestoring && this.missions && this.missions.getActiveMission()?.targetTab !== 'illusion') {
@@ -943,20 +890,8 @@
         silent
       );
       if (snap) {
-        const dom = this._domCache || {};
-        if (dom.btnCompareV1V2) {
-          dom.btnCompareV1V2.style.display = 'inline-flex';
-          dom.btnCompareV1V2.disabled = false;
-          dom.btnCompareV1V2.classList.add('has-v1');
-          dom.btnCompareV1V2.title = `V1 зафіксовано о ${snap.displayTime}. Натисніть для порівняння!`;
-        }
-        if (dom.btnSnapshotV1) {
-          this._setSnapshotButtonState(true, 'V1 ✓');
-          clearTimeout(this._snapshotLabelTimer);
-          this._snapshotLabelTimer = setTimeout(() => {
-            this._setSnapshotButtonState(true);
-          }, 2200);
-        }
+        this._setSnapshotButtonState(true);
+        if (this._domCache?.compareResults && !this._domCache.compareResults.hidden) this.renderComparison();
         this.showToast('📸 V1 (Ескіз) зафіксовано для порівняння!');
         this.autosave();
       }
@@ -1109,7 +1044,12 @@
     }
 
     openCompareModal() {
-      this.compare.openCompareModal(
+      this.compare.openCompareModal(this._domCache);
+      window.ModalFocus.enter(this._domCache.compareModal);
+    }
+
+    renderComparison() {
+      this.compare.renderComparison(
         this._domCache,
         this.sceneManager,
         this.mcGen,
@@ -1117,7 +1057,6 @@
         this.missions.getActiveMission(),
         this._domCache?.slicerTimeInput
       );
-      window.ModalFocus.enter(this._domCache.compareModal);
     }
 
     closeCompareModal() {
@@ -1287,7 +1226,6 @@
     }
 
     onMissionSelected(m) {
-      if (this.adventureShelf) this.adventureShelf.selectMission(m.id);
       this.missions.updateActiveMissionUI(this._domCache);
       this.missions.renderMissionsModal(this._domCache, (id) => this.startMission(id));
       this.autosave();
@@ -1386,7 +1324,6 @@
 
       if (dom.btnUndo) dom.btnUndo.addEventListener('click', () => this.undo());
       if (dom.btnRedo) dom.btnRedo.addEventListener('click', () => this.redo());
-      if (dom.btnMcUndo) dom.btnMcUndo.addEventListener('click', () => this.undo());
 
       // Гарячі клавіші (Undo, Redo, Save, Escape, Ортографія)
       window.addEventListener('keydown', (e) => {
@@ -1405,8 +1342,6 @@
           this.saveProjectToFile();
         } else if (e.key === 'Escape') {
           if (e.defaultPrevented) return;
-          const lessonRoot = this.lessonCompanion?._root;
-          if (lessonRoot && !lessonRoot.hidden) return;
           const open = (m) => m && m.style.display !== 'none' && m.style.display !== '';
           const modals = [
             [dom.aboutModal, () => this.closeAboutModal()],
@@ -1459,9 +1394,7 @@
         });
       }
 
-      if (dom.btnSnapshotV1) dom.btnSnapshotV1.addEventListener('click', () => this.captureV1Snapshot());
-      if (dom.btnCompareV1V2) dom.btnCompareV1V2.addEventListener('click', () => this.openCompareModal());
-      if (dom.btnPrintCard) dom.btnPrintCard.addEventListener('click', () => this.openPrintCardModal());
+      if (dom.btnMyPiece) dom.btnMyPiece.addEventListener('click', () => this.openCompareModal());
 
       const btnToggleSlicer = document.getElementById('btn-toggle-slicer-notes');
       const slicerPanel = document.getElementById('slicer-notes-panel');
@@ -1475,39 +1408,43 @@
         });
       }
 
-      // Керування меню додаткових опцій у шапці
-      const btnMenu = document.getElementById('btn-top-menu');
-      const menuDropdown = document.getElementById('top-dropdown-menu');
-      if (btnMenu && menuDropdown) {
-        const toggleMenu = (open) => {
-          const isOpen = open !== undefined ? open : !menuDropdown.classList.contains('show');
-          if (isOpen && this.responsiveToolbar) {
-            this.responsiveToolbar.closeMenu();
-          }
-          menuDropdown.classList.toggle('show', isOpen);
-          btnMenu.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-          btnMenu.classList.toggle('active', isOpen);
-          if (isOpen && window.StudioSound) window.StudioSound.playPop?.(480);
-        };
-
-        btnMenu.addEventListener('click', (e) => {
+      // Керування випадними меню шапки: «Опції» і «Друк» (одночасно відкрите лише одне)
+      const dropdowns = [
+        [document.getElementById('btn-top-menu'), document.getElementById('top-dropdown-menu')],
+        [document.getElementById('btn-print-menu'), document.getElementById('print-dropdown-menu')]
+      ].filter(([btn, menu]) => btn && menu);
+      const setDropdown = (btn, menu, isOpen) => {
+        if (isOpen) {
+          dropdowns.forEach(([otherBtn, otherMenu]) => {
+            if (otherMenu !== menu) {
+              otherMenu.classList.remove('show');
+              otherBtn.setAttribute('aria-expanded', 'false');
+              otherBtn.classList.remove('active');
+            }
+          });
+        }
+        menu.classList.toggle('show', isOpen);
+        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        btn.classList.toggle('active', isOpen);
+        if (isOpen && window.StudioSound) window.StudioSound.playPop?.(480);
+      };
+      dropdowns.forEach(([btn, menu]) => {
+        btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          toggleMenu();
+          setDropdown(btn, menu, !menu.classList.contains('show'));
         });
-
         document.addEventListener('click', (e) => {
-          if (!menuDropdown.contains(e.target) && e.target !== btnMenu) {
-            toggleMenu(false);
+          if (menu.classList.contains('show') && !menu.contains(e.target) && e.target !== btn) {
+            setDropdown(btn, menu, false);
           }
         });
-
         document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape' && menuDropdown.classList.contains('show')) {
-            toggleMenu(false);
-            btnMenu.focus();
+          if (e.key === 'Escape' && menu.classList.contains('show')) {
+            setDropdown(btn, menu, false);
+            btn.focus();
           }
         });
-      }
+      });
 
       const btnSound = document.getElementById('btn-toggle-sound');
       const btnMusic = document.getElementById('btn-toggle-music');
@@ -1578,25 +1515,17 @@
             this.showToast('⚠️ Не вдалося зберегти STL.');
             return;
           }
-          this.setWorkflowStep(4);
           this.triggerCelebration('🎉 Ура! Твій STL-файл завантажено і готовий до друку!');
         });
       }
 
       // Керування модальним вікном порівняння V1 ↔ V2
       if (dom.btnCloseCompare) dom.btnCloseCompare.addEventListener('click', () => this.closeCompareModal());
-      if (dom.btnCloseCompareFooter) dom.btnCloseCompareFooter.addEventListener('click', () => this.closeCompareModal());
-      if (dom.btnReSnapshotV1) {
-        dom.btnReSnapshotV1.addEventListener('click', () => {
-          this.captureV1Snapshot();
-          this.openCompareModal();
-        });
-      }
+      if (dom.btnReSnapshotV1) dom.btnReSnapshotV1.addEventListener('click', () => this.captureV1Snapshot());
+      if (dom.btnRunCompare) dom.btnRunCompare.addEventListener('click', () => this.renderComparison());
       if (dom.btnCompareToPassport) {
-        dom.btnCompareToPassport.addEventListener('click', () => {
-          this.closeCompareModal();
-          this.openPrintCardModal('V2');
-        });
+        // Паспорт відкривається поверх «Мій виріб»; ModalFocus повертає фокус при закритті
+        dom.btnCompareToPassport.addEventListener('click', () => this.openPrintCardModal('V2'));
       }
       if (dom.compareModal) {
         dom.compareModal.addEventListener('click', (e) => {
@@ -1674,7 +1603,6 @@
       const dom = this._domCache || {};
 
       const btnOpenTop = document.getElementById('btn-open-missions');
-      const btnOpenInline = document.getElementById('btn-open-missions-inline');
       const btnCloseModal = document.getElementById('btn-close-missions');
       const btnToggleBody = document.getElementById('btn-toggle-mission-body');
       const btnCloseCard = document.getElementById('btn-close-active-mission');
@@ -1683,7 +1611,6 @@
       const btnStartActive = document.getElementById('btn-start-active-mission');
 
       if (btnOpenTop) btnOpenTop.addEventListener('click', () => this.toggleMissionsModal());
-      if (btnOpenInline) btnOpenInline.addEventListener('click', () => this.openMissionsModal());
       if (btnCloseModal) btnCloseModal.addEventListener('click', () => this.closeMissionsModal());
 
       if (btnCloseCard) {
@@ -1847,87 +1774,6 @@
         : 'Перспективна проєкція. Натисніть для переходу на Ортографічну проєкцію (Клавіша O)';
     }
 
-    // -------------------------------------------------------------------------
-    // 4-КРОКОВИЙ НАВІГАТОР РОБОЧОГО ПРОЦЕСУ ДЛЯ ДІТЕЙ
-    // -------------------------------------------------------------------------
-    setWorkflowStep(stepNum, triggerAction = false) {
-      this.currentWorkflowStep = stepNum;
-      document.querySelectorAll('.step-btn').forEach((btn) => {
-        const num = parseInt(btn.getAttribute('data-step'), 10);
-        btn.classList.toggle('active', num === stepNum);
-        btn.classList.toggle('completed', num < stepNum);
-      });
-
-      if (!triggerAction) return;
-
-      const dom = this._domCache || {};
-      const isHeightmap = (this.activeTab === 'heightmap');
-
-      if (stepNum === 1) {
-        if (window.StudioSound) window.StudioSound.playPop(380);
-        if (isHeightmap) {
-          const target = dom.hmDropzone || document.querySelector('#panel-heightmap .card');
-          target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          this.showToast('🖼️ Крок 1: Завантаж картинку або обери дитячий значок нижче.');
-        } else {
-          const target = document.querySelector('.panel-section.active .card') || document.getElementById('adventure-shelf');
-          target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-      } else if (stepNum === 2) {
-        if (window.StudioSound) window.StudioSound.playPop(440);
-        if (isHeightmap) {
-          const target = document.querySelector('#panel-heightmap .collapsible-card') ||
-                         document.querySelector('#panel-heightmap .card:nth-of-type(3)');
-          target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          this.showToast('🎛️ Крок 2: Налаштуй чіткість, контраст і розміри під свій 3D-принтер.');
-        } else {
-          const target = document.querySelector('.panel-section.active .pixel-grid-wrapper') ||
-                         document.querySelector('.panel-section.active .card:nth-of-type(2)');
-          target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-      } else if (stepNum === 3) {
-        if (window.StudioSound) window.StudioSound.playPop(520);
-        this.setMonochromeMode(true);
-        if (this.sceneManager) {
-          this.sceneManager.setCameraView('iso');
-        }
-        if (isHeightmap) {
-          const target = dom.hmGeomCheck || dom.geomCheckPill;
-          target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          this.showToast('🔍 Крок 3: Перевір вигляд одним пластиком і монолітність оболонки.');
-        } else {
-          const target = dom.mcConnectivityStatus || dom.geomCheckPill;
-          target?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          this.showToast('🔍 Перевірка: поглянь чи деталі з\'єднані та як модель виглядає одним пластиком.');
-        }
-      } else if (stepNum === 4) {
-        if (window.StudioSound) window.StudioSound.playPop(620);
-        const btnExport = dom.btnExportStl || document.getElementById('btn-export-stl');
-        if (btnExport) {
-          btnExport.classList.remove('pulse-highlight');
-          void btnExport.offsetWidth;
-          btnExport.classList.add('pulse-highlight');
-          setTimeout(() => btnExport.classList.remove('pulse-highlight'), 2600);
-        }
-        if (isHeightmap) {
-          this.showToast('🚀 Фото-барельєф готовий! Натисни зелену кнопку «Експорт STL» угорі.');
-        } else {
-          this.showToast('🚀 Модель готова! Натисни зелену кнопку «Експорт STL» угорі.');
-        }
-      }
-    }
-
-    bindWorkflowStepper() {
-      document.querySelectorAll('.step-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const step = parseInt(btn.getAttribute('data-step'), 10);
-          if (step >= 1 && step <= 4) {
-            this.setWorkflowStep(step, true);
-          }
-        });
-      });
-    }
-
     bindMinecraftControls() {
       document.querySelectorAll('[data-mc-preset]').forEach((btn) => {
         btn.addEventListener('click', () => {
@@ -1952,25 +1798,9 @@
           this.mcGen.loadPreset(key, false, false);
           this.markModelModified();
           this.rebuildCurrentModel(true, true);
-          this.setWorkflowStep(2);
           this.autosave();
         });
       });
-
-      const btnMini = document.getElementById('btn-mc-mini-preset');
-      if (btnMini) {
-        btnMini.addEventListener('click', () => {
-          this.recordUndoSnapshot();
-          const dom = this._domCache || {};
-          if (dom.mcVoxelSize) dom.mcVoxelSize.value = '2.0';
-          if (dom.mcHeightStep) dom.mcHeightStep.value = '1.2';
-          if (dom.mcSolidBase) dom.mcSolidBase.checked = true;
-          this.updateValueLabels();
-          this.markModelModified();
-          this.rebuildCurrentModel(true);
-          this.autosave();
-        });
-      }
 
       document.querySelectorAll('[data-mc-brush]').forEach((btn) => {
         btn.addEventListener('click', () => {
@@ -2023,27 +1853,6 @@
     }
 
     bindIllusionControls() {
-      const btnShort = document.getElementById('btn-il-short-mode');
-      if (btnShort) {
-        btnShort.addEventListener('click', () => {
-          this.recordUndoSnapshot();
-          const firstPreset = document.querySelector('[data-il-preset="short"]');
-          if (firstPreset) {
-            document.querySelectorAll('[data-il-preset]').forEach(b => b.classList.remove('active'));
-            firstPreset.classList.add('active');
-          }
-          const dom = this._domCache || {};
-          if (dom.ilWord1) dom.ilWord1.value = '3D';
-          if (dom.ilDesign) dom.ilDesign.value = 'classic';
-          if (dom.ilWord2) dom.ilWord2.value = '★!';
-          if (dom.ilVoxelSize) dom.ilVoxelSize.value = '2.2';
-          this.updateValueLabels();
-          this.markModelModified();
-          this.rebuildCurrentModel(true);
-          this.autosave();
-        });
-      }
-
       document.querySelectorAll('[data-il-preset]').forEach((btn) => {
         btn.addEventListener('click', () => {
           this.recordUndoSnapshot();
@@ -2060,7 +1869,6 @@
           this.updateValueLabels();
           this.markModelModified();
           this.rebuildCurrentModel(true);
-          this.setWorkflowStep(2);
           this.autosave();
         });
       });
@@ -2327,50 +2135,6 @@
           el.addEventListener('change', handleUpdate);
         }
       });
-
-      // Керування плаваючим вікном (HUD PIP) карти висот у 3D сцені
-      if (dom.btnToggleHmHud && dom.hmFloatingHud) {
-        dom.btnToggleHmHud.addEventListener('click', () => {
-          const isVisible = dom.hmFloatingHud.style.display !== 'none';
-          this.setHeightmapHudVisible(!isVisible);
-        });
-      }
-      if (dom.btnHmHudClose && dom.hmFloatingHud) {
-        dom.btnHmHudClose.addEventListener('click', () => {
-          this.setHeightmapHudVisible(false);
-        });
-      }
-      if (dom.btnHmHudSize && dom.hmFloatingHud) {
-        dom.btnHmHudSize.addEventListener('click', () => {
-          dom.hmFloatingHud.classList.toggle('compact');
-          const isCompact = dom.hmFloatingHud.classList.contains('compact');
-          dom.btnHmHudSize.textContent = isCompact ? '🗖' : '🗗';
-          dom.btnHmHudSize.title = isCompact ? 'Збільшити розмір вікна' : 'Зменшити розмір вікна';
-        });
-      }
-      if (dom.hmFloatingHud) {
-        // Запобігаємо обертанню 3D камери при кліках і скролі всередині плаваючого вікна
-        const stopProp = (e) => e.stopPropagation();
-        dom.hmFloatingHud.addEventListener('pointerdown', stopProp);
-        dom.hmFloatingHud.addEventListener('mousedown', stopProp);
-        dom.hmFloatingHud.addEventListener('touchstart', stopProp, { passive: true });
-        dom.hmFloatingHud.addEventListener('wheel', stopProp, { passive: true });
-      }
-    }
-
-    setHeightmapHudVisible(visible) {
-      const dom = this._domCache || {};
-      if (!dom.hmFloatingHud) return;
-      this._hmHudUserEnabled = Boolean(visible);
-      const shouldShow = visible && this.activeTab === 'heightmap';
-      dom.hmFloatingHud.style.display = shouldShow ? 'flex' : 'none';
-      if (dom.btnToggleHmHud) {
-        dom.btnToggleHmHud.classList.toggle('active', Boolean(visible));
-        dom.btnToggleHmHud.textContent = visible ? '🪟 Вікно: УВІМК' : '🪟 У сцену';
-      }
-      if (shouldShow) {
-        this.updateHeightmapPreview2D();
-      }
     }
 
     updateHeightmapPreview2D() {
@@ -2384,15 +2148,6 @@
         gamma: dom.hmGamma?.value,
         smooth: dom.hmSmooth?.value
       });
-
-      // Синхронізація з плаваючим вікном у 3D сцені (HUD)
-      if (dom.hmFloatingHud && dom.hmFloatingHud.style.display !== 'none' && dom.hmHudPreviewCanvas) {
-        const hudCtx = dom.hmHudPreviewCanvas.getContext('2d');
-        if (hudCtx) {
-          hudCtx.clearRect(0, 0, dom.hmHudPreviewCanvas.width, dom.hmHudPreviewCanvas.height);
-          hudCtx.drawImage(dom.hmPreviewCanvas, 0, 0, dom.hmHudPreviewCanvas.width, dom.hmHudPreviewCanvas.height);
-        }
-      }
     }
 
     updateHeightmapMeshValidation(group) {

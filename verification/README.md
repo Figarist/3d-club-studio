@@ -28,8 +28,8 @@ of 101 configurations await final review.
 Use an isolated profile and local HTTP origin with no prior student data. Inspect
 console errors. Do not inject preferences or call callbacks as proof of UI wiring.
 
-1. Note mission title/grid and checks. Click Rocket on the shelf, Undo once and
-   compare all three plus selected shelf; Redo must restore Rocket. Set sliced
+1. Note mission title/grid and checks. Click Rocket in the missions catalog, Undo once and
+   compare all three plus the active mission; Redo must restore Rocket. Set sliced
    and a synthetic note, click Rotate, and confirm generated/empty note. Undo
    should restore grid and the original sliced/note values. Reload after Redo
    and compare the saved grid.
