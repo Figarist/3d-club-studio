@@ -787,6 +787,15 @@
 
     // Експорт поточної моделі у бінарний .STL файл (100% сумісний з Tinkercad, Makers Empire, Cura, PrusaSlicer)
     exportBinarySTL(filename = '3d_model_for_printer.stl') {
+      try {
+        return this._exportBinarySTLImpl(filename);
+      } catch (err) {
+        console.error('STL export failed:', err);
+        return false;
+      }
+    }
+
+    _exportBinarySTLImpl(filename) {
       if (this.onBeforeExport) this.onBeforeExport();
       this.stopSlicerSimulation();
       this.finishPopAnimation();
@@ -796,6 +805,9 @@
 
       this.modelGroup.traverse((child) => {
         if (!child.isMesh || child.userData.exportable === false) return;
+        for (let n = child; n && n !== this.modelGroup.parent; n = n.parent) {
+          if (n.visible === false) return;
+        }
         let geom = child.geometry.clone();
         geom.applyMatrix4(child.matrixWorld);
 
@@ -832,7 +844,7 @@
 
       if (triangles.length === 0) {
         alert('Немає геометрії для експорту!');
-        return;
+        return false;
       }
 
       // Гарантуємо, що найнижча точка моделі лежить РІВНО на Z = 0.00 мм столу принтера
@@ -896,9 +908,10 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
 
       if (window.StudioSound) window.StudioSound.playExportSuccess();
+      return true;
     }
 
     onResize() {
@@ -994,7 +1007,8 @@
     }
 
     animate() {
-      requestAnimationFrame(() => this.animate());
+      this._rafId = requestAnimationFrame(() => this.animate());
+      if (document.hidden) return;
       const frameDelta = Math.min(0.25, this.clock.getDelta());
       const dt = Math.min(0.05, frameDelta);
       const cameraBlend = 1 - Math.exp(-9 * frameDelta);
@@ -1082,14 +1096,21 @@
           }
 
           // Оновлюємо статус/підказку на кнопці симуляції (номер шару та висота Z)
-          const btn = document.getElementById('btn-simulate-print');
+          if (!this._simBtn || !this._simBtn.isConnected) {
+            this._simBtn = document.getElementById('btn-simulate-print');
+            this._simBtnText = null;
+          }
+          const btn = this._simBtn;
           if (btn) {
             const lbl = btn.querySelector('.btn-lbl');
             const layerText = `Шар ${currentLayerIdx + 1}/${totalLayers} (${currentH.toFixed(1)} мм)`;
-            if (lbl) {
-              lbl.textContent = layerText;
-            } else {
-              btn.textContent = `🔥 ${layerText}`;
+            if (layerText !== this._simBtnText) {
+              this._simBtnText = layerText;
+              if (lbl) {
+                lbl.textContent = layerText;
+              } else {
+                btn.textContent = `🔥 ${layerText}`;
+              }
             }
           }
         }

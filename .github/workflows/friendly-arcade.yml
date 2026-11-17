@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     uses: Figarist/friendly-arcade/.github/workflows/verify-vendored.yml@v2

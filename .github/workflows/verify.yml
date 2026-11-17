@@ -1,0 +1,35 @@
+name: Verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Release static checks
+        run: node verification/verify-release-static.cjs
+      - name: Content registry
+        run: node verification/verify-content-registry.cjs
+      - name: Project state
+        run: node verification/verify-project-state.cjs
+      - name: History transactions
+        run: node verification/verify-history-transactions.cjs
+      - name: Fun state
+        run: node verification/verify-fun-state.cjs
+      - name: Fun export
+        run: node verification/verify-fun-export.cjs
+      - name: Heightmap export
+        run: node verification/verify-heightmap-export.cjs
+      - name: Physics geometry cache
+        run: node verification/verify-physics-geometry-cache.cjs

@@ -1,5 +1,6 @@
 // Генератор 2: Магія Подвійного Тексту (3D Оптична Ілюзія / Перевертень з підтримкою Української Кирилиці та Іконок)
 (function () {
+  const MIN_BASE_HEIGHT = 1.0;
   const IL_CONFIG = {
     DEFAULT_VOXEL_SIZE: 2.6,
     DEFAULT_BASE_HEIGHT: 4.0,
@@ -11,6 +12,12 @@
     RIM_HEIGHT: 1.4,
     RIM_EXTRA: 1.0
   };
+
+  // Висота платформи: не менше 1.0 мм (суцільна підкладка для друку)
+  function parseBaseHeight(raw) {
+    const v = parseFloat(raw);
+    return Math.max(MIN_BASE_HEIGHT, Number.isFinite(v) ? v : IL_CONFIG.DEFAULT_BASE_HEIGHT);
+  }
 
   function rowsFromSpans(spans, width = 11) {
     return Object.freeze(spans.map((row) => {
@@ -203,9 +210,8 @@
     const xCount = frontRows[0].length;
     const zCount = sideRows[0].length;
     const voxelSizeValue = parseFloat(params.voxelSize);
-    const baseHeightValue = parseFloat(params.baseHeight);
     const voxelSize = Number.isFinite(voxelSizeValue) && voxelSizeValue > 0 ? voxelSizeValue : IL_CONFIG.DEFAULT_VOXEL_SIZE;
-    const baseHeight = Number.isFinite(baseHeightValue) && baseHeightValue > 0 ? baseHeightValue : IL_CONFIG.DEFAULT_BASE_HEIGHT;
+    const baseHeight = parseBaseHeight(params.baseHeight);
     const safeSupports = params.safeSupports !== false;
     const grid = Array.from({ length: rowCount }, () =>
       Array.from({ length: xCount }, () => Array(zCount).fill(0))
@@ -319,7 +325,7 @@
       const word1 = params.word1 || 'МАКСИМ';
       const word2 = params.word2 || '★BOSS★';
       const voxelSize = parseFloat(params.voxelSize) || IL_CONFIG.DEFAULT_VOXEL_SIZE; // мм на 1 воксель літери
-      const baseHeight = parseFloat(params.baseHeight) || IL_CONFIG.DEFAULT_BASE_HEIGHT; // мм висота платформи
+      const baseHeight = parseBaseHeight(params.baseHeight); // мм висота платформи
       const safeSupports = params.safeSupports !== false;
       const layoutMode = params.layoutMode || 'diagonal'; // 'diagonal' або 'line'
 

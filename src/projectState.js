@@ -100,7 +100,7 @@
       if (Number.isFinite(value)) return value;
       fail(path, 'must be finite');
     }
-    if (typeof value === 'string' && /^(?:\d+\.?\d*|\.\d+)$/.test(value.trim())) {
+    if (typeof value === 'string' && /^-?(?:\d+\.?\d*|\.\d+)$/.test(value.trim())) {
       const parsed = Number(value);
       if (Number.isFinite(parsed)) return parsed;
     }

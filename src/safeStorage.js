@@ -16,6 +16,7 @@
     },
 
     getItem(key) {
+      if (Object.prototype.hasOwnProperty.call(this._mem, key)) return this._mem[key];
       try {
         if (typeof window !== 'undefined' && window.localStorage) {
           const val = window.localStorage.getItem(key);
@@ -30,10 +31,14 @@
       try {
         if (typeof window !== 'undefined' && window.localStorage) {
           window.localStorage.setItem(key, strVal);
-          return;
+          delete this._mem[key];
+          return true;
         }
-      } catch (_) {}
+      } catch (_) {
+        // Keep the last persisted value; the newer one lives in memory and getItem prefers it.
+      }
       this._mem[key] = strVal;
+      return false;
     },
 
     removeItem(key) {

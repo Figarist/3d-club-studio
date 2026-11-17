@@ -1,4 +1,4 @@
-# ⚒️ 3D Кузня Чудес — 3D Club Studio v2.2.0 Friendly Arcade Edition
+# ⚒️ 3D Кузня Чудес — 3D Club Studio v2.2.1 Friendly Arcade Edition
 
 - **🌐 Живий вебдодаток (Live Web App):** [sivochka.com/3d-club-studio/](https://sivochka.com/3d-club-studio/)
 - **👨‍🏫 Автор:** [Ігор Сівочка — sivochka.com](https://sivochka.com/)
@@ -64,11 +64,12 @@
 ├── src/
 │   ├── app.js
 │   ├── sceneManager.js
+│   ├── responsiveToolbar.js
 │   ├── projectState.js
 │   ├── contentRegistry.js
 │   ├── missionManager.js
 │   ├── content/              # базові та додаткові контент-паки
-│   ├── generators/           # чотири генератори
+│   ├── generators/           # п'ять генераторів
 │   └── UI і стан-модулі      # див. TECHNICAL_ARCHITECTURE.md
 ├── docs/                     # правила, посібники, аудити й докази
 └── verification/             # ізольовані перевірки та маніфести

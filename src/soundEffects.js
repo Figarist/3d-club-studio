@@ -69,6 +69,7 @@
       this.enabled = true;
       this.musicEnabled = false;
       this._boundInit = false;
+      this._gesture = false;
 
       this._printerStepIndex = 0;
       this._lastSliderSoundTime = 0;
@@ -77,23 +78,26 @@
     }
 
     init() {
-      if (!this._boundInit) {
-        this._boundInit = true;
-        // Гарантуємо, що AudioContext створюється тільки після першої взаємодії користувача
-        const initOnInteraction = () => {
-          this._ensureContext();
-          ['click', 'keydown', 'touchstart'].forEach((evt) => {
-            document.removeEventListener(evt, initOnInteraction, true);
-          });
-        };
-        ['click', 'keydown', 'touchstart'].forEach((evt) => {
-          document.addEventListener(evt, initOnInteraction, { once: true, capture: true });
-        });
-      }
-      this._ensureContext();
+      if (this._boundInit) return;
+      this._boundInit = true;
+      // AudioContext створюється лише після першої взаємодії користувача
+      const evts = ['click', 'keydown', 'touchstart'];
+      const onGesture = () => {
+        evts.forEach((evt) => document.removeEventListener(evt, onGesture, true));
+        this._gesture = true;
+        this._ensureContext();
+      };
+      evts.forEach((evt) => document.addEventListener(evt, onGesture, true));
+    }
+
+    _emitChange() {
+      try {
+        window.dispatchEvent(new CustomEvent('studio-sound-change'));
+      } catch (e) { /* ignore */ }
     }
 
     _ensureContext() {
+      if (!this._gesture) return;
       if (!this.ctx) {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
         if (AudioCtx) {
@@ -221,6 +225,7 @@
       } else if (this.musicEnabled) {
         this.stopMusic();
       }
+      this._emitChange();
       return this.enabled;
     }
 
@@ -240,6 +245,7 @@
       }
       if (!this.enabled) {
         this.enabled = true;
+        this._emitChange();
       }
       this.startMusic();
       return true;
@@ -252,6 +258,7 @@
       this._musicStepIndex = 0;
 
       // Граємо перший крок одразу і запускаємо таймер (150 мс = 100 BPM 16-ті ноти)
+      this._emitChange();
       this._playMusicStep();
       this._musicTimer = setInterval(() => {
         if (!this.enabled || !this.musicEnabled) {
@@ -263,11 +270,13 @@
     }
 
     stopMusic() {
+      const was = this.musicEnabled;
       this.musicEnabled = false;
       if (this._musicTimer) {
         clearInterval(this._musicTimer);
         this._musicTimer = null;
       }
+      if (was) this._emitChange();
     }
 
     _playMusicStep() {
@@ -494,23 +503,6 @@
       } catch (e) { console.warn('StudioSound:', e); }
     }
 
-    // Веселий звук друкарської бульбашки при введенні тексту імені/слова
-    playKeyType(char = 'A') {
-      if (!this.enabled) return;
-      try {
-        this.init();
-        if (!this.ctx) return;
-        const code = (char && char.charCodeAt(0)) || 65;
-        const scaleNote = PENTATONIC_SCALE[code % PENTATONIC_SCALE.length];
-        this._tone({
-          type: 'triangle',
-          freq: scaleNote,
-          endFreq: scaleNote * 1.25,
-          duration: 0.055,
-          gain: 0.11
-        });
-      } catch (e) { console.warn('StudioSound:', e); }
-    }
 
     // Музичний джингл перемикання між 4 головними вкладками студії
     playTabSwitch(tabName) {
@@ -816,25 +808,6 @@
       } catch (e) { console.warn('StudioSound:', e); }
     }
 
-    // Пружний мультяшний звук «Боїнг-Бульк!», коли снаряд TNT відскакує від столу принтера
-    playProjectileBounce(bounceIndex = 0) {
-      if (!this.enabled) return;
-      try {
-        this.init();
-        if (!this.ctx) return;
-        const attenuation = Math.pow(0.72, bounceIndex);
-        const baseF = 240 + bounceIndex * 45;
-        this._tone({
-          type: 'triangle',
-          freq: baseF * 0.7,
-          midFreq: baseF * 1.6,
-          midTime: 0.03,
-          endFreq: baseF * 0.9,
-          duration: 0.12 * attenuation + 0.04,
-          gain: 0.2 * attenuation
-        });
-      } catch (e) { console.warn('StudioSound:', e); }
-    }
 
     // Магічне «гойдання-вібрато» для демонстрації Гравітаційного Балансира («Дракон на Пальці»)
     playBalancerWobble() {
@@ -963,25 +936,6 @@
       } catch (e) { console.warn('StudioSound:', e); }
     }
 
-    // Секретна пасхалка при кліку на логотип кузні ⚒️ («Ковальське Ковадло + Іскри»)
-    playAnvilEasterEgg() {
-      if (!this.enabled) return;
-      try {
-        this.init();
-        if (!this.ctx) return;
-        // Два дзвінкі удари молота по ковадлу
-        [0, 0.18].forEach((t, idx) => {
-          const mul = idx === 1 ? 1.25 : 1.0;
-          this._tone({ type: 'square', freq: 920 * mul, endFreq: 890 * mul, startTime: t, duration: 0.22, gain: 0.11 });
-          this._tone({ type: 'sine', freq: 1840 * mul, endFreq: 1790 * mul, startTime: t, duration: 0.28, gain: 0.1 });
-          this._noise({ filterType: 'highpass', freq: 2500, startTime: t, duration: 0.06, gain: 0.14 });
-        });
-        // Каскад магічних іскор
-        [1046.5, 1318.5, 1568.0, 2093.0].forEach((f, i) => {
-          this._tone({ type: 'sine', freq: f, startTime: 0.32 + i * 0.04, duration: 0.16, gain: 0.09 });
-        });
-      } catch (e) { console.warn('StudioSound:', e); }
-    }
   }
 
   window.StudioSound = new SoundEngine();
