@@ -591,12 +591,3 @@
     padding: 10px 14px;
   }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .lesson-dialog *,
-  .lesson-dialog *::before,
-  .lesson-dialog *::after {
-    scroll-behavior: auto !important;
-    transition-duration: .01ms !important;
-  }
-}

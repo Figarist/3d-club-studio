@@ -37,7 +37,7 @@ src/modalFocus.js → src/snapshotCompareController.js → src/passportPrintCont
 src/generators/minecraftForge.js → dualIllusion.js → physicsMechanics.js → mobMutator.js → heightmapRelief.js
 src/content/adventurePack.js → funReliefs.js → funDiscoveries.js → funEngineering.js
 src/adventureShelf.js → src/pixelEditorTools.js → src/lessonCompanion.js
-src/sceneManager.js → src/app.js
+src/sceneManager.js → src/responsiveToolbar.js → src/app.js
 ~~~
 
 Завантажуйте app.js останнім. Контент-паки реєструються після ContentRegistry, базових місій і генераторів, але до побудови UI. Новий скрипт додавайте лише після перевірки його window.* залежностей.
@@ -46,7 +46,7 @@ StudioApp керує вкладками, історією проєкту, міс
 
 ## 4. Каталог і сталі ідентичності
 
-Станом на 2026-10-12 активний реліз — v2.0.0, схема — 1. У каталозі 72 навчальні місії та 48 нових авторських моделей: 20 рельєфів, 12 персонажів, 8 оптичних і 8 інженерних робіт. Нові місії запускаються в одноколірному режимі.
+Станом на 2026-10-12 активний реліз — v2.2.1, схема — 1. У каталозі 72 навчальні місії та 48 нових авторських моделей: 20 рельєфів, 12 персонажів, 8 оптичних і 8 інженерних робіт. Нові місії запускаються в одноколірному режимі.
 
 Не ототожнюйте три числа: mission ID/key позначає навчальне завдання; modelKey позначає запис моделі; пресет і controls визначають конкретну конфігурацію генератора. У verification/content-evidence/manifest.json є 101 конфігурація. Місія може використовувати наявний пресет, а конфігурація може бути варіантом наявного задуму. Не описуйте 101 як число місій або як 101 фізично прийнятий виріб.
 
@@ -69,7 +69,7 @@ StudioApp керує вкладками, історією проєкту, міс
 | data-mc-brush | пензлі висот 0–4 |
 | data-il-preset | пресети Оптичного Перевертня |
 | data-camera-view | ракурси iso, front, top, side, side90, bottom |
-| data-view-mode | editor, split, viewport |
+| data-view-mode | split, viewport |
 | data-insert-sym | вставка воксельного символу |
 | data-mission-check | перевірки size, connected, mono |
 | data-mission-filter | фільтри каталогу, значення див. у index.html |

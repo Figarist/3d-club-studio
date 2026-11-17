@@ -1,6 +1,6 @@
 # Технічна архітектура
 
-Актуальний зріз документації: **3D Club Studio v1.9.0**, формат проєкту **schemaVersion 1**. Версія застосунку й версія формату файлу незалежні. Після змін звіряйте цей опис із джерелом у [index.html](../index.html), [app.js](../src/app.js), [ProjectState](../src/projectState.js), [ContentRegistry](../src/contentRegistry.js) та [SceneManager](../src/sceneManager.js).
+Актуальний зріз документації: **3D Club Studio v2.2.1**, формат проєкту **schemaVersion 1**. Версія застосунку й версія формату файлу незалежні. Після змін звіряйте цей опис із джерелом у [index.html](../index.html), [app.js](../src/app.js), [ProjectState](../src/projectState.js), [ContentRegistry](../src/contentRegistry.js) та [SceneManager](../src/sceneManager.js).
 
 ## Архітектурні межі
 
@@ -22,7 +22,8 @@
 6. src/content/adventurePack.js, src/content/funReliefs.js, src/content/funDiscoveries.js, src/content/funEngineering.js
 7. src/adventureShelf.js, src/pixelEditorTools.js, src/lessonCompanion.js
 8. src/sceneManager.js
-9. src/app.js
+9. src/responsiveToolbar.js
+10. src/app.js
 
 ContentRegistry і місії мають існувати до реєстрації паків; місії та генератори мають існувати до побудови каталогу UI. Новий скрипт розміщуйте за фактичною залежністю, перевіривши всі його window.* посилання.
 

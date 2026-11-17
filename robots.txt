@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /docs/
+Disallow: /verification/
+Disallow: /AGENTS.md
+Disallow: /GEMINI.md
 
 Sitemap: https://sivochka.com/3d-club-studio/sitemap.xml

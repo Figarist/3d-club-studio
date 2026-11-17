@@ -9,11 +9,11 @@ operate real controls and observe resulting state.
 
 | Change | Command | Scope |
 |---|---|---|
-| Catalog registration | `rtk proxy node verification/verify-content-registry.cjs` | Tiny opposite-order packs, invalid registration, real core/Adventure registration |
-| Project schema | `rtk proxy node verification/verify-project-state.cjs` | 15 cases, synthetic fixtures, field errors, detached state and roundtrip |
-| History | `rtk proxy node verification/verify-history-transactions.cjs` | 2 cases, timestamp dedup and undo/redo |
-| Physics resources | `rtk proxy node verification/verify-physics-geometry-cache.cjs` | One bounded build/demo/dispose/rebuild using actual SceneManager cleanup |
-| Visual capture helper syntax | `rtk proxy node --check verification/capture-content-ui.mjs` | Syntax only; the `.mjs` helper uses the active CUA tab and captures one selected catalog row per `captureRow(...)` call |
+| Catalog registration | `node verification/verify-content-registry.cjs` | Tiny opposite-order packs, invalid registration, real core/Adventure registration |
+| Project schema | `node verification/verify-project-state.cjs` | 15 cases, synthetic fixtures, field errors, detached state and roundtrip |
+| History | `node verification/verify-history-transactions.cjs` | 2 cases, timestamp dedup and undo/redo |
+| Physics resources | `node verification/verify-physics-geometry-cache.cjs` | One bounded build/demo/dispose/rebuild using actual SceneManager cleanup |
+| Visual capture helper syntax | `node --check verification/capture-content-ui.mjs` | Syntax only; the `.mjs` helper uses the active CUA tab and captures one selected catalog row per `captureRow(...)` call |
 
 The capture helper is not a standalone browser runner. Use it only inside the
 documented CUA workflow with a real local app tab, a selected catalog row and

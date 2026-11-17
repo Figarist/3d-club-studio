@@ -4,8 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>3D Кузня Чудес — безкоштовний 3D-генератор для школи</title>
-  <meta name="description" content="Безкоштовний 3D-генератор у браузері для шкільних 3D-принтерів: STL для моделей у стилі Minecraft, сумісний з Tinkercad. Без реєстрації. 3D Кузня Чудес." />
-  <meta name="keywords" content="3D Кузня Чудес, 3d моделювання для дітей, генератор STL онлайн, майнкрафт 3d друк, 3d друк без підтримок, гурток 3d моделювання, Tinkercad заготовки, Ігор Сівочка, Figarist, 3d club studio" />
+  <meta name="description" content="Безкоштовний 3D-генератор у браузері для шкільних 3D-принтерів: STL для моделей у стилі Minecraft, експорт бінарного STL для популярних слайсерів (перевіряйте у слайсері). Без реєстрації. 3D Кузня Чудес." />
   <meta name="author" content="Ігор Сівочка (Ihor Sivochka)" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <meta name="google-site-verification" content="Whr2bJTggESM1pyCXLfqwodNQu6cNqk_XKdZ0ix2Tyk" />
@@ -19,7 +18,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://sivochka.com/3d-club-studio/" />
   <meta property="og:title" content="3D Кузня Чудес — безкоштовний 3D-генератор для школи" />
-  <meta property="og:description" content="Безкоштовний 3D-генератор у браузері для шкільних 3D-принтерів: STL для моделей у стилі Minecraft, сумісний з Tinkercad. Без реєстрації. 3D Кузня Чудес." />
+  <meta property="og:description" content="Безкоштовний 3D-генератор у браузері для шкільних 3D-принтерів: STL для моделей у стилі Minecraft, експорт бінарного STL для популярних слайсерів (перевіряйте у слайсері). Без реєстрації. 3D Кузня Чудес." />
   <meta property="og:image" content="https://sivochka.com/assets/images/default-social-card.webp" />
   <meta property="og:image:alt" content="3D Кузня Чудес — браузерний генератор STL-моделей без підтримок для шкільних гуртків" />
   <meta property="og:site_name" content="Ігор Сівочка (Figarist) · sivochka.com" />
@@ -29,7 +28,7 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:url" content="https://sivochka.com/3d-club-studio/" />
   <meta name="twitter:title" content="3D Кузня Чудес — безкоштовний 3D-генератор для школи" />
-  <meta name="twitter:description" content="Безкоштовний 3D-генератор у браузері для шкільних 3D-принтерів: STL для моделей у стилі Minecraft, сумісний з Tinkercad. Без реєстрації. 3D Кузня Чудес." />
+  <meta name="twitter:description" content="Безкоштовний 3D-генератор у браузері для шкільних 3D-принтерів: STL для моделей у стилі Minecraft, експорт бінарного STL для популярних слайсерів (перевіряйте у слайсері). Без реєстрації. 3D Кузня Чудес." />
   <meta name="twitter:image" content="https://sivochka.com/assets/images/default-social-card.webp" />
   <meta name="twitter:image:alt" content="3D Кузня Чудес — браузерний генератор STL-моделей без підтримок для шкільних гуртків" />
   <meta name="twitter:creator" content="@figarist" />
@@ -56,8 +55,8 @@
           "5 процедурних генераторів: Майнкрафт-Кузня 16×16, Оптичний Перевертень 0°/90°, Механіка без шестерень, Мутатор Мобів та Фото-Барельєф (Heightmap)",
           "72 навчальні місії для шкільних гуртків 2–6 класів із покроковими підказками",
           "Автоматичний контроль геометрії для 3D-друку без підтримок (No-Supports) та режим перевірки «1 Пластик»",
-          "Миттєвий клієнтський експорт бінарного .STL для Cura, PrusaSlicer і Tinkercad",
-          "Генератор друкованого Паспорта деталі (Ctrl+P / PNG) та порівняння V1 ↔ V2",
+          "Миттєвий клієнтський експорт бінарного .STL для популярних слайсерів (перевіряйте у слайсері)",
+          "Генератор друкованого Паспорта деталі (PNG) та порівняння V1 ↔ V2",
           "100% офлайн-робота у браузері завдяки вбудованій бібліотеці Three.js"
         ],
         "offers": {
@@ -125,18 +124,18 @@
           },
           {
             "@type": "Question",
-            "name": "Чому моделі гарантовано друкуються без підтримок (No-Supports) на старих шкільних 3D-принтерах?",
+            "name": "Чи можна друкувати моделі без підтримок (No-Supports) на шкільних 3D-принтерах?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Кожен генератор додає суцільну 2-міліметрову підкладку, вертикальні опорні колони під висячими вокселями та широкі інженерні зазори у пружинних механізмах, а режим «1 Пластик» перевіряє читабельність силуету в одному кольорі філаменту до завантаження в Cura або PrusaSlicer."
+              "text": "Моделі спроєктовано для друку без підтримок: генератори додають вертикальні опорні колони під висячими вокселями та широкі інженерні зазори у пружинних механізмах. У Майнкрафт-Кузні з увімкненою опцією «Суцільна підкладка» додається суцільна 2-міліметрова підкладка. Перед друком перевіряйте модель у слайсері; режим «1 Пластик» допомагає оцінити читабельність силуету в одному кольорі філаменту."
             }
           },
           {
             "@type": "Question",
-            "name": "Чи можна імпортувати готові .STL файли у Tinkercad, Cura або PrusaSlicer?",
+            "name": "Чи можна відкрити експортований .STL у слайсері?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Так. Кнопка «Експорт .STL» миттєво формує бінарний STL-файл прямо у браузері. Його можна одразу нарізати у Cura, PrusaSlicer чи OrcaSlicer або завантажити у Tinkercad як готову заготовку для подальшого декорування на уроці."
+              "text": "Так. Кнопка «Експорт .STL» миттєво формує бінарний STL-файл прямо у браузері. Його можна відкрити в популярних слайсерах; перевіряйте модель у слайсері перед друком."
             }
           },
           {
@@ -161,13 +160,16 @@
   }
   </script>
 
-  <link rel="stylesheet" href="vendor/friendly-arcade/tokens.css" />
-  <link rel="stylesheet" href="styles.css?v=2.2.0" />
-  <link rel="stylesheet" href="adventure-shelf.css" />
-  <link rel="stylesheet" href="pixel-editor-tools.css" />
-  <link rel="stylesheet" href="lesson-companion.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%92%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="vendor/friendly-arcade/tokens.css?v=2.2.1" />
+  <link rel="stylesheet" href="styles.css?v=2.2.1" />
+  <link rel="stylesheet" href="adventure-shelf.css?v=2.2.1" />
+  <link rel="stylesheet" href="pixel-editor-tools.css?v=2.2.1" />
+  <link rel="stylesheet" href="lesson-companion.css?v=2.2.1" />
 </head>
 <body>
+  <a class="skip-link" href="#main-workspace">Перейти до редактора</a>
+  <noscript><p class="noscript-notice">Для роботи студії потрібні JavaScript і WebGL. Увімкніть JavaScript у браузері та оновіть сторінку.</p></noscript>
 
   <!-- ВЕРХНЯ ПАНЕЛЬ (АДАПТИВНА КОМАНДНА ШАПКА СТУДІЇ) -->
   <header class="topbar" id="studio-topbar">
@@ -176,30 +178,30 @@
       <div class="brand-title">
         <div class="brand-title-row">
           <h1><span class="brand-name-lead">3D </span><span class="brand-name-main">КУЗНЯ</span><span class="brand-name-extra"> ЧУДЕС</span></h1>
-          <span id="app-version-pill" class="version-pill" title="Версія програми: v2.2.0">v2.2.0</span>
+          <span id="app-version-pill" class="version-pill" title="Версія програми: v2.2.1">v2.2.1</span>
         </div>
       </div>
     </div>
 
     <!-- ПЕРЕМИКАЧ 5 ГЕНЕРАТОРІВ (АДАПТИВНИЙ АРКАДНИЙ ДОК) -->
-    <nav class="gen-tabs" aria-label="3D Генератори">
-      <button class="gen-tab-btn active" data-tab="minecraft" title="Майнкрафт-Кузня: створення воксельних моделей, значків і підставок">
+    <nav class="gen-tabs" role="tablist" aria-label="3D Генератори">
+      <button class="gen-tab-btn active" data-tab="minecraft" role="tab" aria-selected="true" title="Майнкрафт-Кузня: створення воксельних моделей, значків і підставок">
         <span class="gen-tab-ico" aria-hidden="true">⛏️</span>
         <span class="gen-tab-lbl">Кузня</span>
       </button>
-      <button class="gen-tab-btn" data-tab="illusion" title="Оптичний Перевертень: два слова в одному суцільному 3D-тілі">
+      <button class="gen-tab-btn" data-tab="illusion" role="tab" aria-selected="false" title="Оптичний Перевертень: два слова в одному суцільному 3D-тілі">
         <span class="gen-tab-ico" aria-hidden="true">🔮</span>
         <span class="gen-tab-lbl">Ілюзія</span>
       </button>
-      <button class="gen-tab-btn" data-tab="physics" title="Катапульта і Баланс: фізичні механізми з пружиною чи балансиром">
+      <button class="gen-tab-btn" data-tab="physics" role="tab" aria-selected="false" title="Катапульта і Баланс: фізичні механізми з пружиною чи балансиром">
         <span class="gen-tab-ico" aria-hidden="true">🎯</span>
         <span class="gen-tab-lbl">Механіка</span>
       </button>
-      <button class="gen-tab-btn" data-tab="mob" title="Мутатор Мобів: конструктор ігрових персонажів та бойових мобів">
+      <button class="gen-tab-btn" data-tab="mob" role="tab" aria-selected="false" title="Мутатор Мобів: конструктор ігрових персонажів та бойових мобів">
         <span class="gen-tab-ico" aria-hidden="true">👾</span>
         <span class="gen-tab-lbl">Моби</span>
       </button>
-      <button class="gen-tab-btn" data-tab="heightmap" title="Фото-Барельєф: перетворення фото чи значка на рельєфний STL">
+      <button class="gen-tab-btn" data-tab="heightmap" role="tab" aria-selected="false" title="Фото-Барельєф: перетворення фото чи значка на рельєфний STL">
         <span class="gen-tab-ico" aria-hidden="true">🖼️</span>
         <span class="gen-tab-lbl">Барельєф</span>
       </button>
@@ -249,10 +251,10 @@
           <button id="btn-random-wow" class="dropdown-item btn-action btn-random" role="menuitem" title="Випадкова генерація / Мутація!">
             🎲 ВАУ! Мутація
           </button>
-          <button id="btn-toggle-sound" class="dropdown-item btn-action btn-sound" role="menuitem" title="Увімкнути/вимкнути звукові ефекти" aria-label="Звукові ефекти">
+          <button id="btn-toggle-sound" class="dropdown-item btn-action btn-sound" role="menuitemcheckbox" aria-checked="true" title="Увімкнути/вимкнути звукові ефекти" aria-label="Звукові ефекти">
             🔊 Звук
           </button>
-          <button id="btn-toggle-music" class="dropdown-item btn-action btn-music" role="menuitem" title="Увімкнути/вимкнути фонову мелодію кузні" aria-label="Фонова музика">
+          <button id="btn-toggle-music" class="dropdown-item btn-action btn-music" role="menuitemcheckbox" aria-checked="false" title="Увімкнути/вимкнути фонову мелодію кузні" aria-label="Фонова музика">
             🎵 Музика
           </button>
           <div class="dropdown-divider"></div>
@@ -471,7 +473,7 @@
           <div class="card-header">
             <span>🎨 Малюй 3D-Висоту (16×16 блоків)</span>
             <div class="card-header-actions">
-              <button id="btn-mc-undo" class="sym-btn" title="Скасувати останній штрих (Ctrl+Z)">↩️ Скасувати</button>
+              <button id="btn-mc-undo" class="sym-btn" title="Скасувати останню дію (Ctrl+Z)">↩️ Скасувати</button>
               <button id="btn-mc-clear" class="sym-btn" title="Очистити полотно">🗑️ Очистити</button>
             </div>
           </div>
@@ -1044,10 +1046,10 @@
       <!-- НИЖНІ ПАНЕЛІ КЕРУВАННЯ КАМЕРОЮ ТА ДЕМО-ЕФЕКТАМИ -->
       <div class="viewport-hud-bottom">
         <div class="camera-bar" role="toolbar" aria-label="Ракурси камери 3D-сцени">
-          <button class="cam-btn" data-cam-view="front" data-camera-view="front" title="Ракурс спереду (0°)">👁️ 0° Спереду</button>
-          <button class="cam-btn" data-cam-view="side90" data-camera-view="side90" title="Ракурс збоку (90°)">🔄 90° Збоку</button>
-          <button class="cam-btn" data-cam-view="top" data-camera-view="top" title="Ракурс зверху">🔝 Зверху</button>
-          <button class="cam-btn active-cam" data-cam-view="iso" data-camera-view="iso" title="Ізометричний 3D ракурс">🧊 Ізометрія</button>
+          <button class="cam-btn" data-camera-view="front" title="Ракурс спереду (0°)">👁️ 0° Спереду</button>
+          <button class="cam-btn" data-camera-view="side90" title="Ракурс збоку (90°)">🔄 90° Збоку</button>
+          <button class="cam-btn" data-camera-view="top" title="Ракурс зверху">🔝 Зверху</button>
+          <button class="cam-btn active-cam" data-camera-view="iso" title="Ізометричний 3D ракурс">🧊 Ізометрія</button>
           <button id="btn-fit-model" class="cam-btn" title="Показати модель крупно, зберігши поточний ракурс">🔍 Крупно</button>
           <button id="btn-toggle-ortho" class="cam-btn btn-ortho-toggle" title="Перемкнути між Ортографічною та Перспективною проєкцією (Клавіша O)">📐 Орто</button>
           <input id="mono-color-picker" type="color" value="#cfd6df" title="Колір пластику для одноколірного прев'ю" aria-label="Колір пластику для одноколірного прев'ю" class="mono-color-input" />
@@ -1055,10 +1057,10 @@
 
         <!-- Спеціальні кнопки для демонстрації Оптичної Ілюзії -->
         <div id="illusion-camera-bar" class="context-action-bar" style="display:none;">
-          <button class="cam-btn illusion-highlight" data-cam-view="front" data-camera-view="front">
+          <button class="cam-btn illusion-highlight" data-camera-view="front">
             👁️ Показати СЛОВО 1 (Ракурс 0°)
           </button>
-          <button class="cam-btn illusion-highlight" data-cam-view="side90" data-camera-view="side90">
+          <button class="cam-btn illusion-highlight" data-camera-view="side90">
             🔄 Повернути на СЛОВО 2 (Ракурс 90°)
           </button>
         </div>
@@ -1077,8 +1079,8 @@
           <a id="author-badge-link" class="author-corner-badge" href="https://sivochka.com/" target="_blank" rel="noopener" title="Освітній проєкт: уроки 3D-моделювання та програмування (sivochka.com)">
             🌐 sivochka.com ↗
           </a>
-          <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • v2.2.0 Friendly Arcade: Фото-Барельєф, монолітна SDF геометрія, інтегроване вушко брелока, топологічна валідація MeshValidator">
-            ⚒️ v2.2.0
+          <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • v2.2.1 Friendly Arcade: Фото-Барельєф, монолітна SDF геометрія, інтегроване вушко брелока, топологічна валідація MeshValidator">
+            ⚒️ v2.2.1
           </div>
         </div>
       </div>
@@ -1106,7 +1108,7 @@
             На шкільних гуртках 3D-моделювання діти обожнюють <b>Minecraft</b>, рухомі іграшки та оптичні ілюзії. Проте на простих або старих шкільних FDM-принтерах моделі з нависаннями потребують складних підтримок, які ламають вироби при відриванні, а дрібні шарніри сплавляються в моноліт.
           </p>
           <p>
-            <b>«3D Кузня Чудес»</b> вирішує це процедурно: генерує 100% бронебійну геометрію <b>без підтримок (No-Supports)</b>, експортує готові бінарні <code>.STL</code> для слайсерів <b>Cura / PrusaSlicer</b> або заготовки для творчого моделювання в <b>Tinkercad</b> і <b>Makers Empire</b>.
+            <b>«3D Кузня Чудес»</b> вирішує це процедурно: генерує геометрію, спроєктовану для друку <b>без підтримок (No-Supports)</b>, експортує бінарні <code>.STL</code> для популярних слайсерів (перевіряйте у слайсері) або заготовки для творчого моделювання в <b>Tinkercad</b> і <b>Makers Empire</b>.
           </p>
         </section>
 
@@ -1148,12 +1150,12 @@
               <p>«3D Кузня Чудес» (3D Club Studio) — це безкоштовна браузерна студія процедурного 3D-моделювання для учнів 2–6 класів. Вона містить 5 спеціалізованих генераторів (Майнкрафт-рельєф, Оптичний Перевертень 0°/90°, Катапульта та Балансир, Мутатор Мобів і Фото-Барельєф), які автоматично будують геометрію без нависань і підтримок для шкільних FDM 3D-принтерів.</p>
             </details>
             <details class="about-faq-item">
-              <summary>Чому моделі гарантовано друкуються без підтримок (No-Supports) на старих шкільних 3D-принтерах?</summary>
-              <p>Кожен генератор додає суцільну 2-міліметрову підкладку, вертикальні опорні колони під висячими вокселями та широкі інженерні зазори у пружинних механізмах, а режим «1 Пластик» перевіряє читабельність силуету в одному кольорі філаменту до завантаження в Cura або PrusaSlicer.</p>
+              <summary>Чи можна друкувати моделі без підтримок (No-Supports) на шкільних 3D-принтерах?</summary>
+              <p>Моделі спроєктовано для друку без підтримок: генератори додають вертикальні опорні колони під висячими вокселями та широкі інженерні зазори у пружинних механізмах. У Майнкрафт-Кузні з увімкненою опцією «Суцільна підкладка» додається суцільна 2-міліметрова підкладка. Перед друком перевіряйте модель у слайсері; режим «1 Пластик» допомагає оцінити читабельність силуету в одному кольорі філаменту.</p>
             </details>
             <details class="about-faq-item">
-              <summary>Чи можна імпортувати готові .STL файли у Tinkercad, Cura або PrusaSlicer?</summary>
-              <p>Так. Кнопка «Експорт .STL» миттєво формує бінарний STL-файл прямо у браузері. Його можна одразу нарізати у Cura, PrusaSlicer чи OrcaSlicer або завантажити у Tinkercad як готову заготовку для подальшого декорування на уроці.</p>
+              <summary>Чи можна відкрити експортований .STL у слайсері?</summary>
+              <p>Так. Кнопка «Експорт .STL» миттєво формує бінарний STL-файл прямо у браузері. Його можна відкрити в популярних слайсерах; перевіряйте модель у слайсері перед друком.</p>
             </details>
             <details class="about-faq-item">
               <summary>Як працюють 72 навчальні місії гуртка та Паспорт деталі?</summary>
@@ -1187,16 +1189,16 @@
       </div>
 
       <!-- ФІЛЬТР ЗА КАТЕГОРІЯМИ -->
-      <div class="missions-filter-bar" role="tablist" aria-label="Категорії місій">
-        <button class="missions-filter-btn mission-filter-btn filter-chip active" data-mission-filter="all">🌟 Усі місії</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="relief">🛡️ Рельєфи</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="texture">🐾 Фактури і сліди</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="boardgame">🎲 Настільні ігри</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="useful">🏷️ Корисні дрібниці</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="cardboard">🏙️ Картонний мегаполіс</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="optical">🔮 Оптичні ілюзії</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="character">👾 Персонажі</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="engineering">🎯 Інженерні ігри</button>
+      <div class="missions-filter-bar" role="group" aria-label="Категорії місій">
+        <button class="missions-filter-btn mission-filter-btn filter-chip active" data-mission-filter="all" aria-pressed="true">🌟 Усі місії</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="relief" aria-pressed="false">🛡️ Рельєфи</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="texture" aria-pressed="false">🐾 Фактури і сліди</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="boardgame" aria-pressed="false">🎲 Настільні ігри</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="useful" aria-pressed="false">🏷️ Корисні дрібниці</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="cardboard" aria-pressed="false">🏙️ Картонний мегаполіс</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="optical" aria-pressed="false">🔮 Оптичні ілюзії</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="character" aria-pressed="false">👾 Персонажі</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="engineering" aria-pressed="false">🎯 Інженерні ігри</button>
       </div>
       <div class="catalog-search-row">
         <label for="model-search">Знайти пригоду <input id="model-search" type="search" placeholder="Слід, робот, компас…" /></label>
@@ -1283,7 +1285,7 @@
 
       <!-- ВЕРХНЯ ПАНЕЛЬ ДІЙ (НЕ ДРУКУЄТЬСЯ НА ПАПЕРІ) -->
       <div class="print-card-toolbar no-print">
-        <button id="btn-action-print" class="btn-action btn-sim">🖨️ Друкувати картку (Ctrl+P)</button>
+        <button id="btn-action-print" class="btn-action btn-sim">🖨️ Друкувати картку</button>
         <button id="btn-action-download-png" class="btn-action btn-project">💾 Зберегти як PNG</button>
         <button id="btn-action-copy-text" class="btn-action btn-mono">📋 Скопіювати текст</button>
         <div class="pair-code-inline">
@@ -1292,7 +1294,7 @@
         </div>
       </div>
 
-      <!-- ДРУКОВАНА КАРТКА-ПАСПОРТ (ПОТРАПЛЯЄ НА ДРУК Ctrl+P) -->
+      <!-- ДРУКОВАНА КАРТКА-ПАСПОРТ (ПОТРАПЛЯЄ НА ДРУК) -->
       <div id="printable-passport-card" class="passport-card-paper">
         <div class="passport-header">
           <div class="passport-logo">
@@ -1351,9 +1353,9 @@
 
             <div class="passport-section-title" style="margin-top: 8px;">✅ Чек-лист самоперевірки пари</div>
             <div class="passport-checklist" id="p-card-checklist">
-              <label><input type="checkbox" checked /> 1. Усі частини з'єднані в 1 деталь (0 розривів)</label>
-              <label><input type="checkbox" checked /> 2. Силует читається в одному кольорі («🪨 1 Пластик»)</label>
-              <label><input type="checkbox" checked /> 3. Габарити вкладаються у норму місії (≤35 мм)</label>
+              <label><input type="checkbox" /> 1. Усі частини з'єднані в 1 деталь (0 розривів)</label>
+              <label><input type="checkbox" /> 2. Силует читається в одному кольорі («🪨 1 Пластик»)</label>
+              <label><input type="checkbox" /> 3. Габарити вкладаються у норму місії (≤35 мм)</label>
             </div>
             <div class="passport-signatures">
               <div>Дизайнер: _________________</div>
@@ -1403,31 +1405,31 @@
 
   <!-- ПІДКЛЮЧЕННЯ СКРИПТІВ (Працює 100% офлайн без інтернету та серверів!) -->
   <script src="lib/three.min.js"></script>
-  <script src="src/voxelFont.js?v=2.2.0"></script>
-  <script src="src/soundEffects.js?v=2.2.0"></script>
-  <script src="src/safeStorage.js?v=2.2.0"></script>
-  <script src="src/historyManager.js?v=2.2.0"></script>
-  <script src="src/meshValidator.js?v=2.2.0"></script>
-  <script src="src/contentRegistry.js?v=2.2.0"></script>
-  <script src="src/missionManager.js?v=2.2.0"></script>
-  <script src="src/projectState.js?v=2.2.0"></script>
-  <script src="src/modalFocus.js?v=2.2.0"></script>
-  <script src="src/snapshotCompareController.js?v=2.2.0"></script>
-  <script src="src/passportPrintController.js?v=2.2.0"></script>
-  <script src="src/generators/minecraftForge.js?v=2.2.0"></script>
-  <script src="src/generators/dualIllusion.js?v=2.2.0"></script>
-  <script src="src/generators/physicsMechanics.js?v=2.2.0"></script>
-  <script src="src/generators/mobMutator.js?v=2.2.0"></script>
-  <script src="src/generators/heightmapRelief.js?v=2.2.0"></script>
-  <script src="src/content/adventurePack.js?v=2.2.0"></script>
-  <script src="src/content/funReliefs.js?v=2.2.0"></script>
-  <script src="src/content/funDiscoveries.js?v=2.2.0"></script>
-  <script src="src/content/funEngineering.js?v=2.2.0"></script>
-  <script src="src/adventureShelf.js?v=2.2.0"></script>
-  <script src="src/pixelEditorTools.js?v=2.2.0"></script>
-  <script src="src/lessonCompanion.js?v=2.2.0"></script>
-  <script src="src/sceneManager.js?v=2.2.0"></script>
-  <script src="src/responsiveToolbar.js?v=2.2.0"></script>
-  <script src="src/app.js?v=2.2.0"></script>
+  <script src="src/voxelFont.js?v=2.2.1"></script>
+  <script src="src/soundEffects.js?v=2.2.1"></script>
+  <script src="src/safeStorage.js?v=2.2.1"></script>
+  <script src="src/historyManager.js?v=2.2.1"></script>
+  <script src="src/meshValidator.js?v=2.2.1"></script>
+  <script src="src/contentRegistry.js?v=2.2.1"></script>
+  <script src="src/missionManager.js?v=2.2.1"></script>
+  <script src="src/projectState.js?v=2.2.1"></script>
+  <script src="src/modalFocus.js?v=2.2.1"></script>
+  <script src="src/snapshotCompareController.js?v=2.2.1"></script>
+  <script src="src/passportPrintController.js?v=2.2.1"></script>
+  <script src="src/generators/minecraftForge.js?v=2.2.1"></script>
+  <script src="src/generators/dualIllusion.js?v=2.2.1"></script>
+  <script src="src/generators/physicsMechanics.js?v=2.2.1"></script>
+  <script src="src/generators/mobMutator.js?v=2.2.1"></script>
+  <script src="src/generators/heightmapRelief.js?v=2.2.1"></script>
+  <script src="src/content/adventurePack.js?v=2.2.1"></script>
+  <script src="src/content/funReliefs.js?v=2.2.1"></script>
+  <script src="src/content/funDiscoveries.js?v=2.2.1"></script>
+  <script src="src/content/funEngineering.js?v=2.2.1"></script>
+  <script src="src/adventureShelf.js?v=2.2.1"></script>
+  <script src="src/pixelEditorTools.js?v=2.2.1"></script>
+  <script src="src/lessonCompanion.js?v=2.2.1"></script>
+  <script src="src/sceneManager.js?v=2.2.1"></script>
+  <script src="src/responsiveToolbar.js?v=2.2.1"></script>
+  <script src="src/app.js?v=2.2.1"></script>
 </body>
 </html>

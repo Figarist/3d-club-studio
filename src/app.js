@@ -69,7 +69,6 @@
         btnRedo: document.getElementById('btn-redo'),
         btnMcUndo: document.getElementById('btn-mc-undo'),
         btnToggleMono: document.getElementById('btn-toggle-mono'),
-        btnHudMono: document.getElementById('btn-hud-mono'),
         monoColorPicker: document.getElementById('mono-color-picker'),
         verificationBadge: document.getElementById('print-verification-badge'),
         verificationSelect: document.getElementById('verification-status-select'),
@@ -299,7 +298,7 @@
       const savedPair = this.safeStorage.getItem('3d_kuznya_pair_code') || '';
       return {
         app: '3d-club-studio',
-        version: '2.2.0',
+        version: '2.2.1',
         schemaVersion: 1,
         savedAt: new Date().toISOString(),
         activeTab: this.activeTab,
@@ -493,7 +492,7 @@
 
         if (state.monoColor && dom.monoColorPicker) {
           dom.monoColorPicker.value = state.monoColor;
-          this.sceneManager.setMonochromeColor(parseInt(state.monoColor.replace('#', '0x'), 16));
+          this.sceneManager.setMonochromeColor(parseInt(state.monoColor.slice(1), 16));
         }
         if (typeof state.monochrome === 'boolean') {
           this.setMonochromeMode(state.monochrome);
@@ -515,9 +514,16 @@
     }
 
     undo() {
-      const restoredState = this.history.undo(this.serializeState());
+      const current = this.serializeState();
+      const restoredState = this.history.undo(current);
       if (restoredState) {
-        this.applyState(restoredState, false);
+        try {
+          this.applyState(restoredState, false);
+        } catch (error) {
+          this.history.redo(restoredState);
+          this.showToast('⚠️ Не вдалося скасувати дію: ' + error.message);
+          return;
+        }
         this.autosave();
         if (window.StudioSound) window.StudioSound.playPop(380);
       }
@@ -526,9 +532,36 @@
     redo() {
       const restoredState = this.history.redo(this.serializeState());
       if (restoredState) {
-        this.applyState(restoredState, false);
+        try {
+          this.applyState(restoredState, false);
+        } catch (error) {
+          this.history.undo(restoredState);
+          this.showToast('⚠️ Не вдалося повторити дію: ' + error.message);
+          return;
+        }
         this.autosave();
         if (window.StudioSound) window.StudioSound.playPop(480);
+      }
+    }
+
+    _syncAudioButtons() {
+      const snd = window.StudioSound;
+      const btnSound = document.getElementById('btn-toggle-sound');
+      const btnMusic = document.getElementById('btn-toggle-music');
+      if (!snd) return;
+      const soundOn = !!snd.enabled;
+      const musicOn = !!(snd.enabled && snd.musicEnabled);
+      if (btnSound) {
+        btnSound.classList.toggle('muted', !soundOn);
+        btnSound.textContent = soundOn ? '🔊 Звук' : '🔇 Звук: ВИМК';
+        btnSound.title = soundOn ? 'Звукові ефекти увімкнено (натисніть, щоб вимкнути)' : 'Звукові ефекти вимкнено (натисніть, щоб увімкнути)';
+        btnSound.setAttribute('aria-checked', soundOn ? 'true' : 'false');
+      }
+      if (btnMusic) {
+        btnMusic.classList.toggle('playing', musicOn);
+        btnMusic.textContent = musicOn ? '🎵 Мелодія: ГРАЄ' : '🎵 Музика';
+        btnMusic.title = musicOn ? 'Фонова мелодія грає (натисніть для паузи)' : 'Увімкнути фонову мелодію кузні';
+        btnMusic.setAttribute('aria-checked', musicOn ? 'true' : 'false');
       }
     }
 
@@ -591,15 +624,57 @@
 
     autosave() {
       if (this._isRestoring) return;
+      this._autosaveDirty = true;
+      clearTimeout(this._autosaveTimer);
+      this._autosaveTimer = setTimeout(() => this._autosaveNow(), 400);
+    }
+
+    flushAutosave() {
+      if (!this._autosaveDirty) return;
+      clearTimeout(this._autosaveTimer);
+      this._autosaveNow();
+    }
+
+    _scheduleRebuild(animatePop = false, skipSound = false) {
+      this._rebuildArgs = {
+        animatePop: !!(this._rebuildArgs?.animatePop || animatePop),
+        skipSound: this._rebuildArgs ? (this._rebuildArgs.skipSound && skipSound) : skipSound
+      };
+      if (this._rebuildRaf) return;
+      this._rebuildRaf = requestAnimationFrame(() => {
+        this._rebuildRaf = 0;
+        const args = this._rebuildArgs;
+        this._rebuildArgs = null;
+        if (!args) return;
+        this._rebuildFromInput = true;
+        try {
+          this.rebuildCurrentModel(args.animatePop, args.skipSound);
+        } finally {
+          this._rebuildFromInput = false;
+        }
+      });
+      this.autosave();
+    }
+
+    _autosaveNow() {
+      this._autosaveDirty = false;
+      if (this._isRestoring) return;
       try {
         const payload = JSON.stringify(this.serializeState());
-        this.safeStorage.setItem(STORAGE_KEY, payload);
+        if (this.safeStorage.setItem(STORAGE_KEY, payload) === false) {
+          console.warn('Автозбереження не вдалося: сховище браузера недоступне або заповнене');
+          this._updateAutosaveTag('⚠️ Не збережено', '• сховище повне', 'Не збережено: сховище повне або недоступне');
+          return;
+        }
         const now = new Date();
         const hh = String(now.getHours()).padStart(2, '0');
         const mm = String(now.getMinutes()).padStart(2, '0');
         const ss = String(now.getSeconds()).padStart(2, '0');
         this._updateAutosaveTag('Авто', `• ${hh}:${mm}:${ss}`, `Автозбережено о ${hh}:${mm}:${ss} у пам'яті браузера`);
-      } catch (_) {}
+      } catch (error) {
+        console.warn('Автозбереження не вдалося:', error);
+        this._updateAutosaveTag('⚠️ Не збережено', '• помилка', 'Не збережено: ' + (error && error.message || 'помилка'));
+      }
     }
 
     restoreAutosave() {
@@ -629,18 +704,28 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
       if (window.StudioSound) window.StudioSound.playExportSuccess();
     }
 
-    loadProjectFromFile(file) {
+    loadProjectFromFile(file, inputEl) {
       if (!file) return;
+      const MAX_BYTES = 2 * 1024 * 1024;
+      if (file.size > MAX_BYTES) {
+        this.showToast('⚠️ Файл завеликий (максимум 2 МБ).');
+        if (inputEl) inputEl.value = '';
+        return;
+      }
       const reader = new FileReader();
+      reader.onerror = () => {
+        this.showToast('⚠️ Не вдалося прочитати файл.');
+        if (inputEl) inputEl.value = '';
+      };
       reader.onload = (e) => {
         try {
           const parsed = JSON.parse(e.target.result);
           if (!parsed || parsed.app !== '3d-club-studio') {
-            alert('Цей файл не є файлом проєкту «3D Кузня Чудес».');
+            this.showToast('⚠️ Цей файл не є файлом проєкту «3D Кузня Чудес».');
             return;
           }
           const candidate = window.ProjectState.normalize(parsed, {
@@ -650,14 +735,16 @@
           try {
             this.applyState(candidate, true);
           } catch (error) {
-            this.applyState(previous, false);
+            try { this.applyState(previous, false); } catch (restoreError) { console.warn('Не вдалося відновити попередній стан:', restoreError); }
             throw error;
           }
           this.history.recordSnapshot(previous);
           this.autosave();
           if (window.StudioSound) window.StudioSound.playMagicGenerate();
         } catch (error) {
-          alert('Не вдалося відкрити проєкт: ' + error.message);
+          this.showToast('⚠️ Не вдалося відкрити проєкт: ' + error.message);
+        } finally {
+          if (inputEl) inputEl.value = '';
         }
       };
       reader.readAsText(file);
@@ -681,10 +768,6 @@
         dom.btnToggleMono.classList.toggle('active', active);
         dom.btnToggleMono.setAttribute('aria-pressed', active ? 'true' : 'false');
         this._setButtonLabel(dom.btnToggleMono, '🪨', active ? '1 Пластик ✓' : '1 Пластик');
-      }
-      if (dom.btnHudMono) {
-        dom.btnHudMono.classList.toggle('active', active);
-        dom.btnHudMono.textContent = active ? '🪨 1 Пластик: УВІМК' : '🪨 Одним пластиком';
       }
       if (active) {
         this.setWorkflowStep(3);
@@ -779,7 +862,9 @@
       if (!skipRebuild && window.StudioSound) window.StudioSound.playTabSwitch(tabName);
 
       document.querySelectorAll('.gen-tab-btn').forEach((b) => {
-        b.classList.toggle('active', b.getAttribute('data-tab') === tabName);
+        const isActive = b.getAttribute('data-tab') === tabName;
+        b.classList.toggle('active', isActive);
+        b.setAttribute('aria-selected', isActive ? 'true' : 'false');
       });
 
       document.querySelectorAll('.panel-section').forEach((sec) => {
@@ -1001,7 +1086,8 @@
         const activeMission = this.missions?.getActiveMission?.();
         if (activeMission && activeMission.id) {
           const compKey = '3d_kuznya_completed_missions';
-          const completed = JSON.parse(this.safeStorage?.getItem?.(compKey) || '[]');
+          let completed = JSON.parse(this.safeStorage?.getItem?.(compKey) || '[]');
+          if (!Array.isArray(completed)) completed = [];
           if (!completed.includes(activeMission.id)) {
             completed.push(activeMission.id);
             this.safeStorage?.setItem?.(compKey, JSON.stringify(completed));
@@ -1318,10 +1404,18 @@
           e.preventDefault();
           this.saveProjectToFile();
         } else if (e.key === 'Escape') {
-          if (dom.aboutModal && dom.aboutModal.style.display !== 'none') this.closeAboutModal();
-          if (dom.missionsModal && dom.missionsModal.style.display !== 'none') this.closeMissionsModal();
-          if (dom.compareModal && dom.compareModal.style.display !== 'none') this.closeCompareModal();
-          if (dom.printCardModal && dom.printCardModal.style.display !== 'none') this.closePrintCardModal();
+          if (e.defaultPrevented) return;
+          const lessonRoot = this.lessonCompanion?._root;
+          if (lessonRoot && !lessonRoot.hidden) return;
+          const open = (m) => m && m.style.display !== 'none' && m.style.display !== '';
+          const modals = [
+            [dom.aboutModal, () => this.closeAboutModal()],
+            [dom.missionsModal, () => this.closeMissionsModal()],
+            [dom.compareModal, () => this.closeCompareModal()],
+            [dom.printCardModal, () => this.closePrintCardModal()]
+          ].filter(([m]) => open(m));
+          const top = modals.find(([m]) => window.ModalFocus.isTopmost(m)) || modals[modals.length - 1];
+          if (top) top[1]();
         } else if (!e.ctrlKey && !e.metaKey && !e.altKey && (e.key.toLowerCase() === 'o' || e.key === '5')) {
           if (!['input', 'textarea'].includes(document.activeElement?.tagName?.toLowerCase())) {
             e.preventDefault();
@@ -1341,16 +1435,9 @@
           this.autosave();
         });
       }
-      if (dom.btnHudMono) {
-        dom.btnHudMono.addEventListener('click', () => {
-          const act = this.setMonochromeMode();
-          window.StudioSound?.playPop?.(act ? 620 : 380);
-          this.autosave();
-        });
-      }
       if (dom.monoColorPicker) {
         dom.monoColorPicker.addEventListener('input', (e) => {
-          const hex = parseInt(e.target.value.replace('#', '0x'), 16);
+          const hex = parseInt(e.target.value.slice(1), 16);
           this.sceneManager.setMonochromeColor(hex);
           this.autosave();
         });
@@ -1366,7 +1453,7 @@
         inputLoad.addEventListener('change', (e) => {
           const file = e.target.files && e.target.files[0];
           if (file) {
-            this.loadProjectFromFile(file);
+            this.loadProjectFromFile(file, inputLoad);
             inputLoad.value = '';
           }
         });
@@ -1427,15 +1514,8 @@
       if (btnSound) {
         btnSound.addEventListener('click', () => {
           if (window.StudioSound) {
-            const on = window.StudioSound.toggleSound();
-            btnSound.classList.toggle('muted', !on);
-            btnSound.textContent = on ? '🔊 Звук' : '🔇 Звук: ВИМК';
-            btnSound.title = on ? 'Звукові ефекти увімкнено (натисніть, щоб вимкнути)' : 'Звукові ефекти вимкнено (натисніть, щоб увімкнути)';
-            if (!on && btnMusic) {
-              btnMusic.classList.remove('playing');
-              btnMusic.textContent = '🎵 Музика';
-              btnMusic.title = 'Фонова мелодія кузні вимкнена';
-            }
+            window.StudioSound.toggleSound();
+            this._syncAudioButtons();
           }
         });
       }
@@ -1443,17 +1523,15 @@
       if (btnMusic) {
         btnMusic.addEventListener('click', () => {
           if (window.StudioSound) {
-            const on = window.StudioSound.toggleMusic();
-            btnMusic.classList.toggle('playing', on);
-            btnMusic.textContent = on ? '🎵 Мелодія: ГРАЄ' : '🎵 Музика';
-            btnMusic.title = on ? 'Фонова мелодія грає (натисніть для паузи)' : 'Увімкнути фонову мелодію кузні';
-            if (on && btnSound) {
-              btnSound.classList.remove('muted');
-              btnSound.textContent = '🔊 Звук';
-            }
+            window.StudioSound.toggleMusic();
+            this._syncAudioButtons();
           }
         });
       }
+      window.addEventListener('studio-sound-change', () => this._syncAudioButtons());
+      this._syncAudioButtons();
+      window.addEventListener('beforeunload', () => this.flushAutosave());
+      window.addEventListener('pagehide', () => this.flushAutosave());
 
       const btnRandom = document.getElementById('btn-random-wow');
       if (btnRandom) {
@@ -1472,7 +1550,7 @@
 
       if (dom.autosaveTag) {
         dom.autosaveTag.addEventListener('click', () => {
-          this.autosave();
+          this._autosaveNow();
           this.showToast(`💾 ${dom.autosaveTag.title || 'Проєкт збережено у пам\'яті браузера'}`);
           window.StudioSound?.playPop?.(520);
         });
@@ -1495,7 +1573,11 @@
       if (btnExport) {
         btnExport.addEventListener('click', () => {
           const fname = this.getSuggestedFilename();
-          this.sceneManager.exportBinarySTL(fname);
+          const ok = this.sceneManager.exportBinarySTL(fname);
+          if (ok === false) {
+            this.showToast('⚠️ Не вдалося зберегти STL.');
+            return;
+          }
           this.setWorkflowStep(4);
           this.triggerCelebration('🎉 Ура! Твій STL-файл завантажено і готовий до друку!');
         });
@@ -1666,7 +1748,9 @@
           const cat = btn.getAttribute('data-mission-filter') || 'all';
           this.missions.setFilter(cat);
           document.querySelectorAll('[data-mission-filter]').forEach((b) => {
-            b.classList.toggle('active', b.getAttribute('data-mission-filter') === cat);
+            const isActive = b.getAttribute('data-mission-filter') === cat;
+            b.classList.toggle('active', isActive);
+            b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
           });
           this.missions.renderMissionsModal(this._domCache, (id) => this.startMission(id));
           if (window.StudioSound) window.StudioSound.playPop(460);
@@ -1930,8 +2014,7 @@
             this._playControlFeedback(el);
             this.updateValueLabels();
             this.markModelModified();
-            this.rebuildCurrentModel(false);
-            this.autosave();
+            this._scheduleRebuild(false);
           };
           el.addEventListener('input', handleUpdate);
           el.addEventListener('change', handleUpdate);
@@ -1993,8 +2076,7 @@
           inp.addEventListener('input', () => {
             this._playControlFeedback(inp);
             this.markModelModified();
-            this.rebuildCurrentModel(false);
-            this.autosave();
+            this._scheduleRebuild(false);
           });
         }
       });
@@ -2018,8 +2100,7 @@
               window.StudioSound.playThemeSound(symThemeMap[sym] || 'totem');
             }
             this.markModelModified();
-            this.rebuildCurrentModel(false);
-            this.autosave();
+            this._scheduleRebuild(false);
           }
         });
       });
@@ -2033,8 +2114,7 @@
             this._playControlFeedback(el);
             this.updateValueLabels();
             this.markModelModified();
-            this.rebuildCurrentModel(false);
-            this.autosave();
+            this._scheduleRebuild(false);
           };
           el.addEventListener('input', handleUpdate);
           el.addEventListener('change', handleUpdate);
@@ -2081,8 +2161,7 @@
             this._playControlFeedback(el);
             this.updateValueLabels();
             this.markModelModified();
-            this.rebuildCurrentModel(false);
-            this.autosave();
+            this._scheduleRebuild(false);
           };
           el.addEventListener('input', handleUpdate);
           el.addEventListener('change', handleUpdate);
@@ -2119,8 +2198,7 @@
             const isArch = id === 'mob-archetype';
             if (isArch && this._domCache.mobDesign) this._domCache.mobDesign.value = 'classic';
             this.markModelModified();
-            this.rebuildCurrentModel(isArch, true);
-            this.autosave();
+            this._scheduleRebuild(isArch, true);
           };
           el.addEventListener('input', handleUpdate);
           el.addEventListener('change', handleUpdate);
@@ -2162,10 +2240,14 @@
 
         const handleImageFile = (file) => {
           if (!file || !file.type.startsWith('image/')) return;
+          if (file.type === 'image/svg+xml') { this.showToast('⚠️ SVG не підтримується. Оберіть PNG або JPG.'); return; }
+          if (file.size > 8 * 1024 * 1024) { this.showToast('⚠️ Зображення завелике (максимум 8 МБ).'); return; }
           const reader = new FileReader();
+          reader.onerror = () => this.showToast('⚠️ Не вдалося прочитати зображення.');
           reader.onload = (e) => {
             const rawUrl = e.target.result;
             const img = new Image();
+            img.onerror = () => this.showToast('⚠️ Не вдалося відкрити зображення.');
             img.onload = () => {
               const maxDim = 256;
               let w = img.width;
@@ -2239,8 +2321,7 @@
             this.updateValueLabels();
             this.updateHeightmapPreview2D();
             this.markModelModified();
-            this.rebuildCurrentModel(false, true);
-            this.autosave();
+            this._scheduleRebuild(false, true);
           };
           el.addEventListener('input', handleUpdate);
           el.addEventListener('change', handleUpdate);
@@ -2507,7 +2588,7 @@
           voxelSize: dom.ilVoxelSize?.value,
           safeSupports: dom.ilSafeSupports?.checked,
           layoutMode: dom.ilLayoutMode?.value,
-          colorPrimary: parseInt(colorHex.replace('#', '0x'), 16)
+          colorPrimary: parseInt(colorHex.slice(1), 16)
         });
       } else if (this.activeTab === 'physics') {
         group = this.physicsGen.build3D({
@@ -2550,7 +2631,16 @@
           keychain: dom.hmKeychain ? dom.hmKeychain.checked : false
         });
         this.updateHeightmapPreview2D();
-        this.updateHeightmapMeshValidation(group);
+        if (this._rebuildFromInput) {
+          this._pendingHmGroup = group;
+          clearTimeout(this._hmValidateTimer);
+          this._hmValidateTimer = setTimeout(() => {
+            if (this._pendingHmGroup) this.updateHeightmapMeshValidation(this._pendingHmGroup);
+            this._pendingHmGroup = null;
+          }, 300);
+        } else {
+          this.updateHeightmapMeshValidation(group);
+        }
       }
 
       if (group) {
