@@ -3182,6 +3182,21 @@ select:focus, input[type="text"]:focus {
   margin-bottom: 0;
 }
 
+.about-legal-line {
+  font-size: 12px;
+  text-align: center;
+  margin: 0;
+}
+.about-legal-link {
+  color: #6ee7b7;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.about-legal-link:hover,
+.about-legal-link:focus-visible {
+  color: #ffffff;
+}
+
 .author-card {
   border: 2px solid var(--surface2);
   background: var(--card);
