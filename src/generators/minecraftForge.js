@@ -378,7 +378,9 @@
     }
   };
 
-  const MC_CONFIG = {
+  const t = (key, vars) => (typeof window !== 'undefined' && typeof window.t === 'function') ? window.t(key, vars) : key;
+
+const MC_CONFIG = {
     GRID_SIZE: 16,
     BASE_PLATE_HEIGHT: 2.0,
     DEFAULT_VOXEL_SIZE: 3.5,
@@ -659,7 +661,7 @@
           cell.className = classNames;
           cell.dataset.r = r;
           cell.dataset.c = c;
-          cell.title = `Клітинка [${r + 1}, ${c + 1}] • Шар ${this.grid[r][c] || '0'}`;
+          cell.title = t('js.mc.cell_title', { r: r + 1, c: c + 1, lvl: this.grid[r][c] || '0' });
 
           const val = this.grid[r][c];
           if (val > 0) {
@@ -677,7 +679,7 @@
                 if (this.onBeforeMutate) this.onBeforeMutate();
               }
               this.grid[r][c] = this.activeBrush;
-              cell.title = `Клітинка [${r + 1}, ${c + 1}] • Шар ${this.activeBrush || '0'}`;
+              cell.title = t('js.mc.cell_title', { r: r + 1, c: c + 1, lvl: this.activeBrush || '0' });
               if (this.activeBrush > 0) {
                 cell.style.backgroundColor = hexStr(this.colors[this.activeBrush]);
                 cell.textContent = this.activeBrush;

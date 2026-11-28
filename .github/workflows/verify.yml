@@ -33,3 +33,5 @@ jobs:
         run: node verification/verify-heightmap-export.cjs
       - name: Physics geometry cache
         run: node verification/verify-physics-geometry-cache.cjs
+      - name: i18n completeness and parity
+        run: node scripts/check-i18n.mjs

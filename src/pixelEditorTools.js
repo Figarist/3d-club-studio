@@ -1,29 +1,31 @@
 // Допоміжні перетворення для піксельної сітки Minecraft-Кузні.
 (function () {
+  const t = (key, vars) => (typeof window !== 'undefined' && typeof window.t === 'function') ? window.t(key, vars) : key;
+
   const TOOL_DEFINITIONS = [
     {
       key: 'mirror-left-right',
-      label: '↔ Дзеркало',
-      title: 'Віддзеркалити малюнок по вертикальній осі: ліва й права сторони поміняються місцями.',
-      prompt: 'Малюнок віддзеркалено зліва направо.'
+      labelKey: 'js.px.mirror_lr',
+      titleKey: 'js.px.mirror_lr_title',
+      promptKey: 'js.px.mirror_lr_done'
     },
     {
       key: 'mirror-up-down',
-      label: '↕ Дзеркало',
-      title: 'Віддзеркалити малюнок по горизонтальній осі: верх і низ поміняються місцями.',
-      prompt: 'Малюнок віддзеркалено зверху вниз.'
+      labelKey: 'js.px.mirror_ud',
+      titleKey: 'js.px.mirror_ud_title',
+      promptKey: 'js.px.mirror_ud_done'
     },
     {
       key: 'rotate-clockwise',
-      label: '↻ 90°',
-      title: 'Повернути малюнок на 90° за годинниковою стрілкою.',
-      prompt: 'Малюнок повернуто на 90° за годинниковою стрілкою.'
+      labelKey: 'js.px.rotate',
+      titleKey: 'js.px.rotate_title',
+      promptKey: 'js.px.rotate_done'
     },
     {
       key: 'invert-relief',
-      label: 'Рельєф 1↔4',
-      title: 'Перевернути висоту рельєфу: 1 стане 4, 2 стане 3; порожні клітинки не зміняться.',
-      prompt: 'Порожні клітинки лишилися порожніми, а висоти стали протилежними.'
+      labelKey: 'js.px.invert',
+      titleKey: 'js.px.invert_title',
+      promptKey: 'js.px.invert_done'
     }
   ];
 
@@ -105,16 +107,20 @@
       const actions = documentRef.createElement('div');
       actions.className = 'pixel-tools-actions';
       actions.setAttribute('role', 'group');
-      actions.setAttribute('aria-label', 'Перетворення піксельного малюнка');
+      actions.setAttribute('aria-label', t('js.px.aria'));
+      actions.setAttribute('data-i18n-aria', 'js.px.aria');
 
       TOOL_DEFINITIONS.forEach(definition => {
         const button = documentRef.createElement('button');
         button.type = 'button';
         button.className = 'pixel-tools-button';
         button.setAttribute('data-pixel-tool', definition.key);
-        button.setAttribute('aria-label', definition.title);
-        button.title = definition.title;
-        button.textContent = definition.label;
+        button.setAttribute('data-i18n', definition.labelKey);
+        button.setAttribute('data-i18n-title', definition.titleKey);
+        button.setAttribute('data-i18n-aria', definition.titleKey);
+        button.setAttribute('aria-label', t(definition.titleKey));
+        button.title = t(definition.titleKey);
+        button.textContent = t(definition.labelKey);
         actions.appendChild(button);
       });
 
@@ -122,7 +128,7 @@
       this.status.className = 'pixel-tools-status';
       this.status.setAttribute('role', 'status');
       this.status.setAttribute('aria-live', 'polite');
-      this.status.textContent = 'Порівняй віддзеркалення та поворот. Як зміниться тінь після зміни висот?';
+      this.status.textContent = t('js.px.hint');
 
       container.appendChild(actions);
       container.appendChild(this.status);
@@ -146,7 +152,7 @@
 
       const currentState = copyState(this.generator.getState());
       if (!currentState || currentState.grid.length === 0) {
-        this._announce('Сітка порожня. Намалюй фігуру, а тоді спробуй перетворення.');
+        this._announce(t('js.px.empty'));
         return false;
       }
 
@@ -155,14 +161,14 @@
       });
 
       if (JSON.stringify(currentState.grid) === JSON.stringify(nextState.grid)) {
-        this._announce('Без змін: малюнок уже має таку форму. Спробуй інше перетворення.');
+        this._announce(t('js.px.unchanged'));
         return false;
       }
 
       this.onBeforeChange();
       this.generator.setState(nextState, false);
       this.onAfterChange();
-      this._announce(definition.prompt);
+      this._announce(t(definition.promptKey));
       return true;
     }
 

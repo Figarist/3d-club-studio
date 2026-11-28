@@ -1,5 +1,7 @@
 // 3D Рушій студії "3D Кузня Чудес": Three.js сцена, Стіл 3D-принтера, Симулятор Пошарового Друку та Експорт у .STL
 (function () {
+  const t = (key, vars) => (typeof window !== 'undefined' && typeof window.t === 'function') ? window.t(key, vars) : key;
+
   class SceneManager {
     constructor(containerId) {
       this.containerId = containerId;
@@ -696,24 +698,24 @@
       if (!dimEl) return;
       const d = this.dimensions;
       const sizeCategory = !d.fitsBed
-        ? '🚨 За межами столу (>200 мм)'
+        ? t('js.scene.out_of_bed')
         : !d.safeBed
-          ? '⚠️ Впритул до краю (>190 мм)'
+          ? t('js.scene.near_edge')
           : d.isMini
-            ? '🌟 Міні-формат (≤35 мм)'
-            : '📐 У межах норми (Anycubic)';
+            ? t('js.scene.mini')
+            : t('js.scene.ok');
 
       const timeText = slicerNote
-        ? `⏱️ Запис зі слайсера: ${slicerNote}`
-        : '⏱️ Час і витрати: додай запис зі слайсера';
+        ? t('js.scene.slicer_note', { note: slicerNote })
+        : t('js.scene.slicer_empty');
 
       dimEl.innerHTML = `
         <div class="hud-dim-header">
           <span class="hud-status-chip ${!d.fitsBed ? 'chip-danger' : !d.safeBed ? 'chip-warn' : 'chip-ok'}">${sizeCategory}</span>
-          <span class="hud-flat-chip">Дно Z = 0.00 мм ✅</span>
+          <span class="hud-flat-chip">${t('js.scene.flat_z0')}</span>
         </div>
         <div class="hud-dim-primary num-tabular">
-          <b>${d.x} × ${d.y} × ${d.z}</b> <span class="hud-dim-unit">мм</span>
+          <b>${d.x} × ${d.y} × ${d.z}</b> <span class="hud-dim-unit">${t('js.unit_mm')}</span>
         </div>
         <div class="hud-dim-meta num-tabular">
         </div>
@@ -778,9 +780,9 @@
         const lbl = btn.querySelector('.btn-lbl');
         if (ico && lbl) {
           ico.textContent = '🔥';
-          lbl.textContent = 'Симуляція';
+          lbl.textContent = t('js.sim_start');
         } else {
-          btn.textContent = '🔥 Симуляція';
+          btn.textContent = `🔥 ${t('js.sim_start')}`;
         }
       }
     }
@@ -843,7 +845,7 @@
       });
 
       if (triangles.length === 0) {
-        alert('Немає геометрії для експорту!');
+        alert(t('js.scene.no_geom'));
         return false;
       }
 
@@ -1103,7 +1105,7 @@
           const btn = this._simBtn;
           if (btn) {
             const lbl = btn.querySelector('.btn-lbl');
-            const layerText = `Шар ${currentLayerIdx + 1}/${totalLayers} (${currentH.toFixed(1)} мм)`;
+            const layerText = t('js.sim_layer', { cur: currentLayerIdx + 1, total: totalLayers, h: currentH.toFixed(1) });
             if (layerText !== this._simBtnText) {
               this._simBtnText = layerText;
               if (lbl) {

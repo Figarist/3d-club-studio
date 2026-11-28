@@ -13,6 +13,9 @@
   <link rel="canonical" href="https://sivochka.com/3d-club-studio/" />
   <link rel="alternate" hreflang="x-default" href="https://sivochka.com/3d-club-studio/" />
   <link rel="alternate" hreflang="uk" href="https://sivochka.com/3d-club-studio/" />
+  <link rel="alternate" hreflang="en" href="https://sivochka.com/3d-club-studio/?lang=en" />
+  <link rel="alternate" hreflang="pl" href="https://sivochka.com/3d-club-studio/?lang=pl" />
+  <link rel="alternate" hreflang="ru" href="https://sivochka.com/3d-club-studio/?lang=ru" />
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
@@ -166,123 +169,131 @@
   <link rel="stylesheet" href="pixel-editor-tools.css?v=2.3.0" />
 </head>
 <body>
-  <a class="skip-link" href="#main-workspace">Перейти до редактора</a>
-  <noscript><p class="noscript-notice">Для роботи студії потрібні JavaScript і WebGL. Увімкніть JavaScript у браузері та оновіть сторінку.</p></noscript>
+  <a class="skip-link" href="#main-workspace" data-i18n="skip_link">Перейти до редактора</a>
+  <noscript><p class="noscript-notice" data-i18n="noscript_notice">Для роботи студії потрібні JavaScript і WebGL. Увімкніть JavaScript у браузері та оновіть сторінку.</p></noscript>
 
   <!-- ВЕРХНЯ ПАНЕЛЬ (АДАПТИВНА КОМАНДНА ШАПКА СТУДІЇ) -->
   <header class="topbar" id="studio-topbar">
     <div class="brand">
-      <button type="button" class="brand-logo" tabindex="-1" title="Дзенькнути молотом по ковадлу! ⚒️" aria-label="3D Кузня Чудес — дзенькнути молотом по ковадлу">⚒️</button>
+      <button type="button" class="brand-logo" tabindex="-1" title="Дзенькнути молотом по ковадлу! ⚒️" aria-label="3D Кузня Чудес — дзенькнути молотом по ковадлу" data-i18n-title="brand.logo_title" data-i18n-aria="brand.logo_aria">⚒️</button>
       <div class="brand-title">
         <div class="brand-title-row">
-          <h1><span class="brand-name-lead">3D </span><span class="brand-name-main">КУЗНЯ</span><span class="brand-name-extra"> ЧУДЕС</span></h1>
-          <span id="app-version-pill" class="version-pill" title="Версія програми: v2.3.0">v2.3.0</span>
+          <h1><span class="brand-name-lead" data-i18n="brand.lead">3D </span><span class="brand-name-main" data-i18n="brand.main">КУЗНЯ</span><span class="brand-name-extra" data-i18n="brand.extra"> ЧУДЕС</span></h1>
+          <span id="app-version-pill" class="version-pill" title="Версія програми: v2.3.0" data-i18n-title="brand.version_title">v2.3.0</span>
         </div>
       </div>
     </div>
 
     <!-- ПЕРЕМИКАЧ 5 ГЕНЕРАТОРІВ (АДАПТИВНИЙ АРКАДНИЙ ДОК) -->
-    <nav class="gen-tabs" role="tablist" aria-label="3D Генератори">
-      <button class="gen-tab-btn active" data-tab="minecraft" role="tab" aria-selected="true" title="Майнкрафт-Кузня: створення воксельних моделей, значків і підставок">
+    <nav class="gen-tabs" role="tablist" aria-label="3D Генератори" data-i18n-aria="tabs_aria">
+      <button class="gen-tab-btn active" data-tab="minecraft" role="tab" aria-selected="true" title="Майнкрафт-Кузня: створення воксельних моделей, значків і підставок" data-i18n-title="tab.minecraft_title">
         <span class="gen-tab-ico" aria-hidden="true">⛏️</span>
-        <span class="gen-tab-lbl">Кузня</span>
+        <span class="gen-tab-lbl" data-i18n="tab.minecraft">Кузня</span>
       </button>
-      <button class="gen-tab-btn" data-tab="illusion" role="tab" aria-selected="false" title="Оптичний Перевертень: два слова в одному суцільному 3D-тілі">
+      <button class="gen-tab-btn" data-tab="illusion" role="tab" aria-selected="false" title="Оптичний Перевертень: два слова в одному суцільному 3D-тілі" data-i18n-title="tab.illusion_title">
         <span class="gen-tab-ico" aria-hidden="true">🔮</span>
-        <span class="gen-tab-lbl">Ілюзія</span>
+        <span class="gen-tab-lbl" data-i18n="tab.illusion">Ілюзія</span>
       </button>
-      <button class="gen-tab-btn" data-tab="physics" role="tab" aria-selected="false" title="Катапульта і Баланс: фізичні механізми з пружиною чи балансиром">
+      <button class="gen-tab-btn" data-tab="physics" role="tab" aria-selected="false" title="Катапульта і Баланс: фізичні механізми з пружиною чи балансиром" data-i18n-title="tab.physics_title">
         <span class="gen-tab-ico" aria-hidden="true">🎯</span>
-        <span class="gen-tab-lbl">Механіка</span>
+        <span class="gen-tab-lbl" data-i18n="tab.physics">Механіка</span>
       </button>
-      <button class="gen-tab-btn" data-tab="mob" role="tab" aria-selected="false" title="Мутатор Мобів: конструктор ігрових персонажів та бойових мобів">
+      <button class="gen-tab-btn" data-tab="mob" role="tab" aria-selected="false" title="Мутатор Мобів: конструктор ігрових персонажів та бойових мобів" data-i18n-title="tab.mob_title">
         <span class="gen-tab-ico" aria-hidden="true">👾</span>
-        <span class="gen-tab-lbl">Моби</span>
+        <span class="gen-tab-lbl" data-i18n="tab.mob">Моби</span>
       </button>
-      <button class="gen-tab-btn" data-tab="heightmap" role="tab" aria-selected="false" title="Фото-Барельєф: перетворення фото чи значка на рельєфний STL">
+      <button class="gen-tab-btn" data-tab="heightmap" role="tab" aria-selected="false" title="Фото-Барельєф: перетворення фото чи значка на рельєфний STL" data-i18n-title="tab.heightmap_title">
         <span class="gen-tab-ico" aria-hidden="true">🖼️</span>
-        <span class="gen-tab-lbl">Барельєф</span>
+        <span class="gen-tab-lbl" data-i18n="tab.heightmap">Барельєф</span>
       </button>
     </nav>
 
     <!-- ДІЇ: ГРУПОВАНІ ЗА ПРИЗНАЧЕННЯМ -->
     <div class="top-actions">
+      <!-- Language Switcher -->
+      <div class="top-action-group lang-switcher" role="group" aria-label="Мова інтерфейсу" data-i18n-aria="lang.switcher_aria">
+        <button type="button" class="lang-btn active" data-lang="uk" aria-pressed="true" title="Українська" data-i18n-title="lang.uk_title">UK</button>
+        <button type="button" class="lang-btn" data-lang="en" aria-pressed="false" title="English" data-i18n-title="lang.en_title">EN</button>
+        <button type="button" class="lang-btn" data-lang="pl" aria-pressed="false" title="Polski" data-i18n-title="lang.pl_title">PL</button>
+        <button type="button" class="lang-btn" data-lang="ru" aria-pressed="false" title="Русский" data-i18n-title="lang.ru_title">RU</button>
+      </div>
+
       <!-- Група: Історія дій -->
-      <div class="top-action-group" aria-label="Історія дій">
-        <button id="btn-undo" class="btn-action btn-history" title="Скасувати останню дію (Ctrl+Z)" aria-label="Скасувати останню дію">
+      <div class="top-action-group" aria-label="Історія дій" data-i18n-aria="history_aria">
+        <button id="btn-undo" class="btn-action btn-history" title="Скасувати останню дію (Ctrl+Z)" aria-label="Скасувати останню дію" data-i18n-title="history.undo_title" data-i18n-aria="history.undo_aria">
           <span aria-hidden="true">↩️</span>
         </button>
-        <button id="btn-redo" class="btn-action btn-history" title="Повернути скасовану дію (Ctrl+Y)" aria-label="Повернути скасовану дію">
+        <button id="btn-redo" class="btn-action btn-history" title="Повернути скасовану дію (Ctrl+Y)" aria-label="Повернути скасовану дію" data-i18n-title="history.redo_title" data-i18n-aria="history.redo_aria">
           <span aria-hidden="true">↪️</span>
         </button>
       </div>
 
       <!-- Група: Проєкт -->
-      <div class="top-action-group top-project-group" aria-label="Файли проєкту">
-        <button id="btn-save-project" class="btn-action btn-project" title="Зберегти проєкт у .json (Ctrl+S)" aria-label="Зберегти проєкт у .json">
+      <div class="top-action-group top-project-group" aria-label="Файли проєкту" data-i18n-aria="project_aria">
+        <button id="btn-save-project" class="btn-action btn-project" title="Зберегти проєкт у .json (Ctrl+S)" aria-label="Зберегти проєкт у .json" data-i18n-title="project.save_title" data-i18n-aria="project.save_title">
           <span class="btn-ico" aria-hidden="true">📥</span>
-          <span class="btn-lbl">Зберегти</span>
+          <span class="btn-lbl" data-i18n="project.save">Зберегти</span>
         </button>
-        <button id="btn-load-project" class="btn-action btn-project" title="Відкрити файл проєкту .json" aria-label="Відкрити файл проєкту .json">
+        <button id="btn-load-project" class="btn-action btn-project" title="Відкрити файл проєкту .json" aria-label="Відкрити файл проєкту .json" data-i18n-title="project.open_title" data-i18n-aria="project.open_title">
           <span class="btn-ico" aria-hidden="true">📂</span>
-          <span class="btn-lbl">Відкрити</span>
+          <span class="btn-lbl" data-i18n="project.open">Відкрити</span>
         </button>
         <input id="input-load-project" type="file" accept=".json" style="display:none;" aria-hidden="true" />
       </div>
 
       <!-- Група: Мій виріб (чернетка V1 → порівняння → паспорт) -->
-      <div class="top-action-group top-piece-group" aria-label="Мій виріб">
-        <button id="btn-my-piece" class="btn-action btn-v1" aria-haspopup="dialog" aria-label="Мій виріб" title="Мій виріб: чернетка V1, порівняння з поточною моделлю та паспорт деталі">
+      <div class="top-action-group top-piece-group" aria-label="Мій виріб" data-i18n-aria="piece_aria">
+        <button id="btn-my-piece" class="btn-action btn-v1" aria-haspopup="dialog" aria-label="Мій виріб" title="Мій виріб: чернетка V1, порівняння з поточною моделлю та паспорт деталі" data-i18n-aria="piece_aria" data-i18n-title="piece.btn_title">
           <span class="btn-ico" aria-hidden="true">📦</span>
-          <span class="btn-lbl">Мій виріб</span>
+          <span class="btn-lbl" data-i18n="piece.btn">Мій виріб</span>
         </button>
       </div>
 
       <!-- Група: меню «Друк» (симуляція, нотатки слайсера, один пластик, інфо-плашки) -->
       <div class="top-action-group menu-dropdown-wrapper top-print-group">
-        <button id="btn-print-menu" class="btn-action btn-menu-toggle" aria-label="Друк" aria-haspopup="true" aria-expanded="false" aria-controls="print-dropdown-menu" title="Інструменти друку: симуляція, нотатки слайсера, один пластик">
+        <button id="btn-print-menu" class="btn-action btn-menu-toggle" aria-label="Друк" aria-haspopup="true" aria-expanded="false" aria-controls="print-dropdown-menu" title="Інструменти друку: симуляція, нотатки слайсера, один пластик" data-i18n-aria="print.btn" data-i18n-title="print.btn_title">
           <span class="btn-ico" aria-hidden="true">🖨️</span>
-          <span class="btn-lbl">Друк</span>
+          <span class="btn-lbl" data-i18n="print.btn">Друк</span>
           <span class="btn-caret" aria-hidden="true">▾</span>
         </button>
-        <div id="print-dropdown-menu" class="top-dropdown-menu" role="menu" aria-label="Інструменти друку">
-          <button id="btn-simulate-print" class="dropdown-item btn-action btn-sim" role="menuitem" title="Симуляція пошарового друку для FDM-принтера">
+        <div id="print-dropdown-menu" class="top-dropdown-menu" role="menu" aria-label="Інструменти друку" data-i18n-aria="print.menu_aria">
+          <button id="btn-simulate-print" class="dropdown-item btn-action btn-sim" role="menuitem" title="Симуляція пошарового друку для FDM-принтера" data-i18n-title="print.sim_title">
             <span class="btn-ico" aria-hidden="true">🔥</span>
-            <span class="btn-lbl">Симуляція</span>
+            <span class="btn-lbl" data-i18n="print.sim">Симуляція</span>
           </button>
-          <button id="btn-toggle-slicer-notes" class="dropdown-item btn-action" type="button" role="menuitem" title="Показати/сховати статус друку та нотатки слайсера">🧾 Нотатки друку ▾</button>
-          <button id="btn-toggle-mono" class="dropdown-item btn-action btn-mono" role="menuitemcheckbox" aria-checked="true" title="Перемкнути: кольори прев'ю чи реальний вигляд одним пластиком">
+          <button id="btn-toggle-slicer-notes" class="dropdown-item btn-action" type="button" role="menuitem" title="Показати/сховати статус друку та нотатки слайсера" data-i18n="print.notes" data-i18n-title="print.notes_title">🧾 Нотатки друку ▾</button>
+          <button id="btn-toggle-mono" class="dropdown-item btn-action btn-mono" role="menuitemcheckbox" aria-checked="true" title="Перемкнути: кольори прев'ю чи реальний вигляд одним пластиком" data-i18n-title="print.mono_title">
             <span class="btn-ico" aria-hidden="true">🪨</span>
-            <span class="btn-lbl">1 Пластик</span>
+            <span class="btn-lbl" data-i18n="print.mono">1 Пластик</span>
           </button>
-          <button id="btn-toggle-hud" class="dropdown-item btn-action" type="button" role="menuitem" title="Згорнути або показати інформаційні плашки розмірів та статусу друку">👁️ Інфо</button>
+          <button id="btn-toggle-hud" class="dropdown-item btn-action" type="button" role="menuitem" title="Згорнути або показати інформаційні плашки розмірів та статусу друку" data-i18n="print.hud" data-i18n-title="print.hud_title">👁️ Інфо</button>
         </div>
       </div>
 
       <!-- Група: Головний експорт для 3D-друку -->
-      <div class="top-action-group top-export-group" aria-label="Головний експорт">
-        <button id="btn-export-stl" class="btn-action btn-export" title="Експортувати бінарний .STL для слайсера 3D-принтера">
+      <div class="top-action-group top-export-group" aria-label="Головний експорт" data-i18n-aria="export_aria">
+        <button id="btn-export-stl" class="btn-action btn-export" title="Експортувати бінарний .STL для слайсера 3D-принтера" data-i18n-title="export.title">
           <span class="btn-ico" aria-hidden="true">💾</span>
-          <span class="btn-lbl"><span class="lbl-extra">Експорт </span>.STL</span>
+          <span class="btn-lbl"><span class="lbl-extra" data-i18n="export.extra">Експорт </span>.STL</span>
         </button>
       </div>
 
       <!-- Група: Меню опцій (звук, музика, мутація, інформація) -->
       <div class="top-action-group menu-dropdown-wrapper">
-        <button id="btn-top-menu" class="btn-action btn-menu-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="top-dropdown-menu" title="Додаткові опції: Звук, Музика, Інформація" aria-label="Додаткові опції">
+        <button id="btn-top-menu" class="btn-action btn-menu-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="top-dropdown-menu" title="Додаткові опції: Звук, Музика, Інформація" aria-label="Додаткові опції" data-i18n-title="options.btn_title" data-i18n-aria="options.btn_aria">
           <span class="btn-ico" aria-hidden="true">⚙️</span>
-          <span class="btn-lbl">Опції</span>
+          <span class="btn-lbl" data-i18n="options.btn">Опції</span>
           <span class="btn-caret" aria-hidden="true">▾</span>
         </button>
-        <div id="top-dropdown-menu" class="top-dropdown-menu" role="menu" aria-label="Додаткові опції студії">
-          <button id="btn-toggle-sound" class="dropdown-item btn-action btn-sound" role="menuitemcheckbox" aria-checked="true" title="Увімкнути/вимкнути звукові ефекти" aria-label="Звукові ефекти">
+        <div id="top-dropdown-menu" class="top-dropdown-menu" role="menu" aria-label="Додаткові опції студії" data-i18n-aria="options.menu_aria">
+          <button id="btn-toggle-sound" class="dropdown-item btn-action btn-sound" role="menuitemcheckbox" aria-checked="true" title="Увімкнути/вимкнути звукові ефекти" aria-label="Звукові ефекти" data-i18n="options.sound" data-i18n-title="options.sound_title" data-i18n-aria="options.sound_aria">
             🔊 Звук
           </button>
-          <button id="btn-toggle-music" class="dropdown-item btn-action btn-music" role="menuitemcheckbox" aria-checked="false" title="Увімкнути/вимкнути фонову мелодію кузні" aria-label="Фонова музика">
+          <button id="btn-toggle-music" class="dropdown-item btn-action btn-music" role="menuitemcheckbox" aria-checked="false" title="Увімкнути/вимкнути фонову мелодію кузні" aria-label="Фонова музика" data-i18n="options.music" data-i18n-title="options.music_title" data-i18n-aria="options.music_aria">
             🎵 Музика
           </button>
           <div class="dropdown-divider"></div>
-          <button id="btn-open-about" class="dropdown-item btn-action btn-about" role="menuitem" title="Про автора та уроки 3D / IT (Ігор Сівочка)">
+          <button id="btn-open-about" class="dropdown-item btn-action btn-about" role="menuitem" title="Про автора та уроки 3D / IT (Ігор Сівочка)" data-i18n="options.about" data-i18n-title="options.about_title">
             👨‍🏫 Про автора
           </button>
         </div>
@@ -294,32 +305,32 @@
   <div id="view-mode-bar" class="view-mode-bar">
     <!-- Ліва частина: Навчання та режими вікна -->
     <div class="workspace-bar-left">
-      <div class="workspace-bar-group" aria-label="Навчання в гуртку">
-        <button id="btn-open-missions" class="view-btn btn-missions-tab" title="Відкрити каталог навчальних місій гуртка (72 місії для 2–6 класів)">
+      <div class="workspace-bar-group" aria-label="Навчання в гуртку" data-i18n-aria="bar.missions_aria">
+        <button id="btn-open-missions" class="view-btn btn-missions-tab" title="Відкрити каталог навчальних місій гуртка (72 місії для 2–6 класів)" data-i18n-title="bar.missions_title">
           <span class="btn-ico" aria-hidden="true">🗺️</span>
-          <span class="btn-lbl">Місії <span class="btn-badge-num" data-missions-count>(72)</span></span>
+          <span class="btn-lbl"><span data-i18n="bar.missions_lbl">Місії</span> <span class="btn-badge-num" data-missions-count>(72)</span></span>
         </button>
       </div>
 
       <div class="bar-separator" aria-hidden="true"></div>
 
-      <div class="view-mode-group" aria-label="Режим робочого простору">
-        <button class="view-btn active" data-view-mode="split" title="Редактор ліворуч, 3D сцена праворуч">
+      <div class="view-mode-group" aria-label="Режим робочого простору" data-i18n-aria="bar.view_aria">
+        <button class="view-btn active" data-view-mode="split" title="Редактор ліворуч, 3D сцена праворуч" data-i18n-title="bar.split_title">
           <span class="btn-ico" aria-hidden="true">🌗</span>
-          <span class="btn-lbl"><span class="lbl-full">Редактор + 3D</span><span class="lbl-short">Спліт</span></span>
+          <span class="btn-lbl"><span class="lbl-full" data-i18n="bar.split_full">Редактор + 3D</span><span class="lbl-short" data-i18n="bar.split_short">Спліт</span></span>
         </button>
-        <button class="view-btn" data-view-mode="viewport" title="Тільки 3D сцена для проєктора або демонстрації">
+        <button class="view-btn" data-view-mode="viewport" title="Тільки 3D сцена для проєктора або демонстрації" data-i18n-title="bar.vp_title">
           <span class="btn-ico" aria-hidden="true">🧊</span>
-          <span class="btn-lbl"><span class="lbl-full">Тільки 3D</span><span class="lbl-short">3D</span></span>
+          <span class="btn-lbl"><span class="lbl-full" data-i18n="bar.vp_full">Тільки 3D</span><span class="lbl-short" data-i18n="bar.vp_short">3D</span></span>
         </button>
       </div>
     </div>
 
     <!-- Права частина: Контроль якості, підготовка друку (Priority+ адаптивна) та автозбереження -->
     <div class="workspace-bar-right">
-      <button type="button" id="autosave-tag" class="autosave-tag" title="Стан автоматично зберігається у пам'яті браузера">
+      <button type="button" id="autosave-tag" class="autosave-tag" title="Стан автоматично зберігається у пам'яті браузера" data-i18n-title="bar.autosave_title">
         <span class="autosave-dot" aria-hidden="true"></span>
-        <span class="autosave-short">Авто</span>
+        <span class="autosave-short" data-i18n="bar.autosave_short">Авто</span>
         <span class="autosave-full"></span>
       </button>
     </div>
@@ -333,8 +344,8 @@
 
       <!-- ВАУ! Мутація: одна спільна кнопка для всіх вкладок генераторів -->
       <div class="sidebar-wow-bar">
-        <button id="btn-random-wow" class="btn-wow" type="button" title="Випадкова генерація / Мутація для поточної вкладки!">
-          <span aria-hidden="true">🎲</span> ВАУ! Мутація
+        <button id="btn-random-wow" class="btn-wow" type="button" title="Випадкова генерація / Мутація для поточної вкладки!" data-i18n-title="sidebar.wow_title">
+          <span aria-hidden="true">🎲</span> <span data-i18n="sidebar.wow">ВАУ! Мутація</span>
         </button>
       </div>
 
@@ -343,10 +354,10 @@
         <div class="mission-compact-top">
           <span id="active-mission-badge" class="mission-cat-pill">🗺️ Місія #1 • Рельєфи</span>
           <div class="mission-compact-actions">
-            <button id="btn-prev-mission" class="mission-nav-btn" title="Попередня місія">◀</button>
-            <button id="btn-next-mission" class="mission-nav-btn" title="Наступна місія">▶</button>
-            <button id="btn-toggle-mission-body" class="mission-small-btn" title="Згорнути або розгорнути опис місії">🔼 Згорнути</button>
-            <button id="btn-close-active-mission" class="mission-nav-btn mission-close-btn" title="Сховати панель місії" aria-label="Сховати панель місії">✕</button>
+            <button id="btn-prev-mission" class="mission-nav-btn" title="Попередня місія" data-i18n-title="mission.prev_title">◀</button>
+            <button id="btn-next-mission" class="mission-nav-btn" title="Наступна місія" data-i18n-title="mission.next_title">▶</button>
+            <button id="btn-toggle-mission-body" class="mission-small-btn" title="Згорнути або розгорнути опис місії" data-i18n="mission.collapse" data-i18n-title="mission.collapse_title">🔼 Згорнути</button>
+            <button id="btn-close-active-mission" class="mission-nav-btn mission-close-btn" title="Сховати панель місії" aria-label="Сховати панель місії" data-i18n-title="mission.close_title" data-i18n-aria="mission.close_aria">✕</button>
           </div>
         </div>
 
@@ -355,7 +366,7 @@
             <strong id="active-mission-title" class="mission-compact-title">⚡ Паспорт таємного дослідника</strong>
             <span id="active-mission-meta" class="mission-compact-meta">🎯 Габарит: до 35×35 мм • ⛏️ Майнкрафт-Кузня</span>
           </div>
-          <button id="btn-start-active-mission" class="btn-mission-apply" title="Увімкнути потрібну вкладку, стартовий міні-шаблон та рекомендовані параметри цієї місії">
+          <button id="btn-start-active-mission" class="btn-mission-apply" title="Увімкнути потрібну вкладку, стартовий міні-шаблон та рекомендовані параметри цієї місії" data-i18n="mission.start" data-i18n-title="mission.start_title">
             🚀 Почати місію
           </button>
         </div>
@@ -364,11 +375,11 @@
           <div id="active-mission-riddle" class="mission-riddle-box"></div>
           <div class="mission-grades-row">
             <div class="mission-grade-item">
-              <span class="grade-tag grade-23">👶 2–3 класи:</span>
+              <span class="grade-tag grade-23" data-i18n="mission.g23_tag">👶 2–3 класи:</span>
               <span id="active-mission-g23"></span>
             </div>
             <div class="mission-grade-item">
-              <span class="grade-tag grade-46">🧑 4–6 класи:</span>
+              <span class="grade-tag grade-46" data-i18n="mission.g46_tag">🧑 4–6 класи:</span>
               <span id="active-mission-g46"></span>
             </div>
           </div>
@@ -376,18 +387,18 @@
           <div id="active-mission-steps" class="mission-steps-mini"></div>
 
           <div class="mission-checklist-box">
-            <div class="mission-checklist-title">✅ Чек-лист самоперевірки (Дизайнер + Перевіряльник):</div>
+            <div class="mission-checklist-title" data-i18n="mission.checklist_title">✅ Чек-лист самоперевірки (Дизайнер + Перевіряльник):</div>
             <label class="mission-check-row">
               <input type="checkbox" id="chk-mission-connected" data-mission-check="connected" />
-              <span>Чи з'єднані всі частини в одну суцільну деталь?</span>
+              <span data-i18n="mission.chk_connected">Чи з'єднані всі частини в одну суцільну деталь?</span>
             </label>
             <label class="mission-check-row">
               <input type="checkbox" id="chk-mission-mono" data-mission-check="mono" />
-              <span>Чи впізнається силует в 1 кольорі (кнопка «🪨 1 Пластик»)?</span>
+              <span data-i18n="mission.chk_mono">Чи впізнається силует в 1 кольорі (кнопка «🪨 1 Пластик»)?</span>
             </label>
             <label class="mission-check-row">
               <input type="checkbox" id="chk-mission-size" data-mission-check="size" />
-              <span>Чи вкладається модель у цільовий габарит місії?</span>
+              <span data-i18n="mission.chk_size">Чи вкладається модель у цільовий габарит місії?</span>
             </label>
           </div>
         </div>
@@ -397,119 +408,119 @@
            ВКЛАДКА 1: МАЙНКРАФТ-КУЗНЯ (ВОКСЕЛЬНИЙ 3D-РЕЛЬЄФ)
            =================================================================== -->
       <section id="panel-minecraft" class="panel-section active">
-        <div class="printer-safe-tip">
+        <div class="printer-safe-tip" data-i18n-html="mc.tip">
           🛡️ <b>Порада:</b> Кожен шар має свою висоту. Перевіряй виразність рельєфу кнопкою «🪨 1 Пластик» у меню «🖨️ Друк»!
         </div>
 
         <div class="card">
           <div class="card-header">
-            <span>🌟 Малі рельєфні шаблони місій (25–35 мм)</span>
+            <span data-i18n="mc.mini_header">🌟 Малі рельєфні шаблони місій (25–35 мм)</span>
           </div>
           <div class="preset-grid">
-            <button class="preset-btn preset-mini-btn" data-mc-preset="hero_badge">⚡ Паспорт Героя</button>
-            <button class="preset-btn preset-mini-btn" data-mc-preset="creature_track">🐾 Слід Істоти</button>
-            <button class="preset-btn preset-mini-btn" data-mc-preset="fossil_shell">🐚 Скам'янілість</button>
-            <button class="preset-btn preset-mini-btn" data-mc-preset="city_coin">🪙 Монета Міста</button>
-            <button class="preset-btn preset-mini-btn" data-mc-preset="game_token">🎲 Жетон Гравця</button>
-            <button class="preset-btn preset-mini-btn" data-mc-preset="mini_tag">🏷️ Міні-Табличка</button>
-            <button class="preset-btn preset-mini-btn" data-mc-preset="cardboard_stand">🏙️ Паз для Картону</button>
-            <button class="preset-btn preset-mini-btn" data-mc-preset="slot_calibrator">📏 Калібратор Пазів</button>
-            <button class="preset-btn preset-mini-btn" data-mc-preset="shield">🛡️ Щит (Tinkercad)</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="hero_badge" data-i18n="mc.preset.hero_badge">⚡ Паспорт Героя</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="creature_track" data-i18n="mc.preset.creature_track">🐾 Слід Істоти</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="fossil_shell" data-i18n="mc.preset.fossil_shell">🐚 Скам'янілість</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="city_coin" data-i18n="mc.preset.city_coin">🪙 Монета Міста</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="game_token" data-i18n="mc.preset.game_token">🎲 Жетон Гравця</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="mini_tag" data-i18n="mc.preset.mini_tag">🏷️ Міні-Табличка</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="cardboard_stand" data-i18n="mc.preset.cardboard_stand">🏙️ Паз для Картону</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="slot_calibrator" data-i18n="mc.preset.slot_calibrator">📏 Калібратор Пазів</button>
+            <button class="preset-btn preset-mini-btn" data-mc-preset="shield" data-i18n="mc.preset.shield">🛡️ Щит (Tinkercad)</button>
           </div>
 
           <div class="card-header" style="margin-top: 6px;">
-            <span>📦 Класичні Артефакти Minecraft</span>
+            <span data-i18n="mc.classic_header">📦 Класичні Артефакти Minecraft</span>
           </div>
           <div class="preset-grid">
-            <button class="preset-btn active" data-mc-preset="sword">⚔️ Алмазний Меч</button>
-            <button class="preset-btn" data-mc-preset="pickaxe">⛏️ Алмазна Кірка</button>
-            <button class="preset-btn" data-mc-preset="creeper">💚 Кріпер-Трофей</button>
-            <button class="preset-btn" data-mc-preset="tnt">🧨 Динаміт TNT</button>
-            <button class="preset-btn" data-mc-preset="heart">❤️ Серце Життя</button>
-            <button class="preset-btn" data-mc-preset="totem">🏆 Тотем Безсмертя</button>
-            <button class="preset-btn" data-mc-preset="dragon">🐉 Дракон Енду</button>
+            <button class="preset-btn active" data-mc-preset="sword" data-i18n="mc.preset.sword">⚔️ Алмазний Меч</button>
+            <button class="preset-btn" data-mc-preset="pickaxe" data-i18n="mc.preset.pickaxe">⛏️ Алмазна Кірка</button>
+            <button class="preset-btn" data-mc-preset="creeper" data-i18n="mc.preset.creeper">💚 Кріпер-Трофей</button>
+            <button class="preset-btn" data-mc-preset="tnt" data-i18n="mc.preset.tnt">🧨 Динаміт TNT</button>
+            <button class="preset-btn" data-mc-preset="heart" data-i18n="mc.preset.heart">❤️ Серце Життя</button>
+            <button class="preset-btn" data-mc-preset="totem" data-i18n="mc.preset.totem">🏆 Тотем Безсмертя</button>
+            <button class="preset-btn" data-mc-preset="dragon" data-i18n="mc.preset.dragon">🐉 Дракон Енду</button>
           </div>
         </div>
 
         <div class="card">
           <div class="card-header">
-            <span>🎨 Малюй 3D-Висоту (16×16 блоків)</span>
+            <span data-i18n="mc.draw_header">🎨 Малюй 3D-Висоту (16×16 блоків)</span>
             <div class="card-header-actions">
-              <button id="btn-mc-clear" class="sym-btn" title="Очистити полотно">🗑️ Очистити</button>
+              <button id="btn-mc-clear" class="sym-btn" title="Очистити полотно" data-i18n="mc.clear" data-i18n-title="mc.clear_title">🗑️ Очистити</button>
             </div>
           </div>
 
           <div class="brush-bar">
-            <button class="brush-btn" data-mc-brush="0" title="Гумка: видаляє кубик (висота 0 мм)">🧽 Гумка</button>
-            <button class="brush-btn" data-mc-brush="1" title="Шар 1: найнижчий шар (1 мм)">🟫 Шар 1 (Низько)</button>
-            <button class="brush-btn" data-mc-brush="2" title="Шар 2: середній шар (2 мм)">🟦 Шар 2 (Середнє)</button>
-            <button class="brush-btn active" data-mc-brush="3" title="Шар 3: високий шар (3 мм)">💎 Шар 3 (Високо)</button>
-            <button class="brush-btn" data-mc-brush="4" title="Шар 4: найвищий пік (4 мм)">✨ Шар 4 (Найвище)</button>
+            <button class="brush-btn" data-mc-brush="0" title="Гумка: видаляє кубик (висота 0 мм)" data-i18n="mc.brush_0" data-i18n-title="mc.brush_0_title">🧽 Гумка</button>
+            <button class="brush-btn" data-mc-brush="1" title="Шар 1: найнижчий шар (1 мм)" data-i18n="mc.brush_1" data-i18n-title="mc.brush_1_title">🟫 Шар 1 (Низько)</button>
+            <button class="brush-btn" data-mc-brush="2" title="Шар 2: середній шар (2 мм)" data-i18n="mc.brush_2" data-i18n-title="mc.brush_2_title">🟦 Шар 2 (Середнє)</button>
+            <button class="brush-btn active" data-mc-brush="3" title="Шар 3: високий шар (3 мм)" data-i18n="mc.brush_3" data-i18n-title="mc.brush_3_title">💎 Шар 3 (Високо)</button>
+            <button class="brush-btn" data-mc-brush="4" title="Шар 4: найвищий пік (4 мм)" data-i18n="mc.brush_4" data-i18n-title="mc.brush_4_title">✨ Шар 4 (Найвище)</button>
           </div>
 
           <!-- Індикатор фізичної зв'язності деталей -->
-          <div id="mc-connectivity-status" class="connectivity-pill">
+          <div id="mc-connectivity-status" class="connectivity-pill" data-i18n="mc.conn_empty">
             ✏️ Намалюй свій візерунок або обери зразок вище.
           </div>
 
           <div class="pixel-grid-wrapper">
-            <div id="mc-pixel-grid" class="pixel-grid pixel-grid-container" role="grid" aria-label="Піксельна сітка 16 на 16 для малювання 3D-висоти"></div>
+            <div id="mc-pixel-grid" class="pixel-grid pixel-grid-container" role="grid" aria-label="Піксельна сітка 16 на 16 для малювання 3D-висоти" data-i18n-aria="mc.grid_aria"></div>
           </div>
           <div id="pixel-editor-tools"></div>
         </div>
 
         <details class="card collapsible-card">
           <summary class="card-header">
-            <span>⚙️ Додаткові налаштування друку</span>
+            <span data-i18n="mc.adv_header">⚙️ Додаткові налаштування друку</span>
           </summary>
 
           <div class="collapsible-card-content">
             <div class="control-row">
               <div class="control-label">
-                <span>Розмір 1 кубика (вокселя):</span>
+                <span data-i18n="mc.voxel_lbl">Розмір 1 кубика (вокселя):</span>
                 <span id="val-mc-voxel" class="control-val">3.5 мм</span>
               </div>
-              <input id="mc-voxel-size" type="range" min="1.8" max="5.0" step="0.1" value="3.5" aria-label="Розмір 1 кубика (вокселя), мм" />
+              <input id="mc-voxel-size" type="range" min="1.8" max="5.0" step="0.1" value="3.5" aria-label="Розмір 1 кубика (вокселя), мм" data-i18n-aria="mc.voxel_aria" />
             </div>
 
             <div class="control-row">
               <div class="control-label">
-                <span>Сходинка висоти між шарами:</span>
+                <span data-i18n="mc.step_lbl">Сходинка висоти між шарами:</span>
                 <span id="val-mc-step" class="control-val">1.5 мм</span>
               </div>
-              <input id="mc-height-step" type="range" min="0.8" max="2.8" step="0.1" value="1.5" aria-label="Сходинка висоти між шарами, мм" />
+              <input id="mc-height-step" type="range" min="0.8" max="2.8" step="0.1" value="1.5" aria-label="Сходинка висоти між шарами, мм" data-i18n-aria="mc.step_aria" />
             </div>
 
-            <label class="checkbox-row" title="Створює спільну підошву 2 мм та автоматичні містки між віддаленими островами">
-              <input id="mc-solid-base" type="checkbox" checked aria-label="Суцільна підкладка 2 мм та авто-містки" />
-              <span>Суцільна підкладка 2 мм + авто-містки (1 суцільна деталь)</span>
+            <label class="checkbox-row" title="Створює спільну підошву 2 мм та автоматичні містки між віддаленими островами" data-i18n-title="mc.solid_base_title">
+              <input id="mc-solid-base" type="checkbox" checked aria-label="Суцільна підкладка 2 мм та авто-містки" data-i18n-aria="mc.solid_base_aria" />
+              <span data-i18n="mc.solid_base">Суцільна підкладка 2 мм + авто-містки (1 суцільна деталь)</span>
             </label>
 
             <div class="control-row">
-              <div class="control-label"><span>Тип кріплення / підставки:</span></div>
-              <select id="mc-mount-type" aria-label="Тип кріплення або підставки">
-                <option value="keychain" selected>🔑 Міцне вушко для брелока (отвір 6 мм)</option>
-                <option value="none">🧱 Чиста фігурка / Плитка (для Tinkercad / жетона)</option>
-                <option value="stand">🏆 З іменною табличкою внизу</option>
+              <div class="control-label"><span data-i18n="mc.mount_lbl">Тип кріплення / підставки:</span></div>
+              <select id="mc-mount-type" aria-label="Тип кріплення або підставки" data-i18n-aria="mc.mount_aria">
+                <option value="keychain" selected data-i18n="mc.mount_keychain">🔑 Міцне вушко для брелока (отвір 6 мм)</option>
+                <option value="none" data-i18n="mc.mount_none">🧱 Чиста фігурка / Плитка (для Tinkercad / жетона)</option>
+                <option value="stand" data-i18n="mc.mount_stand">🏆 З іменною табличкою внизу</option>
               </select>
             </div>
 
             <div id="mc-slot-width-group" class="control-row" style="display:none;">
               <div class="control-label">
-                <span>Ширина паза під картон:</span>
+                <span data-i18n="mc.slot_lbl">Ширина паза під картон:</span>
                 <span id="val-mc-slot" class="control-val">2.0 мм (+0.2 допуск)</span>
               </div>
-              <select id="mc-slot-width" aria-label="Ширина паза під картон">
-                <option value="1.5">1.5 мм (допуск +0.2 = 1.7 мм) — тонкий картон</option>
-                <option value="2.0" selected>2.0 мм (допуск +0.2 = 2.2 мм) — палітурний картон</option>
-                <option value="2.5">2.5 мм (допуск +0.2 = 2.7 мм) — гофрокартон мікро-E</option>
-                <option value="3.0">3.0 мм (допуск +0.2 = 3.2 мм) — щільний гофрокартон-B</option>
+              <select id="mc-slot-width" aria-label="Ширина паза під картон" data-i18n-aria="mc.slot_aria">
+                <option value="1.5" data-i18n="mc.slot_15">1.5 мм (допуск +0.2 = 1.7 мм) — тонкий картон</option>
+                <option value="2.0" selected data-i18n="mc.slot_20">2.0 мм (допуск +0.2 = 2.2 мм) — палітурний картон</option>
+                <option value="2.5" data-i18n="mc.slot_25">2.5 мм (допуск +0.2 = 2.7 мм) — гофрокартон мікро-E</option>
+                <option value="3.0" data-i18n="mc.slot_30">3.0 мм (допуск +0.2 = 3.2 мм) — щільний гофрокартон-B</option>
               </select>
             </div>
 
             <div class="control-row">
-              <div class="control-label"><span>Ім'я учня (об'ємні літери внизу):</span></div>
-              <input id="mc-custom-label" type="text" maxlength="9" placeholder="Напр.: МАКСИМ (необов'язково)" aria-label="Ім'я учня (об'ємні літери внизу)" />
+              <div class="control-label"><span data-i18n="mc.label_lbl">Ім'я учня (об'ємні літери внизу):</span></div>
+              <input id="mc-custom-label" type="text" maxlength="9" placeholder="Напр.: МАКСИМ (необов'язково)" aria-label="Ім'я учня (об'ємні літери внизу)" data-i18n-placeholder="mc.label_placeholder" data-i18n-aria="mc.label_aria" />
             </div>
           </div>
         </details>
@@ -519,83 +530,83 @@
            ВКЛАДКА 2: ОПТИЧНИЙ ПЕРЕВЕРТЕНЬ (ПОДВІЙНИЙ 3D-ТЕКСТ)
            =================================================================== -->
       <section id="panel-illusion" class="panel-section">
-        <div class="card"><label class="control-label" for="il-design">🔮 Оптична знахідка</label><select id="il-design"><option value="classic">Класичні слова й символи</option></select></div>
-        <div class="printer-safe-tip">
+        <div class="card"><label class="control-label" for="il-design" data-i18n="il.design_lbl">🔮 Оптична знахідка</label><select id="il-design"><option value="classic" data-i18n="il.design_classic">Класичні слова й символи</option></select></div>
+        <div class="printer-safe-tip" data-i18n-html="il.tip">
           🔮 <b>Порада:</b> Дивись на слово спереду (0°), а потім поверни збоку (90°), щоб відкрити секретний напис!
         </div>
 
         <div class="card">
           <div class="card-header">
-            <span>⚡ Швидкі Шаблони Ілюзій</span>
+            <span data-i18n="il.presets_header">⚡ Швидкі Шаблони Ілюзій</span>
           </div>
           <div class="preset-grid">
-            <button class="preset-btn preset-mini-btn" data-il-preset="short" data-w1="3D" data-w2="★!" data-voxel="2.2">⚡ 3D ↔ ★! (~28 мм)</button>
-            <button class="preset-btn preset-mini-btn" data-il-preset="cipher" data-w1="ОК" data-w2="⚔👑" data-voxel="2.2">🔮 ОК ↔ ⚔👑 (~28 мм)</button>
-            <button class="preset-btn" data-il-preset="1" data-w1="МАКСИМ" data-w2="★BOSS★" data-voxel="2.6">👦 МАКСИМ ↔ BOSS</button>
-            <button class="preset-btn" data-il-preset="2" data-w1="МАЙН!" data-w2="КРАФТ" data-voxel="2.6">⛏️ МАЙН! ↔ КРАФТ</button>
-            <button class="preset-btn" data-il-preset="3" data-w1="КРІПЕР" data-w2="⚔💀⛏♥👑★" data-voxel="2.6">💀 КРІПЕР ↔ Символи</button>
-            <button class="preset-btn" data-il-preset="4" data-w1="СОФІЯ" data-w2="★PRO★" data-voxel="2.6">👧 СОФІЯ ↔ Зірка</button>
+            <button class="preset-btn preset-mini-btn" data-il-preset="short" data-w1="3D" data-w2="★!" data-voxel="2.2" data-i18n="il.preset_short">⚡ 3D ↔ ★! (~28 мм)</button>
+            <button class="preset-btn preset-mini-btn" data-il-preset="cipher" data-w1="ОК" data-w2="⚔👑" data-voxel="2.2" data-i18n="il.preset_cipher">🔮 ОК ↔ ⚔👑 (~28 мм)</button>
+            <button class="preset-btn" data-il-preset="1" data-w1="МАКСИМ" data-w2="★BOSS★" data-voxel="2.6" data-i18n="il.preset_1">👦 МАКСИМ ↔ BOSS</button>
+            <button class="preset-btn" data-il-preset="2" data-w1="МАЙН!" data-w2="КРАФТ" data-voxel="2.6" data-i18n="il.preset_2">⛏️ МАЙН! ↔ КРАФТ</button>
+            <button class="preset-btn" data-il-preset="3" data-w1="КРІПЕР" data-w2="⚔💀⛏♥👑★" data-voxel="2.6" data-i18n="il.preset_3">💀 КРІПЕР ↔ Символи</button>
+            <button class="preset-btn" data-il-preset="4" data-w1="СОФІЯ" data-w2="★PRO★" data-voxel="2.6" data-i18n="il.preset_4">👧 СОФІЯ ↔ Зірка</button>
           </div>
         </div>
 
         <div class="card">
           <div class="card-header">
-            <span>✍️ Введіть Два Слова (Укр / Англ / Іконки)</span>
+            <span data-i18n="il.words_header">✍️ Введіть Два Слова (Укр / Англ / Іконки)</span>
           </div>
 
           <div class="control-row">
-            <div class="control-label"><span>Слово 1 (Вигляд Спереду 0°):</span></div>
-            <input id="il-word1" type="text" maxlength="9" value="МАКСИМ" aria-label="Слово 1 (Вигляд Спереду 0 градусів)" />
+            <div class="control-label"><span data-i18n="il.word1_lbl">Слово 1 (Вигляд Спереду 0°):</span></div>
+            <input id="il-word1" type="text" maxlength="9" value="МАКСИМ" aria-label="Слово 1 (Вигляд Спереду 0 градусів)" data-i18n-aria="il.word1_aria" />
           </div>
 
           <div class="control-row">
-            <div class="control-label"><span>Слово 2 (Вигляд Збоку 90°):</span></div>
-            <input id="il-word2" type="text" maxlength="9" value="★BOSS★" aria-label="Слово 2 (Вигляд Збоку 90 градусів)" />
+            <div class="control-label"><span data-i18n="il.word2_lbl">Слово 2 (Вигляд Збоку 90°):</span></div>
+            <input id="il-word2" type="text" maxlength="9" value="★BOSS★" aria-label="Слово 2 (Вигляд Збоку 90 градусів)" data-i18n-aria="il.word2_aria" />
           </div>
 
           <div class="control-row">
-            <div class="control-label"><span>Додати 3D-іконку в активне поле:</span></div>
+            <div class="control-label"><span data-i18n="il.icons_lbl">Додати 3D-іконку в активне поле:</span></div>
             <div class="sym-bar">
-              <button class="sym-btn" data-insert-sym="⚔" title="Меч">⚔ Меч</button>
-              <button class="sym-btn" data-insert-sym="⛏" title="Кірка">⛏ Кірка</button>
-              <button class="sym-btn" data-insert-sym="💀" title="Кріпер">💀 Кріпер</button>
-              <button class="sym-btn" data-insert-sym="👑" title="Корона">👑 Корона</button>
-              <button class="sym-btn" data-insert-sym="♥" title="Серце">♥ Серце</button>
-              <button class="sym-btn" data-insert-sym="★" title="Зірка">★ Зірка</button>
+              <button class="sym-btn" data-insert-sym="⚔" title="Меч" data-i18n="il.sym_sword" data-i18n-title="il.sym_sword_title">⚔ Меч</button>
+              <button class="sym-btn" data-insert-sym="⛏" title="Кірка" data-i18n="il.sym_pickaxe" data-i18n-title="il.sym_pickaxe_title">⛏ Кірка</button>
+              <button class="sym-btn" data-insert-sym="💀" title="Кріпер" data-i18n="il.sym_creeper" data-i18n-title="il.sym_creeper_title">💀 Кріпер</button>
+              <button class="sym-btn" data-insert-sym="👑" title="Корона" data-i18n="il.sym_crown" data-i18n-title="il.sym_crown_title">👑 Корона</button>
+              <button class="sym-btn" data-insert-sym="♥" title="Серце" data-i18n="il.sym_heart" data-i18n-title="il.sym_heart_title">♥ Серце</button>
+              <button class="sym-btn" data-insert-sym="★" title="Зірка" data-i18n="il.sym_star" data-i18n-title="il.sym_star_title">★ Зірка</button>
             </div>
           </div>
         </div>
 
         <details class="card collapsible-card">
           <summary class="card-header">
-            <span>🛡️ Налаштування друку та опор</span>
+            <span data-i18n="il.adv_header">🛡️ Налаштування друку та опор</span>
           </summary>
 
           <div class="collapsible-card-content">
             <div class="control-row">
               <div class="control-label">
-                <span>Товщина вокселя літер:</span>
+                <span data-i18n="il.voxel_lbl">Товщина вокселя літер:</span>
                 <span id="val-il-voxel" class="control-val">2.6 мм</span>
               </div>
-              <input id="il-voxel-size" type="range" min="2.0" max="4.0" step="0.1" value="2.6" aria-label="Товщина вокселя літер, мм" />
+              <input id="il-voxel-size" type="range" min="2.0" max="4.0" step="0.1" value="2.6" aria-label="Товщина вокселя літер, мм" data-i18n-aria="il.voxel_aria" />
             </div>
 
             <label class="checkbox-row">
-              <input id="il-safe-supports" type="checkbox" checked aria-label="Авто-опори під нависаючими частинами літер" />
-              <span>Внутрішні стовпчики під нависаючими вокселями літер</span>
+              <input id="il-safe-supports" type="checkbox" checked aria-label="Авто-опори під нависаючими частинами літер" data-i18n-aria="il.supports_aria" />
+              <span data-i18n="il.supports_lbl">Внутрішні стовпчики під нависаючими вокселями літер</span>
             </label>
 
             <div class="control-row">
-              <div class="control-label"><span>Розташування літер на подіумі:</span></div>
-              <select id="il-layout-mode" aria-label="Розташування літер на подіумі">
-                <option value="diagonal" selected>📐 По діагоналі (обидва слова видно без перекриття)</option>
-                <option value="line">📏 В одну лінію (компактна підставка)</option>
+              <div class="control-label"><span data-i18n="il.layout_lbl">Розташування літер на подіумі:</span></div>
+              <select id="il-layout-mode" aria-label="Розташування літер на подіумі" data-i18n-aria="il.layout_aria">
+                <option value="diagonal" selected data-i18n="il.layout_diag">📐 По діагоналі (обидва слова видно без перекриття)</option>
+                <option value="line" data-i18n="il.layout_line">📏 В одну лінію (компактна підставка)</option>
               </select>
             </div>
 
             <div class="control-row">
-              <div class="control-label"><span>Колір моделі на екрані:</span></div>
-              <input id="il-color-primary" type="color" value="#00d26a" aria-label="Колір моделі на екрані" style="height:44px; width:100%; background:var(--bg2); border:2px solid var(--surface2); border-radius:var(--r-sm); cursor:pointer;" />
+              <div class="control-label"><span data-i18n="il.color_lbl">Колір моделі на екрані:</span></div>
+              <input id="il-color-primary" type="color" value="#00d26a" aria-label="Колір моделі на екрані" data-i18n-aria="il.color_aria" style="height:44px; width:100%; background:var(--bg2); border:2px solid var(--surface2); border-radius:var(--r-sm); cursor:pointer;" />
             </div>
           </div>
         </details>
@@ -605,71 +616,71 @@
            ВКЛАДКА 3: ФІЗИКА БЕЗ ШЕСТЕРЕНЬ (КАТАПУЛЬТА ТА БАЛАНСИР)
            =================================================================== -->
       <section id="panel-physics" class="panel-section">
-        <div class="printer-safe-tip">
+        <div class="printer-safe-tip" data-i18n-html="ph.tip">
           🎯 <b>Порада:</b> Експериментуй з формою важеля та тисни «Постріл», щоб перевірити дальність на екрані!
         </div>
 
         <div class="card">
           <div class="card-header">
-            <span>🚀 Оберіть Фізичну Модель</span>
+            <span data-i18n="ph.model_header">🚀 Оберіть Фізичну Модель</span>
           </div>
 
           <div class="control-row">
-            <label class="control-label" for="ph-design">🎯 Інженерна пригода</label>
-            <select id="ph-design"><option value="classic">Класичний механізм</option></select>
-            <select id="ph-submode" aria-label="Оберіть фізичну модель">
-              <option value="catapult" selected>🏹 Монолітна Пружинна Міні-Катапульта + TNT</option>
-              <option value="balancer">🦅 Гравітаційний Балансир «Дракон на Пальці»</option>
+            <label class="control-label" for="ph-design" data-i18n="ph.design_lbl">🎯 Інженерна пригода</label>
+            <select id="ph-design"><option value="classic" data-i18n="ph.design_classic">Класичний механізм</option></select>
+            <select id="ph-submode" aria-label="Оберіть фізичну модель" data-i18n-aria="ph.submode_aria">
+              <option value="catapult" selected data-i18n="ph.submode_catapult">🏹 Монолітна Пружинна Міні-Катапульта + TNT</option>
+              <option value="balancer" data-i18n="ph.submode_balancer">🦅 Гравітаційний Балансир «Дракон на Пальці»</option>
             </select>
           </div>
         </div>
 
         <details class="card collapsible-card" open>
           <summary class="card-header">
-            <span>🔧 Налаштування розмірів та важеля</span>
+            <span data-i18n="ph.adv_header">🔧 Налаштування розмірів та важеля</span>
           </summary>
 
           <div class="collapsible-card-content">
             <div class="control-row">
               <div class="control-label">
-                <span>Висота екструзії (товщина моделі):</span>
+                <span data-i18n="ph.height_lbl">Висота екструзії (товщина моделі):</span>
                 <span id="val-ph-height" class="control-val">10.0 мм</span>
               </div>
-              <input id="ph-extrude-height" type="range" min="5.0" max="15.0" step="0.5" value="10.0" aria-label="Висота екструзії (товщина моделі), мм" />
+              <input id="ph-extrude-height" type="range" min="5.0" max="15.0" step="0.5" value="10.0" aria-label="Висота екструзії (товщина моделі), мм" data-i18n-aria="ph.height_aria" />
             </div>
 
             <div id="ph-spring-group" class="control-row">
               <div class="control-label">
-                <span>Товщина геометрії ресори:</span>
+                <span data-i18n="ph.spring_lbl">Товщина геометрії ресори:</span>
                 <span id="val-ph-spring" class="control-val">2.4 мм</span>
               </div>
-              <input id="ph-spring-thickness" type="range" min="1.8" max="3.6" step="0.1" value="2.4" aria-label="Товщина геометрії ресори, мм" />
+              <input id="ph-spring-thickness" type="range" min="1.8" max="3.6" step="0.1" value="2.4" aria-label="Товщина геометрії ресори, мм" data-i18n-aria="ph.spring_aria" />
             </div>
 
             <div id="ph-weight-group" class="control-row" style="display:none;">
               <div class="control-label">
-                <span>Вага баласту на кінцях крил:</span>
+                <span data-i18n="ph.weight_lbl">Вага баласту на кінцях крил:</span>
                 <span id="val-ph-weight" class="control-val">11.0 мм</span>
               </div>
-              <input id="ph-wing-weight" type="range" min="7.0" max="16.0" step="0.5" value="11.0" aria-label="Вага баласту на кінцях крил, мм" />
+              <input id="ph-wing-weight" type="range" min="7.0" max="16.0" step="0.5" value="11.0" aria-label="Вага баласту на кінцях крил, мм" data-i18n-aria="ph.weight_aria" />
             </div>
 
             <div class="control-row">
               <div class="control-label">
-                <span>Довжина важеля / Розмах крил:</span>
+                <span data-i18n="ph.arm_lbl">Довжина важеля / Розмах крил:</span>
                 <span id="val-ph-arm" class="control-val">68 мм</span>
               </div>
-              <input id="ph-arm-length" type="range" min="52" max="85" step="1" value="68" aria-label="Довжина важеля або розмах крил, мм" />
+              <input id="ph-arm-length" type="range" min="52" max="85" step="1" value="68" aria-label="Довжина важеля або розмах крил, мм" data-i18n-aria="ph.arm_aria" />
             </div>
 
             <label class="checkbox-row">
-              <input id="ph-include-ammo" type="checkbox" checked aria-label="Додати комплектну заготовку снаряда або підставку" />
-              <span>Додати комплектну заготовку снаряда / підставку (окрема деталь для друку)</span>
+              <input id="ph-include-ammo" type="checkbox" checked aria-label="Додати комплектну заготовку снаряда або підставку" data-i18n-aria="ph.ammo_aria" />
+              <span data-i18n="ph.ammo_lbl">Додати комплектну заготовку снаряда / підставку (окрема деталь для друку)</span>
             </label>
 
             <div class="control-row">
-              <div class="control-label"><span>Напис на корпусі катапульти:</span></div>
-              <input id="ph-custom-text" type="text" maxlength="6" value="" aria-label="Напис на корпусі катапульти" />
+              <div class="control-label"><span data-i18n="ph.text_lbl">Напис на корпусі катапульти:</span></div>
+              <input id="ph-custom-text" type="text" maxlength="6" value="" aria-label="Напис на корпусі катапульти" data-i18n-aria="ph.text_aria" />
             </div>
           </div>
         </details>
@@ -679,100 +690,100 @@
            ВКЛАДКА 4: МУТАТОР ВОКСЕЛЬНИХ МОБІВ ТА БОСІВ
            =================================================================== -->
       <section id="panel-mob" class="panel-section">
-        <div class="card"><label class="control-label" for="mob-design">👾 Маленький супутник</label><select id="mob-design"><option value="classic">Класичний моб</option></select></div>
-        <div class="printer-safe-tip">
+        <div class="card"><label class="control-label" for="mob-design" data-i18n="mob.design_lbl">👾 Маленький супутник</label><select id="mob-design"><option value="classic" data-i18n="mob.design_classic">Класичний моб</option></select></div>
+        <div class="printer-safe-tip" data-i18n-html="mob.tip">
           👾 <b>Порада:</b> Обери архетип монстра, налаштуй броню та зброю і перевір міцність на екрані!
         </div>
 
         <div class="card">
           <div class="card-header">
-            <span>🧬 Генетика та Клас Боса</span>
+            <span data-i18n="mob.genetics_header">🧬 Генетика та Клас Боса</span>
           </div>
 
           <div class="control-row">
-            <div class="control-label"><span>Базовий архетип:</span></div>
-            <select id="mob-archetype" aria-label="Базовий архетип моба">
-              <option value="golem" selected>🛡️ Залізний Титан-Голем</option>
-              <option value="creeper">💚 Мутант-Кріпер (4 лапи)</option>
-              <option value="knight">⚔️ Алмазний Паладин</option>
-              <option value="dragon">🐉 Володар Енду</option>
-              <option value="cyborg">🤖 Кібер-Робот 3000</option>
+            <div class="control-label"><span data-i18n="mob.arch_lbl">Базовий архетип:</span></div>
+            <select id="mob-archetype" aria-label="Базовий архетип моба" data-i18n-aria="mob.arch_aria">
+              <option value="golem" selected data-i18n="mob.arch_golem">🛡️ Залізний Титан-Голем</option>
+              <option value="creeper" data-i18n="mob.arch_creeper">💚 Мутант-Кріпер (4 лапи)</option>
+              <option value="knight" data-i18n="mob.arch_knight">⚔️ Алмазний Паладин</option>
+              <option value="dragon" data-i18n="mob.arch_dragon">🐉 Володар Енду</option>
+              <option value="cyborg" data-i18n="mob.arch_cyborg">🤖 Кібер-Робот 3000</option>
             </select>
           </div>
 
           <div class="control-row">
             <div class="control-label">
-              <span>Масштаб голови:</span>
+              <span data-i18n="mob.head_lbl">Масштаб голови:</span>
               <span id="val-mob-head" class="control-val">1.05x</span>
             </div>
-            <input id="mob-head-scale" type="range" min="0.75" max="1.45" step="0.05" value="1.05" aria-label="Масштаб голови" />
+            <input id="mob-head-scale" type="range" min="0.75" max="1.45" step="0.05" value="1.05" aria-label="Масштаб голови" data-i18n-aria="mob.head_aria" />
           </div>
 
           <div class="control-row">
             <div class="control-label">
-              <span>Масивність броні та тулуба:</span>
+              <span data-i18n="mob.bulk_lbl">Масивність броні та тулуба:</span>
               <span id="val-mob-bulk" class="control-val">1.05x</span>
             </div>
-            <input id="mob-body-bulk" type="range" min="0.8" max="1.35" step="0.05" value="1.05" aria-label="Масивність броні та тулуба" />
+            <input id="mob-body-bulk" type="range" min="0.8" max="1.35" step="0.05" value="1.05" aria-label="Масивність броні та тулуба" data-i18n-aria="mob.bulk_aria" />
           </div>
         </div>
 
         <details class="card collapsible-card" open>
           <summary class="card-header">
-            <span>⚔️ Спорядження та Мутації</span>
+            <span data-i18n="mob.gear_header">⚔️ Спорядження та Мутації</span>
           </summary>
 
           <div class="collapsible-card-content">
             <div class="control-row">
-              <div class="control-label"><span>Тип очей / Візора:</span></div>
-              <select id="mob-eye-type" aria-label="Тип очей або візора">
-                <option value="two" selected>👀 Два бойові ока</option>
-                <option value="creeper">💀 Обличчя Кріпера</option>
-                <option value="visor">🕶️ Лазерний Кібер-Візор</option>
-                <option value="one">👁️ Око Циклопа</option>
-                <option value="three">👽 Три ока Мутанта</option>
+              <div class="control-label"><span data-i18n="mob.eye_lbl">Тип очей / Візора:</span></div>
+              <select id="mob-eye-type" aria-label="Тип очей або візора" data-i18n-aria="mob.eye_aria">
+                <option value="two" selected data-i18n="mob.eye_two">👀 Два бойові ока</option>
+                <option value="creeper" data-i18n="mob.eye_creeper">💀 Обличчя Кріпера</option>
+                <option value="visor" data-i18n="mob.eye_visor">🕶️ Лазерний Кібер-Візор</option>
+                <option value="one" data-i18n="mob.eye_one">👁️ Око Циклопа</option>
+                <option value="three" data-i18n="mob.eye_three">👽 Три ока Мутанта</option>
               </select>
             </div>
 
             <div class="control-row">
-              <div class="control-label"><span>Шолом / Роги / Корона:</span></div>
-              <select id="mob-headgear" aria-label="Шолом, роги або корона">
-                <option value="crown" selected>👑 Золота Корона Боса</option>
-                <option value="horns">🐂 Роги Вікінга / Дракона</option>
-                <option value="antenna">📡 Антена Робота</option>
-                <option value="ears">🐺 Бойові Вуха</option>
-                <option value="none">Немає</option>
+              <div class="control-label"><span data-i18n="mob.headgear_lbl">Шолом / Роги / Корона:</span></div>
+              <select id="mob-headgear" aria-label="Шолом, роги або корона" data-i18n-aria="mob.headgear_aria">
+                <option value="crown" selected data-i18n="mob.hg_crown">👑 Золота Корона Боса</option>
+                <option value="horns" data-i18n="mob.hg_horns">🐂 Роги Вікінга / Дракона</option>
+                <option value="antenna" data-i18n="mob.hg_antenna">📡 Антена Робота</option>
+                <option value="ears" data-i18n="mob.hg_ears">🐺 Бойові Вуха</option>
+                <option value="none" data-i18n="mob.hg_none">Немає</option>
               </select>
             </div>
 
             <div class="control-row">
-              <div class="control-label"><span>Спина (Крила / Ранець):</span></div>
-              <select id="mob-backgear" aria-label="Спорядження на спині (крила, ранець або плащ)">
-                <option value="wings" selected>🦇 Ступінчасті Крила Дракона</option>
-                <option value="jetpack">🚀 Турбо-Джетпак</option>
-                <option value="cape">🧣 Лицарський Плащ</option>
-                <option value="none">Немає</option>
+              <div class="control-label"><span data-i18n="mob.backgear_lbl">Спина (Крила / Ранець):</span></div>
+              <select id="mob-backgear" aria-label="Спорядження на спині (крила, ранець або плащ)" data-i18n-aria="mob.backgear_aria">
+                <option value="wings" selected data-i18n="mob.bg_wings">🦇 Ступінчасті Крила Дракона</option>
+                <option value="jetpack" data-i18n="mob.bg_jetpack">🚀 Турбо-Джетпак</option>
+                <option value="cape" data-i18n="mob.bg_cape">🧣 Лицарський Плащ</option>
+                <option value="none" data-i18n="mob.bg_none">Немає</option>
               </select>
             </div>
 
             <div class="control-row">
-              <div class="control-label"><span>Зброя (спирається на базу):</span></div>
-              <select id="mob-weapon" aria-label="Зброя моба">
-                <option value="sword" selected>⚔️ Дворучний Алмазний Меч</option>
-                <option value="hammer">🔨 Громовий Молот Тора</option>
-                <option value="shield">🛡️ Бастіонний Щит</option>
-                <option value="dual_axes">🪓 Подвійні Бойові Сокири</option>
+              <div class="control-label"><span data-i18n="mob.weapon_lbl">Зброя (спирається на базу):</span></div>
+              <select id="mob-weapon" aria-label="Зброя моба" data-i18n-aria="mob.weapon_aria">
+                <option value="sword" selected data-i18n="mob.wp_sword">⚔️ Дворучний Алмазний Меч</option>
+                <option value="hammer" data-i18n="mob.wp_hammer">🔨 Громовий Молот Тора</option>
+                <option value="shield" data-i18n="mob.wp_shield">🛡️ Бастіонний Щит</option>
+                <option value="dual_axes" data-i18n="mob.wp_axes">🪓 Подвійні Бойові Сокири</option>
               </select>
             </div>
 
             <div class="control-row">
-              <div class="control-label"><span>Ім'я на п'єдесталі:</span></div>
-              <input id="mob-name" type="text" maxlength="7" value="ТИТАН" aria-label="Ім'я на п'єдесталі" />
+              <div class="control-label"><span data-i18n="mob.name_lbl">Ім'я на п'єдесталі:</span></div>
+              <input id="mob-name" type="text" maxlength="7" value="ТИТАН" aria-label="Ім'я на п'єдесталі" data-i18n-aria="mob.name_aria" />
             </div>
 
             <label class="checkbox-row">
-              <input id="mob-tinkercad-blank" type="checkbox" aria-label="Режим заготовки для Tinkercad" />
-              <span>🧩 Режим «Заготовка для Tinkercad» (без дрібних деталей, щоб діти самі доробили обличчя в Tinkercad!)</span>
+              <input id="mob-tinkercad-blank" type="checkbox" aria-label="Режим заготовки для Tinkercad" data-i18n-aria="mob.tinkercad_aria" />
+              <span data-i18n="mob.tinkercad_lbl">🧩 Режим «Заготовка для Tinkercad» (без дрібних деталей, щоб діти самі доробили обличчя в Tinkercad!)</span>
             </label>
           </div>
         </details>
@@ -780,56 +791,56 @@
 
       <!-- 5. ГЕНЕРАТОР: ФОТО-БАРЕЛЬЄФ (GRAYSCALE HEIGHTMAP TO SOLID STL) -->
       <section id="panel-heightmap" class="panel-section">
-        <div class="printer-safe-tip">
+        <div class="printer-safe-tip" data-i18n-html="hm.tip">
           🖼️ <b>Порада:</b> Завантаж будь-яку картинку чи фото, або обери дитячий значок нижче. Світлі місця стануть рельєфними вершинами, а темні — заглибинами!
         </div>
 
         <!-- КАРТКА 1: ЗОБРАЖЕННЯ ТА ДИТЯЧІ ПРЕСЕТИ -->
         <div class="card">
           <div class="card-header">
-            <span>📷 Зображення або Значок</span>
+            <span data-i18n="hm.img_header">📷 Зображення або Значок</span>
           </div>
 
           <!-- Зона вибору / перетягування файлу -->
-          <div id="hm-dropzone" class="hm-dropzone" tabindex="0" role="button" aria-label="Зона завантаження зображення: натисніть або перетягніть файл">
+          <div id="hm-dropzone" class="hm-dropzone" tabindex="0" role="button" aria-label="Зона завантаження зображення: натисніть або перетягніть файл" data-i18n-aria="hm.drop_aria">
             <input type="file" id="hm-file-input" accept="image/*" style="display:none;" />
             <div class="hm-dropzone-icon">📥</div>
-            <div class="hm-dropzone-text"><b>Обери картинку</b> або перетягни сюди</div>
-            <div class="hm-dropzone-sub">PNG, JPG, BMP, WebP або SVG</div>
+            <div class="hm-dropzone-text" data-i18n-html="hm.drop_text"><b>Обери картинку</b> або перетягни сюди</div>
+            <div class="hm-dropzone-sub" data-i18n="hm.drop_sub">PNG, JPG, BMP, WebP або SVG</div>
           </div>
 
           <!-- Сітка швидких дитячих пресетів -->
           <div class="control-row" style="margin-top:8px;">
-            <div class="control-label"><span>Або обери швидкий значок:</span></div>
-            <div class="preset-grid hm-preset-grid" role="group" aria-label="Швидкі дитячі пресети">
-              <button class="preset-btn hm-preset-btn active" data-hm-preset="cat" type="button" title="Котик 🐱">🐱 Котик</button>
-              <button class="preset-btn hm-preset-btn" data-hm-preset="rocket" type="button" title="Ракета 🚀">🚀 Ракета</button>
-              <button class="preset-btn hm-preset-btn" data-hm-preset="star" type="button" title="Зірочка ⭐">⭐ Зірочка</button>
-              <button class="preset-btn hm-preset-btn" data-hm-preset="coin" type="button" title="Монета 🪙">🪙 Монета</button>
-              <button class="preset-btn hm-preset-btn" data-hm-preset="smiley" type="button" title="Смайлик 😊">😊 Смайлик</button>
-              <button class="preset-btn hm-preset-btn" data-hm-preset="dino" type="button" title="Динозавр 🦕">🦕 Дино</button>
+            <div class="control-label"><span data-i18n="hm.quick_lbl">Або обери швидкий значок:</span></div>
+            <div class="preset-grid hm-preset-grid" role="group" aria-label="Швидкі дитячі пресети" data-i18n-aria="hm.quick_aria">
+              <button class="preset-btn hm-preset-btn active" data-hm-preset="cat" type="button" title="Котик 🐱" data-i18n="hm.preset_cat">🐱 Котик</button>
+              <button class="preset-btn hm-preset-btn" data-hm-preset="rocket" type="button" title="Ракета 🚀" data-i18n="hm.preset_rocket">🚀 Ракета</button>
+              <button class="preset-btn hm-preset-btn" data-hm-preset="star" type="button" title="Зірочка ⭐" data-i18n="hm.preset_star">⭐ Зірочка</button>
+              <button class="preset-btn hm-preset-btn" data-hm-preset="coin" type="button" title="Монета 🪙" data-i18n="hm.preset_coin">🪙 Монета</button>
+              <button class="preset-btn hm-preset-btn" data-hm-preset="smiley" type="button" title="Смайлик 😊" data-i18n="hm.preset_smiley">😊 Смайлик</button>
+              <button class="preset-btn hm-preset-btn" data-hm-preset="dino" type="button" title="Динозавр 🦕" data-i18n="hm.preset_dino">🦕 Дино</button>
             </div>
           </div>
 
           <!-- Ч/Б 2D Прев'ю Карти Висот -->
           <div class="hm-preview-card">
             <div class="hm-preview-header">
-              <span class="hm-preview-title">🗺️ 2D Карта висот</span>
+              <span class="hm-preview-title" data-i18n="hm.preview_title">🗺️ 2D Карта висот</span>
             </div>
             <div class="hm-canvas-wrap">
-              <canvas id="hm-preview-canvas" width="256" height="256" class="hm-preview-canvas" title="Ч/Б Прев'ю висот рельєфу"></canvas>
+              <canvas id="hm-preview-canvas" width="256" height="256" class="hm-preview-canvas" title="Ч/Б Прев'ю висот рельєфу" data-i18n-title="hm.preview_canvas_title"></canvas>
             </div>
             <div class="hm-height-scale" aria-hidden="true">
-              <span class="hm-scale-lbl">0 мм (основа)</span>
+              <span class="hm-scale-lbl" data-i18n="hm.scale_min">0 мм (основа)</span>
               <div class="hm-scale-gradient"></div>
-              <span class="hm-scale-lbl">Max (пік)</span>
+              <span class="hm-scale-lbl" data-i18n="hm.scale_max">Max (пік)</span>
             </div>
             <div class="hm-preview-info">
               <label class="checkbox-row" style="margin:0;">
-                <input id="hm-invert" type="checkbox" aria-label="Інвертувати висоти: чорне стає опуклим, біле — заглибленим" />
-                <span>🔄 <b>Інвертувати висоти</b> (для печаток і штампів)</span>
+                <input id="hm-invert" type="checkbox" aria-label="Інвертувати висоти: чорне стає опуклим, біле — заглибленим" data-i18n-aria="hm.invert_aria" />
+                <span data-i18n-html="hm.invert_lbl">🔄 <b>Інвертувати висоти</b> (для печаток і штампів)</span>
               </label>
-              <div class="hm-preview-hint">Біле = високе, Чорне = низьке. Інверсія міняє їх місцями!</div>
+              <div class="hm-preview-hint" data-i18n="hm.invert_hint">Біле = високе, Чорне = низьке. Інверсія міняє їх місцями!</div>
             </div>
           </div>
         </div>
@@ -837,45 +848,45 @@
         <!-- КАРТКА 2: ОБРОБКА ТА ЧІТКІСТЬ КАРТИНКИ -->
         <details class="card collapsible-card" open>
           <summary class="card-header">
-            <span>🎛️ Чіткість та Фільтри Рельєфу</span>
+            <span data-i18n="hm.filters_header">🎛️ Чіткість та Фільтри Рельєфу</span>
           </summary>
 
           <div class="collapsible-card-content">
             <label class="checkbox-row" style="margin-bottom: 8px;">
-              <input id="hm-auto-levels" type="checkbox" checked aria-label="Автоматичний контраст: оптимізує діапазон тіней і світла" />
-              <span>⚡ <b>Автоконтраст деталей</b> (проявляє дрібні контури)</span>
+              <input id="hm-auto-levels" type="checkbox" checked aria-label="Автоматичний контраст: оптимізує діапазон тіней і світла" data-i18n-aria="hm.auto_aria" />
+              <span data-i18n-html="hm.auto_lbl">⚡ <b>Автоконтраст деталей</b> (проявляє дрібні контури)</span>
             </label>
 
             <div class="control-row">
               <div class="control-label">
-                <span>Контрастність (виразність ліній):</span>
+                <span data-i18n="hm.contrast_lbl">Контрастність (виразність ліній):</span>
                 <span id="val-hm-contrast" class="control-val">1.0x</span>
               </div>
-              <input id="hm-contrast" type="range" min="0.5" max="2.5" step="0.1" value="1.0" aria-label="Контрастність рельєфу" />
+              <input id="hm-contrast" type="range" min="0.5" max="2.5" step="0.1" value="1.0" aria-label="Контрастність рельєфу" data-i18n-aria="hm.contrast_aria" />
             </div>
 
             <div class="control-row">
               <div class="control-label">
-                <span>Яскравість (підйом висот):</span>
+                <span data-i18n="hm.brightness_lbl">Яскравість (підйом висот):</span>
                 <span id="val-hm-brightness" class="control-val">0</span>
               </div>
-              <input id="hm-brightness" type="range" min="-50" max="50" step="5" value="0" aria-label="Яскравість" />
+              <input id="hm-brightness" type="range" min="-50" max="50" step="5" value="0" aria-label="Яскравість" data-i18n-aria="hm.brightness_aria" />
             </div>
 
             <div class="control-row">
               <div class="control-label">
-                <span>Глибина тіней (гамма):</span>
+                <span data-i18n="hm.gamma_lbl">Глибина тіней (гамма):</span>
                 <span id="val-hm-gamma" class="control-val">1.0</span>
               </div>
-              <input id="hm-gamma" type="range" min="0.5" max="2.0" step="0.1" value="1.0" aria-label="Глибина тіней і середніх тонів" />
+              <input id="hm-gamma" type="range" min="0.5" max="2.0" step="0.1" value="1.0" aria-label="Глибина тіней і середніх тонів" data-i18n-aria="hm.gamma_aria" />
             </div>
 
             <div class="control-row">
               <div class="control-label">
-                <span>Згладжування (крайовий двосторонній фільтр):</span>
-                <span id="val-hm-smooth" class="control-val">Вимк</span>
+                <span data-i18n="hm.smooth_lbl">Згладжування (крайовий двосторонній фільтр):</span>
+                <span id="val-hm-smooth" class="control-val" data-i18n="hm.smooth_off">Вимк</span>
               </div>
-              <input id="hm-smooth" type="range" min="0" max="3" step="1" value="0" aria-label="Згладжування рельєфу" />
+              <input id="hm-smooth" type="range" min="0" max="3" step="1" value="0" aria-label="Згладжування рельєфу" data-i18n-aria="hm.smooth_aria" />
             </div>
           </div>
         </details>
@@ -883,63 +894,63 @@
         <!-- КАРТКА 3: 3D-РОЗМІРИ ДЛЯ ПРИНТЕРА ТА ФОРМА -->
         <div class="card">
           <div class="card-header">
-            <span>📐 Розміри для 3D-Принтера (в мм)</span>
+            <span data-i18n="hm.dims_header">📐 Розміри для 3D-Принтера (в мм)</span>
           </div>
 
           <div class="control-row">
             <div class="control-label">
-              <span>Ширина основи:</span>
+              <span data-i18n="hm.width_lbl">Ширина основи:</span>
               <span id="val-hm-width" class="control-val">60 мм</span>
             </div>
-            <input id="hm-width" type="range" min="30" max="140" step="5" value="60" aria-label="Ширина основи моделі в мм" />
+            <input id="hm-width" type="range" min="30" max="140" step="5" value="60" aria-label="Ширина основи моделі в мм" data-i18n-aria="hm.width_aria" />
           </div>
 
           <div class="control-row">
             <div class="control-label">
-              <span>Висота 3D-рельєфу:</span>
+              <span data-i18n="hm.relief_lbl">Висота 3D-рельєфу:</span>
               <span id="val-hm-relief-height" class="control-val">3.5 мм</span>
             </div>
-            <input id="hm-relief-height" type="range" min="1.0" max="12.0" step="0.5" value="3.5" aria-label="Висота рельєфу в мм" />
+            <input id="hm-relief-height" type="range" min="1.0" max="12.0" step="0.5" value="3.5" aria-label="Висота рельєфу в мм" data-i18n-aria="hm.relief_aria" />
           </div>
 
           <div class="control-row">
             <div class="control-label">
-              <span>Товщина підкладки (дно):</span>
+              <span data-i18n="hm.base_lbl">Товщина підкладки (дно):</span>
               <span id="val-hm-base-thickness" class="control-val">2.0 мм</span>
             </div>
-            <input id="hm-base-thickness" type="range" min="1.0" max="6.0" step="0.5" value="2.0" aria-label="Товщина підкладки в мм" />
+            <input id="hm-base-thickness" type="range" min="1.0" max="6.0" step="0.5" value="2.0" aria-label="Товщина підкладки в мм" data-i18n-aria="hm.base_aria" />
           </div>
 
           <div class="control-row">
-            <div class="control-label"><span>Форма виробу:</span></div>
-            <select id="hm-shape" aria-label="Форма основи">
-              <option value="rect" selected>⏹️ Прямокутна пластина (картина / значок)</option>
-              <option value="circle">🪙 Круглий медальйон (монета / орден)</option>
+            <div class="control-label"><span data-i18n="hm.shape_lbl">Форма виробу:</span></div>
+            <select id="hm-shape" aria-label="Форма основи" data-i18n-aria="hm.shape_aria">
+              <option value="rect" selected data-i18n="hm.shape_rect">⏹️ Прямокутна пластина (картина / значок)</option>
+              <option value="circle" data-i18n="hm.shape_circle">🪙 Круглий медальйон (монета / орден)</option>
             </select>
           </div>
 
           <div class="control-row">
-            <div class="control-label"><span>Деталізація сітки (полігони):</span></div>
-            <select id="hm-resolution" aria-label="Деталізація сітки">
-              <option value="64">⚡ Швидка (64×64 — для слабких ПК)</option>
-              <option value="128" selected>✨ Стандартна (128×128 — гладенький друк)</option>
-              <option value="192">💎 Висока (192×192 — максимальна чіткість)</option>
-              <option value="256">🔬 Ультра (256×256 — фото-деталізація)</option>
+            <div class="control-label"><span data-i18n="hm.res_lbl">Деталізація сітки (полігони):</span></div>
+            <select id="hm-resolution" aria-label="Деталізація сітки" data-i18n-aria="hm.res_aria">
+              <option value="64" data-i18n="hm.res_64">⚡ Швидка (64×64 — для слабких ПК)</option>
+              <option value="128" selected data-i18n="hm.res_128">✨ Стандартна (128×128 — гладенький друк)</option>
+              <option value="192" data-i18n="hm.res_192">💎 Висока (192×192 — максимальна чіткість)</option>
+              <option value="256" data-i18n="hm.res_256">🔬 Ультра (256×256 — фото-деталізація)</option>
             </select>
           </div>
 
           <label class="checkbox-row">
-            <input id="hm-frame" type="checkbox" checked aria-label="Захисний бортик навколо рельєфу" />
-            <span>🖼️ Захисний бортик по краях (як рамка картини або гурт монети)</span>
+            <input id="hm-frame" type="checkbox" checked aria-label="Захисний бортик навколо рельєфу" data-i18n-aria="hm.frame_aria" />
+            <span data-i18n="hm.frame_lbl">🖼️ Захисний бортик по краях (як рамка картини або гурт монети)</span>
           </label>
 
           <label class="checkbox-row">
-            <input id="hm-keychain" type="checkbox" aria-label="Вушко з отвором для брелока" />
-            <span>🎒 Вушко для брелока (отвір 4.8 мм, монолітне зрощення)</span>
+            <input id="hm-keychain" type="checkbox" aria-label="Вушко з отвором для брелока" data-i18n-aria="hm.keychain_aria" />
+            <span data-i18n="hm.keychain_lbl">🎒 Вушко для брелока (отвір 4.8 мм, монолітне зрощення)</span>
           </label>
 
           <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-soft);">
-            <div id="hm-geom-check" class="connectivity-pill bridged" title="Топологічна перевірка 3D-моделі на водонепроникність (watertight)">
+            <div id="hm-geom-check" class="connectivity-pill bridged" title="Топологічна перевірка 3D-моделі на водонепроникність (watertight)" data-i18n="hm.geom_checking" data-i18n-title="hm.geom_title">
               🛡️ Модель: перевірка...
             </div>
           </div>
@@ -950,7 +961,7 @@
 
     <!-- ПРАВА ЧАСТИНА — ІНТЕРАКТИВНА 3D-СЦЕНА -->
     <section class="viewport-area" id="app-viewport">
-      <div id="viewport-container" role="region" aria-label="Інтерактивна 3D-сцена столу принтера"></div>
+      <div id="viewport-container" role="region" aria-label="Інтерактивна 3D-сцена столу принтера" data-i18n-aria="vp.region_aria"></div>
 
       <!-- ВЕРХНІ ІНФОРМАЦІЙНІ БЕЙДЖІ (ЧЕСНА ДІАГНОСТИКА ТА СТАТУС ПЕРЕВІРКИ) -->
       <div class="viewport-hud-top" id="viewport-hud-top">
@@ -960,18 +971,18 @@
         <div class="hud-top-right-group">
           <div id="print-verification-badge" class="hud-badge verification-badge status-generated">
             <div class="verification-row">
-              <span id="geom-check-pill" class="geom-check-pill">🔍 Перевірка геометрії...</span>
+              <span id="geom-check-pill" class="geom-check-pill" data-i18n="vp.geom_checking">🔍 Перевірка геометрії...</span>
             </div>
             <div id="slicer-notes-panel" class="slicer-notes-panel" style="display:none;">
               <div class="verification-row">
-                <select id="verification-status-select" class="hud-select" aria-label="Статус перевірки моделі для друку">
-                  <option value="generated" selected>🧪 Статус: Згенеровано (не перевірено)</option>
-                  <option value="sliced">🔍 Статус: Перевірено у слайсері</option>
-                  <option value="printed">🖨️ Статус: Надруковано на принтері</option>
+                <select id="verification-status-select" class="hud-select" aria-label="Статус перевірки моделі для друку" data-i18n-aria="vp.status_aria">
+                  <option value="generated" selected data-i18n="vp.status_generated">🧪 Статус: Згенеровано (не перевірено)</option>
+                  <option value="sliced" data-i18n="vp.status_sliced">🔍 Статус: Перевірено у слайсері</option>
+                  <option value="printed" data-i18n="vp.status_printed">🖨️ Статус: Надруковано на принтері</option>
                 </select>
               </div>
               <div class="verification-row slicer-note-row">
-                <input id="slicer-time-input" class="hud-input" type="text" maxlength="28" placeholder="Запис зі слайсера (напр.: 14 хв, PLA 0.2)" aria-label="Запис фактичного часу та профілю зі слайсера" />
+                <input id="slicer-time-input" class="hud-input" type="text" maxlength="28" placeholder="Запис зі слайсера (напр.: 14 хв, PLA 0.2)" aria-label="Запис фактичного часу та профілю зі слайсера" data-i18n-placeholder="vp.slicer_placeholder" data-i18n-aria="vp.slicer_aria" />
               </div>
             </div>
           </div>
@@ -980,38 +991,38 @@
 
       <!-- НИЖНІ ПАНЕЛІ КЕРУВАННЯ КАМЕРОЮ ТА ДЕМО-ЕФЕКТАМИ -->
       <div class="viewport-hud-bottom">
-        <div class="camera-bar" role="toolbar" aria-label="Ракурси камери 3D-сцени">
-          <button class="cam-btn" data-camera-view="front" title="Ракурс спереду (0°)">👁️ 0° Спереду</button>
-          <button class="cam-btn" data-camera-view="side90" title="Ракурс збоку (90°)">🔄 90° Збоку</button>
-          <button class="cam-btn" data-camera-view="top" title="Ракурс зверху">🔝 Зверху</button>
-          <button class="cam-btn active-cam" data-camera-view="iso" title="Ізометричний 3D ракурс">🧊 Ізометрія</button>
-          <button id="btn-fit-model" class="cam-btn" title="Показати модель крупно, зберігши поточний ракурс">🔍 Крупно</button>
-          <button id="btn-toggle-ortho" class="cam-btn btn-ortho-toggle" title="Перемкнути між Ортографічною та Перспективною проєкцією (Клавіша O)">📐 Орто</button>
-          <input id="mono-color-picker" type="color" value="#cfd6df" title="Колір пластику для одноколірного прев'ю" aria-label="Колір пластику для одноколірного прев'ю" class="mono-color-input" />
+        <div class="camera-bar" role="toolbar" aria-label="Ракурси камери 3D-сцени" data-i18n-aria="cam.bar_aria">
+          <button class="cam-btn" data-camera-view="front" title="Ракурс спереду (0°)" data-i18n="cam.front" data-i18n-title="cam.front_title">👁️ 0° Спереду</button>
+          <button class="cam-btn" data-camera-view="side90" title="Ракурс збоку (90°)" data-i18n="cam.side90" data-i18n-title="cam.side90_title">🔄 90° Збоку</button>
+          <button class="cam-btn" data-camera-view="top" title="Ракурс зверху" data-i18n="cam.top" data-i18n-title="cam.top_title">🔝 Зверху</button>
+          <button class="cam-btn active-cam" data-camera-view="iso" title="Ізометричний 3D ракурс" data-i18n="cam.iso" data-i18n-title="cam.iso_title">🧊 Ізометрія</button>
+          <button id="btn-fit-model" class="cam-btn" title="Показати модель крупно, зберігши поточний ракурс" data-i18n="cam.fit" data-i18n-title="cam.fit_title">🔍 Крупно</button>
+          <button id="btn-toggle-ortho" class="cam-btn btn-ortho-toggle" title="Перемкнути між Ортографічною та Перспективною проєкцією (Клавіша O)" data-i18n="cam.ortho" data-i18n-title="cam.ortho_title">📐 Орто</button>
+          <input id="mono-color-picker" type="color" value="#cfd6df" title="Колір пластику для одноколірного прев'ю" aria-label="Колір пластику для одноколірного прев'ю" data-i18n-title="cam.mono_title" data-i18n-aria="cam.mono_aria" class="mono-color-input" />
         </div>
 
         <!-- Спеціальні кнопки для демонстрації Оптичної Ілюзії -->
         <div id="illusion-camera-bar" class="context-action-bar" style="display:none;">
-          <button class="cam-btn illusion-highlight" data-camera-view="front">
+          <button class="cam-btn illusion-highlight" data-camera-view="front" data-i18n="il.cam_word1">
             👁️ Показати СЛОВО 1 (Ракурс 0°)
           </button>
-          <button class="cam-btn illusion-highlight" data-camera-view="side90">
+          <button class="cam-btn illusion-highlight" data-camera-view="side90" data-i18n="il.cam_word2">
             🔄 Повернути на СЛОВО 2 (Ракурс 90°)
           </button>
         </div>
 
         <!-- Спеціальна кнопка для пострілу з катапульти та тесту балансира -->
         <div id="physics-action-bar" class="context-action-bar" style="display:none;">
-          <button id="btn-physics-reset" class="cam-btn">↩️ Повторити</button>
-          <button id="btn-physics-demo" class="btn-big-demo">
+          <button id="btn-physics-reset" class="cam-btn" data-i18n="ph.btn_reset">↩️ Повторити</button>
+          <button id="btn-physics-demo" class="btn-big-demo" data-i18n="ph.btn_demo">
             🚀 ВИСТРІЛИТИ З КАТАПУЛЬТИ!
           </button>
-          <output id="physics-demo-result" class="demo-result" aria-live="polite">Екранна демонстрація — не прогноз сили або міцності.</output>
+          <output id="physics-demo-result" class="demo-result" aria-live="polite" data-i18n="ph.demo_default">Екранна демонстрація — не прогноз сили або міцності.</output>
         </div>
 
         <!-- Кутовий бейдж версії програми та автора -->
         <div class="version-corner-group">
-          <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • v2.3.0 Friendly Arcade: Фото-Барельєф, монолітна SDF геометрія, інтегроване вушко брелока, топологічна валідація MeshValidator">
+          <div id="app-version-corner" class="version-corner-badge" title="3D Кузня Чудес • v2.3.0 Friendly Arcade: Фото-Барельєф, монолітна SDF геометрія, інтегроване вушко брелока, топологічна валідація MeshValidator" data-i18n-title="vp.version_title">
             ⚒️ v2.3.0
           </div>
         </div>
@@ -1025,21 +1036,21 @@
     <div class="modal-window about-modal-window">
       <div class="modal-header">
         <div>
-          <h2 id="about-modal-title">⚒️ Про проєкт «3D Кузня Чудес»</h2>
-          <p class="modal-subtitle">
+          <h2 id="about-modal-title" data-i18n="about.title">⚒️ Про проєкт «3D Кузня Чудес»</h2>
+          <p class="modal-subtitle" data-i18n="about.subtitle">
             Безкоштовна веб-студія процедурного 3D-моделювання для шкільних гуртків (2–6 класи)
           </p>
         </div>
-        <button id="btn-close-about" class="modal-close-btn" title="Закрити (Esc)" aria-label="Закрити вікно про проєкт">✕</button>
+        <button id="btn-close-about" class="modal-close-btn" title="Закрити (Esc)" aria-label="Закрити вікно про проєкт" data-i18n-title="about.close_title" data-i18n-aria="about.close_aria">✕</button>
       </div>
 
       <div class="modal-body about-modal-body">
         <section class="about-section">
-          <h3>🎯 Чому виникла «3D Кузня Чудес»?</h3>
-          <p>
+          <h3 data-i18n="about.why_h3">🎯 Чому виникла «3D Кузня Чудес»?</h3>
+          <p data-i18n-html="about.why_p1">
             На шкільних гуртках 3D-моделювання діти обожнюють <b>Minecraft</b>, рухомі іграшки та оптичні ілюзії. Проте на простих або старих шкільних FDM-принтерах моделі з нависаннями потребують складних підтримок, які ламають вироби при відриванні, а дрібні шарніри сплавляються в моноліт.
           </p>
-          <p>
+          <p data-i18n-html="about.why_p2">
             <b>«3D Кузня Чудес»</b> вирішує це процедурно: генерує геометрію, спроєктовану для друку <b>без підтримок (No-Supports)</b>, експортує бінарні <code>.STL</code> для популярних слайсерів (перевіряйте у слайсері) або заготовки для творчого моделювання в <b>Tinkercad</b> і <b>Makers Empire</b>.
           </p>
         </section>
@@ -1048,64 +1059,64 @@
           <div class="author-card-header">
             <div class="author-avatar-badge" aria-hidden="true">👨‍💻</div>
             <div>
-              <h3 class="author-name">Ігор Сівочка (Figarist)</h3>
-              <p class="author-tagline">Розробник ігор • Викладач 3D-моделювання, Unity та програмування</p>
+              <h3 class="author-name" data-i18n="about.author_name">Ігор Сівочка (Figarist)</h3>
+              <p class="author-tagline" data-i18n="about.author_tagline">Розробник ігор • Викладач 3D-моделювання, Unity та програмування</p>
             </div>
           </div>
-          <p class="author-bio">
+          <p class="author-bio" data-i18n-html="about.author_bio">
             Практикуючий викладач IT для дітей та підлітків. Навчаю створювати власні ігри на Unity &amp; C#, програмувати на Python та моделювати для 3D-принтера. Кожен інструмент розробляю з урахуванням реальних потреб учнів на заняттях.
           </p>
           <div class="about-links-grid">
             <a href="https://sivochka.com/" target="_blank" rel="noopener" class="about-card-link about-card-link--primary">
               <span class="link-icon">🌐</span>
-              <span class="link-text"><strong>sivochka.com</strong><small>Особистий сайт автора</small></span>
+              <span class="link-text"><strong>sivochka.com</strong><small data-i18n="about.link_site_sub">Особистий сайт автора</small></span>
               <span class="link-arrow">↗</span>
             </a>
             <a href="https://github.com/Figarist/3d-club-studio" target="_blank" rel="noopener" class="about-card-link">
               <span class="link-icon">⭐️</span>
-              <span class="link-text"><strong>GitHub Репозиторій</strong><small>Код доступний для перегляду</small></span>
+              <span class="link-text"><strong data-i18n="about.link_gh_title">GitHub Репозиторій</strong><small data-i18n="about.link_gh_sub">Код доступний для перегляду</small></span>
               <span class="link-arrow">↗</span>
             </a>
             <a href="https://github.com/Figarist/friendly-arcade" target="_blank" rel="noopener" class="about-card-link">
               <span class="link-icon">🎮</span>
-              <span class="link-text"><strong>Friendly Arcade UI</strong><small>Дизайн-система (v2.0.0)</small></span>
+              <span class="link-text"><strong>Friendly Arcade UI</strong><small data-i18n="about.link_fa_sub">Дизайн-система (v2.0.0)</small></span>
               <span class="link-arrow">↗</span>
             </a>
           </div>
         </section>
 
         <section class="about-section about-faq-section" id="faq" aria-labelledby="about-faq-heading">
-          <h3 id="about-faq-heading">❓ Часті запитання (FAQ)</h3>
+          <h3 id="about-faq-heading" data-i18n="about.faq_h3">❓ Часті запитання (FAQ)</h3>
           <div class="about-faq-list">
             <details class="about-faq-item" open>
-              <summary>Що таке «3D Кузня Чудес» і чим вона відрізняється від Tinkercad або Blender?</summary>
-              <p>«3D Кузня Чудес» (3D Club Studio) — це безкоштовна браузерна студія процедурного 3D-моделювання для учнів 2–6 класів. Вона містить 5 спеціалізованих генераторів (Майнкрафт-рельєф, Оптичний Перевертень 0°/90°, Катапульта та Балансир, Мутатор Мобів і Фото-Барельєф), які автоматично будують геометрію без нависань і підтримок для шкільних FDM 3D-принтерів.</p>
+              <summary data-i18n="about.faq1_q">Що таке «3D Кузня Чудес» і чим вона відрізняється від Tinkercad або Blender?</summary>
+              <p data-i18n="about.faq1_a">«3D Кузня Чудес» (3D Club Studio) — це безкоштовна браузерна студія процедурного 3D-моделювання для учнів 2–6 класів. Вона містить 5 спеціалізованих генераторів (Майнкрафт-рельєф, Оптичний Перевертень 0°/90°, Катапульта та Балансир, Мутатор Мобів і Фото-Барельєф), які автоматично будують геометрію без нависань і підтримок для шкільних FDM 3D-принтерів.</p>
             </details>
             <details class="about-faq-item">
-              <summary>Чи можна друкувати моделі без підтримок (No-Supports) на шкільних 3D-принтерах?</summary>
-              <p>Моделі спроєктовано для друку без підтримок: генератори додають вертикальні опорні колони під висячими вокселями та широкі інженерні зазори у пружинних механізмах. У Майнкрафт-Кузні з увімкненою опцією «Суцільна підкладка» додається суцільна 2-міліметрова підкладка. Перед друком перевіряйте модель у слайсері; режим «1 Пластик» допомагає оцінити читабельність силуету в одному кольорі філаменту.</p>
+              <summary data-i18n="about.faq2_q">Чи можна друкувати моделі без підтримок (No-Supports) на шкільних 3D-принтерах?</summary>
+              <p data-i18n="about.faq2_a">Моделі спроєктовано для друку без підтримок: генератори додають вертикальні опорні колони під висячими вокселями та широкі інженерні зазори у пружинних механізмах. У Майнкрафт-Кузні з увімкненою опцією «Суцільна підкладка» додається суцільна 2-міліметрова підкладка. Перед друком перевіряйте модель у слайсері; режим «1 Пластик» допомагає оцінити читабельність силуету в одному кольорі філаменту.</p>
             </details>
             <details class="about-faq-item">
-              <summary>Чи можна відкрити експортований .STL у слайсері?</summary>
-              <p>Так. Кнопка «Експорт .STL» миттєво формує бінарний STL-файл прямо у браузері. Його можна відкрити в популярних слайсерах; перевіряйте модель у слайсері перед друком.</p>
+              <summary data-i18n="about.faq3_q">Чи можна відкрити експортований .STL у слайсері?</summary>
+              <p data-i18n="about.faq3_a">Так. Кнопка «Експорт .STL» миттєво формує бінарний STL-файл прямо у браузері. Його можна відкрити в популярних слайсерах; перевіряйте модель у слайсері перед друком.</p>
             </details>
             <details class="about-faq-item">
-              <summary>Як працюють 72 навчальні місії гуртка та Паспорт деталі?</summary>
-              <p>У каталозі доступні 72 місії з підказками для 2–3 та 4–6 класів. Після вибору місії студія автоматично відкриває потрібний генератор і стартову заготовку, дозволяє зафіксувати прогрес (V1 ↔ V2) та роздрукувати Паспорт деталі для черги на 3D-друк.</p>
+              <summary data-i18n="about.faq4_q">Як працюють 72 навчальні місії гуртка та Паспорт деталі?</summary>
+              <p data-i18n="about.faq4_a">У каталозі доступні 72 місії з підказками для 2–3 та 4–6 класів. Після вибору місії студія автоматично відкриває потрібний генератор і стартову заготовку, дозволяє зафіксувати прогрес (V1 ↔ V2) та роздрукувати Паспорт деталі для черги на 3D-друк.</p>
             </details>
             <details class="about-faq-item">
-              <summary>Чи працює 3D Кузня Чудес без інтернету та чи потрібна реєстрація?</summary>
-              <p>Ні, реєстрація не потрібна, і всі обчислення виконуються локально на пристрої. Завдяки вбудованій копії Three.js студія працює навіть повністю офлайн на шкільних комп'ютерах.</p>
+              <summary data-i18n="about.faq5_q">Чи працює 3D Кузня Чудес без інтернету та чи потрібна реєстрація?</summary>
+              <p data-i18n="about.faq5_a">Ні, реєстрація не потрібна, і всі обчислення виконуються локально на пристрої. Завдяки вбудованій копії Three.js студія працює навіть повністю офлайн на шкільних комп'ютерах.</p>
             </details>
             <details class="about-faq-item">
-              <summary>Як експортувати STL для Bambu Studio / Cura?</summary>
-              <p>Натисніть «Експорт STL», перевірте чекліст «Без підтримок» та відкрийте файл у Bambu Studio, Cura чи PrusaSlicer (0.20 мм, 15% заповнення).</p>
+              <summary data-i18n="about.faq6_q">Як експортувати STL для Bambu Studio / Cura?</summary>
+              <p data-i18n="about.faq6_a">Натисніть «Експорт STL», перевірте чекліст «Без підтримок» та відкрийте файл у Bambu Studio, Cura чи PrusaSlicer (0.20 мм, 15% заповнення).</p>
             </details>
           </div>
         </section>
 
         <p class="about-legal-line">
-          <a href="https://sivochka.com/uk/privacy/" target="_blank" rel="noopener" class="about-legal-link">Політика конфіденційності</a>
+          <a href="https://sivochka.com/uk/privacy/" target="_blank" rel="noopener" class="about-legal-link" data-i18n="about.privacy">Політика конфіденційності</a>
         </p>
       </div>
     </div>
@@ -1116,30 +1127,30 @@
     <div class="modal-window missions-modal-window">
       <div class="modal-header missions-modal-header">
         <div>
-          <h2 id="missions-modal-title">🗺️ Каталог пригод та місій (72 місії для 2–6 класів)</h2>
-          <p class="modal-subtitle missions-modal-subtitle">
+          <h2 id="missions-modal-title" data-i18n="missions.title">🗺️ Каталог пригод та місій (72 місії для 2–6 класів)</h2>
+          <p class="modal-subtitle missions-modal-subtitle" data-i18n-html="missions.subtitle">
             Обери місію, прочитай загадку та натисни <b>«🚀 Обрати цю місію»</b> — студія сама відкриє потрібний генератор, заготовку та рекомендовані параметри!
           </p>
         </div>
-        <button id="btn-close-missions" class="modal-close-btn missions-close-btn" title="Закрити каталог місій (Esc)" aria-label="Закрити каталог місій">✕</button>
+        <button id="btn-close-missions" class="modal-close-btn missions-close-btn" title="Закрити каталог місій (Esc)" aria-label="Закрити каталог місій" data-i18n-title="missions.close_title" data-i18n-aria="missions.close_aria">✕</button>
       </div>
 
       <!-- ФІЛЬТР ЗА КАТЕГОРІЯМИ -->
-      <div class="missions-filter-bar" role="group" aria-label="Категорії місій">
-        <button class="missions-filter-btn mission-filter-btn filter-chip active" data-mission-filter="all" aria-pressed="true">🌟 Усі місії</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="relief" aria-pressed="false">🛡️ Рельєфи</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="texture" aria-pressed="false">🐾 Фактури і сліди</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="boardgame" aria-pressed="false">🎲 Настільні ігри</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="useful" aria-pressed="false">🏷️ Корисні дрібниці</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="cardboard" aria-pressed="false">🏙️ Картонний мегаполіс</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="optical" aria-pressed="false">🔮 Оптичні ілюзії</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="character" aria-pressed="false">👾 Персонажі</button>
-        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="engineering" aria-pressed="false">🎯 Інженерні ігри</button>
+      <div class="missions-filter-bar" role="group" aria-label="Категорії місій" data-i18n-aria="missions.filter_aria">
+        <button class="missions-filter-btn mission-filter-btn filter-chip active" data-mission-filter="all" aria-pressed="true" data-i18n="missions.f_all">🌟 Усі місії</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="relief" aria-pressed="false" data-i18n="missions.f_relief">🛡️ Рельєфи</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="texture" aria-pressed="false" data-i18n="missions.f_texture">🐾 Фактури і сліди</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="boardgame" aria-pressed="false" data-i18n="missions.f_boardgame">🎲 Настільні ігри</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="useful" aria-pressed="false" data-i18n="missions.f_useful">🏷️ Корисні дрібниці</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="cardboard" aria-pressed="false" data-i18n="missions.f_cardboard">🏙️ Картонний мегаполіс</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="optical" aria-pressed="false" data-i18n="missions.f_optical">🔮 Оптичні ілюзії</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="character" aria-pressed="false" data-i18n="missions.f_character">👾 Персонажі</button>
+        <button class="missions-filter-btn mission-filter-btn filter-chip" data-mission-filter="engineering" aria-pressed="false" data-i18n="missions.f_engineering">🎯 Інженерні ігри</button>
       </div>
       <div class="catalog-search-row">
-        <label for="model-search">Знайти пригоду <input id="model-search" type="search" placeholder="Слід, робот, компас…" /></label>
-        <label for="model-theme">Тема <select id="model-theme"><option value="">Усі теми</option></select></label>
-        <span id="missions-count-badge" class="missions-count-badge">72 місії</span>
+        <label for="model-search"><span data-i18n="missions.search_lbl">Знайти пригоду</span> <input id="model-search" type="search" placeholder="Слід, робот, компас…" data-i18n-placeholder="missions.search_placeholder" /></label>
+        <label for="model-theme"><span data-i18n="missions.theme_lbl">Тема</span> <select id="model-theme"><option value="" data-i18n="missions.theme_all">Усі теми</option></select></label>
+        <span id="missions-count-badge" class="missions-count-badge" data-i18n="missions.count_badge">72 місії</span>
       </div>
 
       <!-- СІТКА 12 КАРТОК МІСІЙ -->
@@ -1152,38 +1163,38 @@
     <div class="modal-window compare-window">
       <div class="modal-header">
         <div>
-          <h2 id="compare-modal-title">📦 Мій виріб</h2>
-          <p class="modal-subtitle">
+          <h2 id="compare-modal-title" data-i18n="compare.title">📦 Мій виріб</h2>
+          <p class="modal-subtitle" data-i18n="compare.subtitle">
             Три кроки: збережи чернетку, порівняй із тим, що зараз, і надрукуй паспорт. Придатність STL і час друку перевір у слайсері.
           </p>
         </div>
-        <button id="btn-close-compare" class="modal-close-btn" title="Закрити (Esc)" aria-label="Закрити вікно «Мій виріб»">✕</button>
+        <button id="btn-close-compare" class="modal-close-btn" title="Закрити (Esc)" aria-label="Закрити вікно «Мій виріб»" data-i18n-title="compare.close_title" data-i18n-aria="compare.close_aria">✕</button>
       </div>
 
       <ol class="piece-steps">
         <li class="piece-step">
           <span class="piece-step-num" aria-hidden="true">1</span>
           <div class="piece-step-body">
-            <h3>Зберегти чернетку (V1)</h3>
-            <p id="piece-v1-status" class="piece-step-hint">Чернетки ще немає. Збережи поточну модель, щоб потім побачити, що змінилось.</p>
+            <h3 data-i18n="compare.step1_h3">Зберегти чернетку (V1)</h3>
+            <p id="piece-v1-status" class="piece-step-hint" data-i18n="compare.step1_hint">Чернетки ще немає. Збережи поточну модель, щоб потім побачити, що змінилось.</p>
           </div>
-          <button id="btn-re-snapshot-v1" class="btn-action btn-v1">📸 Зберегти чернетку</button>
+          <button id="btn-re-snapshot-v1" class="btn-action btn-v1" data-i18n="compare.step1_btn">📸 Зберегти чернетку</button>
         </li>
         <li class="piece-step">
           <span class="piece-step-num" aria-hidden="true">2</span>
           <div class="piece-step-body">
-            <h3>Порівняти з тим, що зараз</h3>
-            <p id="piece-compare-hint" class="piece-step-hint">Спершу збережи чернетку (крок 1), потім змінюй модель і порівнюй.</p>
+            <h3 data-i18n="compare.step2_h3">Порівняти з тим, що зараз</h3>
+            <p id="piece-compare-hint" class="piece-step-hint" data-i18n="compare.step2_hint">Спершу збережи чернетку (крок 1), потім змінюй модель і порівнюй.</p>
           </div>
-          <button id="btn-run-compare" class="btn-action btn-v1" disabled>⚖️ Порівняти</button>
+          <button id="btn-run-compare" class="btn-action btn-v1" disabled data-i18n="compare.step2_btn">⚖️ Порівняти</button>
         </li>
         <li class="piece-step">
           <span class="piece-step-num" aria-hidden="true">3</span>
           <div class="piece-step-body">
-            <h3>Надрукувати паспорт</h3>
-            <p class="piece-step-hint">Картка для черги 3D-друку: можна роздрукувати або зберегти як PNG.</p>
+            <h3 data-i18n="compare.step3_h3">Надрукувати паспорт</h3>
+            <p class="piece-step-hint" data-i18n="compare.step3_hint">Картка для черги 3D-друку: можна роздрукувати або зберегти як PNG.</p>
           </div>
-          <button id="btn-compare-to-passport" class="btn-action btn-card">📋 Паспорт деталі</button>
+          <button id="btn-compare-to-passport" class="btn-action btn-card" data-i18n="compare.step3_btn">📋 Паспорт деталі</button>
         </li>
       </ol>
 
@@ -1195,7 +1206,7 @@
         <div class="compare-grid">
           <div class="compare-col v1-col">
             <div class="compare-card-header">
-              <span class="version-tag v1-tag">Версія 1 (Ескіз)</span>
+              <span class="version-tag v1-tag" data-i18n="compare.v1_tag">Версія 1 (Ескіз)</span>
               <span id="v1-timestamp" class="compare-time">--:--:--</span>
             </div>
             <div class="compare-img-wrap">
@@ -1206,8 +1217,8 @@
   
           <div class="compare-col v2-col">
             <div class="compare-card-header">
-              <span class="version-tag v2-tag">Версія 2 (Поточна модель)</span>
-              <span id="v2-timestamp" class="compare-time">Зараз</span>
+              <span class="version-tag v2-tag" data-i18n="compare.v2_tag">Версія 2 (Поточна модель)</span>
+              <span id="v2-timestamp" class="compare-time" data-i18n="compare.v2_now">Зараз</span>
             </div>
             <div class="compare-img-wrap">
               <img id="v2-preview-img" alt="Прев'ю моделі V2" class="compare-preview-img" />
@@ -1218,11 +1229,11 @@
   
         <!-- ІНЖЕНЕРНА РЕФЛЕКСІЯ ДЛЯ 52–60 ХВИЛИН УРОКУ -->
         <div class="reflection-box">
-          <h4>💡 Інженерна рефлексія пари (хвилини 52–60):</h4>
+          <h4 data-i18n="compare.refl_h4">💡 Інженерна рефлексія пари (хвилини 52–60):</h4>
           <ul>
-            <li><b>Зв'язність:</b> перевір суміжність клітинок у редакторі, а цілісність 3D-сітки — у слайсері.</li>
-            <li><b>Силует і тінь:</b> чи достатньо контрастні сходинки висоти, коли колір пластику один?</li>
-            <li><b>Час друку:</b> порівняй фактичні записи зі слайсера для двох версій, якщо вони є.</li>
+            <li data-i18n-html="compare.refl_1"><b>Зв'язність:</b> перевір суміжність клітинок у редакторі, а цілісність 3D-сітки — у слайсері.</li>
+            <li data-i18n-html="compare.refl_2"><b>Силует і тінь:</b> чи достатньо контрастні сходинки висоти, коли колір пластику один?</li>
+            <li data-i18n-html="compare.refl_3"><b>Час друку:</b> порівняй фактичні записи зі слайсера для двох версій, якщо вони є.</li>
           </ul>
         </div>
       </div>
@@ -1234,22 +1245,22 @@
     <div class="modal-window print-card-window">
       <div class="modal-header no-print">
         <div>
-          <h2 id="print-card-modal-title">📋 Паспорт деталі для черги 3D-друку</h2>
-          <p class="modal-subtitle">
+          <h2 id="print-card-modal-title" data-i18n="passport.title">📋 Паспорт деталі для черги 3D-друку</h2>
+          <p class="modal-subtitle" data-i18n="passport.subtitle">
             Заповни код пари та перевір відмітки. Картку можна роздрукувати на звичайному принтері або зберегти як PNG!
           </p>
         </div>
-        <button id="btn-close-print-card" class="modal-close-btn" title="Закрити (Esc)" aria-label="Закрити паспорт деталі">✕</button>
+        <button id="btn-close-print-card" class="modal-close-btn" title="Закрити (Esc)" aria-label="Закрити паспорт деталі" data-i18n-title="passport.close_title" data-i18n-aria="passport.close_aria">✕</button>
       </div>
 
       <!-- ВЕРХНЯ ПАНЕЛЬ ДІЙ (НЕ ДРУКУЄТЬСЯ НА ПАПЕРІ) -->
       <div class="print-card-toolbar no-print">
-        <button id="btn-action-print" class="btn-action btn-sim">🖨️ Друкувати картку</button>
-        <button id="btn-action-download-png" class="btn-action btn-project">💾 Зберегти як PNG</button>
-        <button id="btn-action-copy-text" class="btn-action btn-mono">📋 Скопіювати текст</button>
+        <button id="btn-action-print" class="btn-action btn-sim" data-i18n="passport.btn_print">🖨️ Друкувати картку</button>
+        <button id="btn-action-download-png" class="btn-action btn-project" data-i18n="passport.btn_png">💾 Зберегти як PNG</button>
+        <button id="btn-action-copy-text" class="btn-action btn-mono" data-i18n="passport.btn_copy">📋 Скопіювати текст</button>
         <div class="pair-code-inline">
-          <label for="card-pair-input"><b>Код пари / Учні:</b></label>
-          <input id="card-pair-input" type="text" maxlength="32" placeholder="Пара #1 (Максим & Данило)" class="hud-input" style="width:230px;" />
+          <label for="card-pair-input"><b data-i18n="passport.pair_lbl">Код пари / Учні:</b></label>
+          <input id="card-pair-input" type="text" maxlength="32" placeholder="Пара #1 (Максим & Данило)" data-i18n-placeholder="passport.pair_placeholder" class="hud-input" style="width:230px;" />
         </div>
       </div>
 
@@ -1259,13 +1270,13 @@
           <div class="passport-logo">
             <span class="logo-icon">⚒️</span>
             <div>
-              <div class="passport-studio-name">3D КУЗНЯ ЧУДЕС • ЛАБОРАТОРІЯ 3D-ДИЗАЙНУ</div>
-              <div class="passport-doc-title">ПАСПОРТ ДЕТАЛІ ДЛЯ ЧЕРГИ 3D-ДРУКУ</div>
+              <div class="passport-studio-name" data-i18n="passport.studio_name">3D КУЗНЯ ЧУДЕС • ЛАБОРАТОРІЯ 3D-ДИЗАЙНУ</div>
+              <div class="passport-doc-title" data-i18n="passport.doc_title">ПАСПОРТ ДЕТАЛІ ДЛЯ ЧЕРГИ 3D-ДРУКУ</div>
             </div>
           </div>
           <div class="passport-meta-box">
-            <div><b>Пара / Учні:</b> <span id="p-card-pair">Пара #1</span></div>
-            <div><b>Дата:</b> <span id="p-card-date">01.10.2026</span></div>
+            <div><b data-i18n="passport.meta_pair">Пара / Учні:</b> <span id="p-card-pair">Пара #1</span></div>
+            <div><b data-i18n="passport.meta_date">Дата:</b> <span id="p-card-date">01.10.2026</span></div>
           </div>
         </div>
 
@@ -1276,73 +1287,73 @@
               <div class="passport-stl-name" id="p-card-filename">model.stl</div>
             </div>
             <div class="passport-mission-info">
-              <div><b>Місія:</b> <span id="p-card-mission">#1 Паспорт Героя</span></div>
+              <div><b data-i18n="passport.mission_lbl">Місія:</b> <span id="p-card-mission">#1 Паспорт Героя</span></div>
               <div class="passport-version-row">
-                <b>Версія:</b>
-                <label><input type="radio" name="p-card-ver" value="V1" id="p-ver-v1" /> V1 (Ескіз)</label>
-                <label><input type="radio" name="p-card-ver" value="V2" id="p-ver-v2" checked /> V2 (Фінал)</label>
+                <b data-i18n="passport.ver_lbl">Версія:</b>
+                <label><input type="radio" name="p-card-ver" value="V1" id="p-ver-v1" /> <span data-i18n="passport.ver_v1">V1 (Ескіз)</span></label>
+                <label><input type="radio" name="p-card-ver" value="V2" id="p-ver-v2" checked /> <span data-i18n="passport.ver_v2">V2 (Фінал)</span></label>
               </div>
             </div>
           </div>
 
           <div class="passport-mid-col">
-            <div class="passport-section-title">📐 Інженерні характеристики</div>
+            <div class="passport-section-title" data-i18n="passport.specs_title">📐 Інженерні характеристики</div>
             <table class="passport-specs-table">
               <tr>
-                <td>Габарити (X × Y × Z):</td>
+                <td data-i18n="passport.spec_dims">Габарити (X × Y × Z):</td>
                 <td><strong id="p-card-dims">-- × -- × -- мм</strong></td>
               </tr>
               <tr>
-                <td>Зв'язність деталей:</td>
+                <td data-i18n="passport.spec_conn">Зв'язність деталей:</td>
                 <td><span id="p-card-conn" class="badge-conn">✅ 1 суцільна деталь</span></td>
               </tr>
               <tr>
-                <td>Суцільна підкладка:</td>
+                <td data-i18n="passport.spec_base">Суцільна підкладка:</td>
                 <td><span id="p-card-base">Так (2.0 мм + містки)</span></td>
               </tr>
               <tr>
-                <td>Особливий параметр:</td>
+                <td data-i18n="passport.spec_param">Особливий параметр:</td>
                 <td><span id="p-card-custom-param">Воксель 2.0 мм</span></td>
               </tr>
               <tr>
-                <td>Тест «🪨 1 Пластик»:</td>
+                <td data-i18n="passport.spec_mono">Тест «🪨 1 Пластик»:</td>
                 <td><span id="p-card-mono">Перевірено (контраст OK)</span></td>
               </tr>
             </table>
 
-            <div class="passport-section-title" style="margin-top: 8px;">✅ Чек-лист самоперевірки пари</div>
+            <div class="passport-section-title" style="margin-top: 8px;" data-i18n="passport.chk_title">✅ Чек-лист самоперевірки пари</div>
             <div class="passport-checklist" id="p-card-checklist">
-              <label><input type="checkbox" /> 1. Усі частини з'єднані в 1 деталь (0 розривів)</label>
-              <label><input type="checkbox" /> 2. Силует читається в одному кольорі («🪨 1 Пластик»)</label>
-              <label><input type="checkbox" /> 3. Габарити вкладаються у норму місії (≤35 мм)</label>
+              <label><input type="checkbox" /> <span data-i18n="passport.chk_1">1. Усі частини з'єднані в 1 деталь (0 розривів)</span></label>
+              <label><input type="checkbox" /> <span data-i18n="passport.chk_2">2. Силует читається в одному кольорі («🪨 1 Пластик»)</span></label>
+              <label><input type="checkbox" /> <span data-i18n="passport.chk_3">3. Габарити вкладаються у норму місії (≤35 мм)</span></label>
             </div>
             <div class="passport-signatures">
-              <div>Дизайнер: _________________</div>
-              <div>Перевіряльник: _________________</div>
+              <div data-i18n="passport.sig_designer">Дизайнер: _________________</div>
+              <div data-i18n="passport.sig_checker">Перевіряльник: _________________</div>
             </div>
           </div>
 
           <div class="passport-right-col">
-            <div class="passport-section-title">🖨️ Службові поля викладача</div>
+            <div class="passport-section-title" data-i18n="passport.teacher_title">🖨️ Службові поля викладача</div>
             <div class="teacher-fields-box">
               <div class="t-field">
-                <span class="t-label">Слайсер (хв/грам):</span>
-                <div class="t-line">______ хв / ______ г PLA</div>
+                <span class="t-label" data-i18n="passport.t_slicer">Слайсер (хв/грам):</span>
+                <div class="t-line" data-i18n="passport.t_slicer_val">______ хв / ______ г PLA</div>
               </div>
               <div class="t-field">
-                <span class="t-label">Профіль слайсера:</span>
-                <div class="t-line">[ ] 0.20 мм (швидк) [ ] 0.16 мм (рельєф)</div>
+                <span class="t-label" data-i18n="passport.t_profile">Профіль слайсера:</span>
+                <div class="t-line" data-i18n="passport.t_profile_val">[ ] 0.20 мм (швидк) [ ] 0.16 мм (рельєф)</div>
               </div>
               <div class="t-field">
-                <span class="t-label">Дата й час запуску:</span>
-                <div class="t-line">____.____.202_ о ____:____</div>
+                <span class="t-label" data-i18n="passport.t_datetime">Дата й час запуску:</span>
+                <div class="t-line" data-i18n="passport.t_datetime_val">____.____.202_ о ____:____</div>
               </div>
               <div class="t-field">
-                <span class="t-label">Результат перевірки:</span>
-                <div class="t-line">[ ] У черзі [ ] Друк OK [ ] Брак</div>
+                <span class="t-label" data-i18n="passport.t_result">Результат перевірки:</span>
+                <div class="t-line" data-i18n="passport.t_result_val">[ ] У черзі [ ] Друк OK [ ] Брак</div>
               </div>
               <div class="t-field" style="margin-top: 10px;">
-                <span class="t-label">Підпис викладача:</span>
+                <span class="t-label" data-i18n="passport.t_sig">Підпис викладача:</span>
                 <div class="t-line">__________________________</div>
               </div>
             </div>
@@ -1364,6 +1375,7 @@
 
   <!-- ПІДКЛЮЧЕННЯ СКРИПТІВ (Працює 100% офлайн без інтернету та серверів!) -->
   <script src="lib/three.min.js"></script>
+  <script src="src/i18n.js?v=2.3.0"></script>
   <script src="src/voxelFont.js?v=2.3.0"></script>
   <script src="src/soundEffects.js?v=2.3.0"></script>
   <script src="src/safeStorage.js?v=2.3.0"></script>

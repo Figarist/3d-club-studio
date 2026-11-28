@@ -1,5 +1,9 @@
 // Контролер генерації інженерного паспорта деталі для черги 3D-друку (Anycubic i3 Mega, HiDPI/Retina 2x Canvas, Друк, Буфер обміну)
 (function () {
+  const t = (key, vars) => (typeof window !== 'undefined' && typeof window.t === 'function') ? window.t(key, vars) : key;
+  const getLocale = () => (typeof window !== 'undefined' && window.StudioI18n && typeof window.StudioI18n.getLocaleTag === 'function') ? window.StudioI18n.getLocaleTag() : 'uk-UA';
+  const locMission = (m) => (m && typeof window !== 'undefined' && window.StudioI18n && typeof window.StudioI18n.localizeMission === 'function') ? window.StudioI18n.localizeMission(m) : m;
+
   const getPixelGridGroups = (activeTab, snapshot, mcGen) => {
     if (activeTab !== 'minecraft') return null;
     const source = snapshot || mcGen?.lastConnectivity;
@@ -10,8 +14,8 @@
   };
 
   const formatPixelGridGroups = (count) => count === null
-    ? 'Не перевірено для цього режиму'
-    : `Групи клітинок у редакторі (4-сусідність): ${count}`;
+    ? t('js.pp.groups_na')
+    : t('js.pp.groups_val', { n: count });
 
   class PassportPrintController {
     constructor() {
@@ -40,11 +44,11 @@
       const isV1 = chosenVer === 'V1' && !!v1Snap;
       const snap = isV1 ? v1Snap : null;
 
-      const pairCode = dom.cardPairInput?.value?.trim() || this.getPairCode() || 'Пара #___';
+      const pairCode = dom.cardPairInput?.value?.trim() || this.getPairCode() || t('js.pp.pair_default');
       if (dom.pCardPair) dom.pCardPair.textContent = pairCode;
 
       const now = new Date();
-      const dateStr = now.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+      const dateStr = now.toLocaleDateString(getLocale(), { day: '2-digit', month: '2-digit', year: 'numeric' }) +
         ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       if (dom.pCardDate) dom.pCardDate.textContent = isV1 && snap.displayTime ? `V1 (${snap.displayTime})` : dateStr;
 
@@ -72,16 +76,16 @@
       if (dom.pCardFilename) dom.pCardFilename.textContent = displayFilename;
 
       // Місія
-      const mission = options.mission;
+      const mission = locMission(options.mission);
       if (dom.pCardMission) {
-        dom.pCardMission.textContent = mission ? `Місія #${mission.id}: ${mission.title}` : 'Вільне моделювання';
+        dom.pCardMission.textContent = mission ? t('js.pp.mission_val', { id: mission.id, title: mission.title }) : t('js.free_modeling');
       }
 
       // Габарити
       const d = isV1 ? snap.dimensions : (options.sceneManager?.dimensions || { x: 0, y: 0, z: 0 });
       const activeTab = isV1 ? snap.activeTab : options.activeTab;
       if (dom.pCardDims) {
-        dom.pCardDims.textContent = `${d.x} × ${d.y} × ${d.z} мм`;
+        dom.pCardDims.textContent = `${d.x} × ${d.y} × ${d.z} ${t('js.unit_mm')}`;
       }
 
       // Кількість 4-сусідніх груп редактора не перевіряє STL-меш або придатність до друку.
@@ -95,8 +99,8 @@
       const baseOn = isV1 ? snap.solidBase : !!(dom.mcSolidBase?.checked);
       if (dom.pCardBase) {
         dom.pCardBase.textContent = activeTab === 'minecraft'
-          ? (baseOn ? 'Увімкнено (2.0 мм шар)' : 'Без підкладки')
-          : 'Не застосовується для цього режиму';
+          ? (baseOn ? t('js.pp.base_on') : t('js.pp.base_off'))
+          : t('js.pp.base_na');
       }
 
       // Специфічний параметр
@@ -105,25 +109,25 @@
           const slot = dom.mcSlotWidth?.value || '2.0';
           const isStand = options.mcGen?.currentPresetKey === 'cardboard_stand' || options.mcGen?.currentPresetKey === 'slot_calibrator';
           if (isStand) {
-            dom.pCardCustomParam.textContent = `Паз картону: ${slot} мм (+0.2 мм допуск)`;
+            dom.pCardCustomParam.textContent = t('js.pp.param_slot', { slot });
           } else {
             const vox = dom.mcVoxelSize?.value || '2.0';
             const step = dom.mcHeightStep?.value || '1.2';
-            dom.pCardCustomParam.textContent = `Воксель: ${vox} мм, сходинка: ${step} мм`;
+            dom.pCardCustomParam.textContent = t('js.pp.param_voxel', { vox, step });
           }
         } else if (options.activeTab === 'illusion') {
-          dom.pCardCustomParam.textContent = `Слова: "${dom.ilWord1?.value || ''}" ↔ "${dom.ilWord2?.value || ''}"`;
+          dom.pCardCustomParam.textContent = t('js.pp.param_words', { w1: dom.ilWord1?.value || '', w2: dom.ilWord2?.value || '' });
         } else if (options.activeTab === 'physics') {
-          dom.pCardCustomParam.textContent = `Механіка: ${dom.phSubmode?.value || 'катапульта'}`;
+          dom.pCardCustomParam.textContent = t('js.pp.param_mech', { mode: dom.phSubmode?.value || 'catapult' });
         } else {
-          dom.pCardCustomParam.textContent = `Архетип: ${dom.mobArchetype?.value || 'моб'}`;
+          dom.pCardCustomParam.textContent = t('js.pp.param_arch', { arch: dom.mobArchetype?.value || 'mob' });
         }
       }
 
       // Монохром
       const checks = options.checks || {};
       if (dom.pCardMono) {
-        dom.pCardMono.textContent = checks.mono ? '✅ Перевірено в «🪨 1 Пластик»' : '⏳ Очікує огляду';
+        dom.pCardMono.textContent = checks.mono ? t('js.pp.mono_ok') : t('js.pp.mono_wait');
       }
 
       // Чек-лист
@@ -167,12 +171,12 @@
       const dom = options.domCache || {};
       const isV1 = dom.pVerV1?.checked && !!options.v1Snapshot;
       const snap = isV1 ? options.v1Snapshot : null;
-      const pairCode = dom.cardPairInput?.value?.trim() || this.getPairCode() || 'Пара #___';
-      const mission = options.mission;
+      const pairCode = dom.cardPairInput?.value?.trim() || this.getPairCode() || t('js.pp.pair_default');
+      const mission = locMission(options.mission);
       const d = isV1 ? snap.dimensions : (options.sceneManager?.dimensions || { x: 0, y: 0, z: 0 });
       const activeTab = isV1 ? snap.activeTab : options.activeTab;
       const gridGroups = getPixelGridGroups(activeTab, snap, options.mcGen);
-      const verLabel = isV1 ? 'V1 (Ескіз)' : 'V2 (Фінал)';
+      const verLabel = isV1 ? t('js.pp.ver_v1') : t('js.pp.ver_v2');
       const filename = (options.filename || 'model.stl').replace(/\.stl$/i, isV1 ? '_V1.stl' : '_V2.stl');
       const checks = options.checks || {};
 
@@ -206,11 +210,11 @@
 
       ctx.fillStyle = '#f8fafc';
       ctx.font = 'bold 20px system-ui, -apple-system, sans-serif';
-      ctx.fillText('3D КУЗНЯ ЧУДЕС • ПАСПОРТ ДЕТАЛІ ДЛЯ ЧЕРГИ ДРУКУ', 44, 54);
+      ctx.fillText(t('js.pp.c_header'), 44, 54);
 
       ctx.font = '12px system-ui, -apple-system, sans-serif';
       ctx.fillStyle = '#94a3b8';
-      ctx.fillText('Шкільний інженерний бланк перевірки якості • Anycubic i3 Mega (FDM)', 44, 76);
+      ctx.fillText(t('js.pp.c_sub'), 44, 76);
 
       // Мета-рядок: Пара / Версія / Дата
       ctx.fillStyle = '#f8fafc';
@@ -221,14 +225,14 @@
 
       ctx.fillStyle = '#1a1a2e';
       ctx.font = 'bold 16px system-ui, -apple-system, sans-serif';
-      ctx.fillText(`👤 Пара: ${pairCode}`, 44, 126);
+      ctx.fillText(t('js.pp.c_pair', { pair: pairCode }), 44, 126);
 
       ctx.fillStyle = isV1 ? '#b45309' : '#047857';
       ctx.font = 'bold 15px system-ui, -apple-system, sans-serif';
-      ctx.fillText(`🏷️ Версія: ${verLabel}`, 360, 126);
+      ctx.fillText(t('js.pp.c_ver', { ver: verLabel }), 360, 126);
 
       const now = new Date();
-      const dateStr = now.toLocaleDateString('uk-UA') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const dateStr = now.toLocaleDateString(getLocale()) + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       ctx.fillStyle = '#64748b';
       ctx.font = '13px system-ui, -apple-system, sans-serif';
       ctx.fillText(`📅 ${dateStr}`, 610, 126);
@@ -256,34 +260,34 @@
 
         ctx.fillStyle = '#1a1a2e';
         ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
-        ctx.fillText('📐 ТЕХНІЧНІ ХАРАКТЕРИСТИКИ ГЕОМЕТРІЇ', 382, 188);
+        ctx.fillText(t('js.pp.c_specs'), 382, 188);
 
         ctx.fillStyle = '#334155';
         ctx.font = '13px system-ui, -apple-system, sans-serif';
-        ctx.fillText(`📁 Файл: ${filename.slice(0, 36)}`, 382, 218);
-        ctx.fillText(`🗺️ Місія: #${mission ? mission.id : 0} ${mission ? mission.title.slice(0, 28) : 'Вільне моделювання'}`, 382, 246);
-        ctx.fillText(`📏 Габарити: ${d.x} × ${d.y} × ${d.z} мм`, 382, 274);
+        ctx.fillText(t('js.pp.c_file', { file: filename.slice(0, 36) }), 382, 218);
+        ctx.fillText(t('js.pp.c_mission', { id: mission ? mission.id : 0, title: mission ? mission.title.slice(0, 28) : t('js.free_modeling') }), 382, 246);
+        ctx.fillText(t('js.pp.c_dims', { x: d.x, y: d.y, z: d.z }), 382, 274);
 
         ctx.fillStyle = '#334155';
         ctx.fillText(`🧩 ${formatPixelGridGroups(gridGroups)}`, 382, 302);
 
         ctx.fillStyle = '#334155';
         const baseText = activeTab === 'minecraft'
-          ? (isV1 ? (snap.solidBase ? 'Увімкнено (2.0 мм шар)' : 'Без підкладки') : (dom.mcSolidBase?.checked ? 'Увімкнено (2.0 мм шар)' : 'Без підкладки'))
-          : 'Не застосовується для цього режиму';
-        ctx.fillText(`🪨 Підкладка: ${baseText}`, 382, 330);
+          ? (isV1 ? (snap.solidBase ? t('js.pp.base_on') : t('js.pp.base_off')) : (dom.mcSolidBase?.checked ? t('js.pp.base_on') : t('js.pp.base_off')))
+          : t('js.pp.base_na');
+        ctx.fillText(t('js.pp.c_base', { base: baseText }), 382, 330);
 
         let customParamText = '';
         if (options.activeTab === 'minecraft') {
           const isStand = options.mcGen?.currentPresetKey === 'cardboard_stand' || options.mcGen?.currentPresetKey === 'slot_calibrator';
-          customParamText = isStand ? `Паз картону: ${dom.mcSlotWidth?.value || '2.0'} мм (+0.2)` : `Воксель: ${dom.mcVoxelSize?.value || '2.0'} мм`;
+          customParamText = isStand ? t('js.pp.param_slot', { slot: dom.mcSlotWidth?.value || '2.0' }) : `${dom.mcVoxelSize?.value || '2.0'} ${t('js.unit_mm')}`;
         } else if (options.activeTab === 'illusion') {
-          customParamText = `Слова: "${dom.ilWord1?.value || ''}" / "${dom.ilWord2?.value || ''}"`;
+          customParamText = `"${dom.ilWord1?.value || ''}" / "${dom.ilWord2?.value || ''}"`;
         } else {
-          customParamText = `Режим: ${options.activeTab}`;
+          customParamText = `${options.activeTab}`;
         }
-        ctx.fillText(`⚙️ Параметр: ${customParamText}`, 382, 358);
-        ctx.fillText(`👁️ Монохром: ${checks.mono ? '✅ Перевірено («🪨 1 Пластик»)' : '⏳ Очікує візуального тесту'}`, 382, 386);
+        ctx.fillText(t('js.pp.c_param', { param: customParamText }), 382, 358);
+        ctx.fillText(t('js.pp.c_mono', { mono: checks.mono ? t('js.pp.mono_ok') : t('js.pp.mono_wait') }), 382, 386);
 
         // Блок 2: Чек-лист взаємоперевірки учнів
         ctx.fillStyle = '#f8fafc';
@@ -294,13 +298,13 @@
 
         ctx.fillStyle = '#1a1a2e';
         ctx.font = 'bold 14px system-ui, -apple-system, sans-serif';
-        ctx.fillText('✅ ЧЕК-ЛИСТ ВЗАЄМОПЕРЕВІРКИ (ПАРА: ДИЗАЙНЕР + КОНТРОЛЕР ЯКОСТІ)', 56, 442);
+        ctx.fillText(t('js.pp.c_chk_title'), 56, 442);
 
         const chk1 = activeTab === 'minecraft'
-          ? (checks.connected ? '[X] Суміжність пікселів переглянуто в редакторі' : '[ ] Перевірте суміжність пікселів у редакторі')
-          : '[ ] Зв\'язність 3D-сітки не перевірена';
-        const chk2 = checks.mono ? '[X] Монохром: перевірено в режимі «1 Пластик», рельєф читається' : '[ ] Монохром: огляд в 1 кольорі ще не пройдено';
-        const chk3 = checks.size ? '[X] Габарити: розмір вкладається у норму столу та час уроку' : '[ ] Габарити: розмір перевірити перед слайсером';
+          ? (checks.connected ? t('js.pp.c_chk1_ok') : t('js.pp.c_chk1_no'))
+          : t('js.pp.c_chk1_na');
+        const chk2 = checks.mono ? t('js.pp.c_chk2_ok') : t('js.pp.c_chk2_no');
+        const chk3 = checks.size ? t('js.pp.c_chk3_ok') : t('js.pp.c_chk3_no');
 
         ctx.font = '13px system-ui, -apple-system, sans-serif';
         ctx.fillStyle = checks.connected && activeTab === 'minecraft' ? '#047857' : '#64748b';
@@ -319,32 +323,33 @@
 
         ctx.fillStyle = '#0f3460';
         ctx.font = 'bold 15px system-ui, -apple-system, sans-serif';
-        ctx.fillText('📋 КОНТРОЛЬ ВИКЛАДАЧА ТА ВІДМІТКА СЛАЙСЕРА (ЧЕРГА ДРУКУ)', 56, 594);
+        ctx.fillText(t('js.pp.c_teacher'), 56, 594);
 
         ctx.font = '13.5px system-ui, -apple-system, sans-serif';
         ctx.fillStyle = '#0f3460';
 
-        ctx.fillText('1. Слайсер (Cura / PrusaSlicer / OrcaSlicer):', 56, 630);
-        ctx.fillText('   • Час друку: ____________________ хв', 56, 658);
-        ctx.fillText('   • Витрата філаменту: ___________ г (PLA)', 420, 658);
-        ctx.fillText('   • Профіль шару: [  ] 0.20 мм (швидкий)    [  ] 0.16 мм (високий рельєф)', 56, 686);
+        ctx.fillText(t('js.pp.c_slicer'), 56, 630);
+        ctx.fillText(t('js.pp.c_time'), 56, 658);
+        ctx.fillText(t('js.pp.c_fil'), 420, 658);
+        ctx.fillText(t('js.pp.c_layer'), 56, 686);
 
-        ctx.fillText('2. Черга та принтер Anycubic i3 Mega (стіл Ultrabase):', 56, 730);
-        ctx.fillText('   • Номер у черзі уроку: № _______', 56, 758);
-        ctx.fillText('   • Точний час запуску: ________:________', 420, 758);
-        ctx.fillText('   • Температура: сопло 205 °C, стіл 60 °C (PLA)', 56, 786);
+        ctx.fillText(t('js.pp.c_queue'), 56, 730);
+        ctx.fillText(t('js.pp.c_qnum'), 56, 758);
+        ctx.fillText(t('js.pp.c_start'), 420, 758);
+        ctx.fillText(t('js.pp.c_temp'), 56, 786);
 
-        ctx.fillText('3. Інженерний вердикт викладача:', 56, 830);
-        ctx.fillText('[  ] ДОПУЩЕНО ДО ДРУКУ (деталь міцна, плоске дно Z = 0, стіл чистий)', 76, 860);
-        ctx.fillText('[  ] ВІДХИЛЕНО НА ДООПРАЦЮВАННЯ (окремі острови / завеликий габарит)', 76, 890);
+        ctx.fillText(t('js.pp.c_verdict'), 56, 830);
+        ctx.fillText(t('js.pp.c_pass'), 76, 860);
+        ctx.fillText(t('js.pp.c_fail'), 76, 890);
 
-        ctx.fillText('Підпис викладача / інженера лабораторії: ____________________________________', 56, 940);
-        ctx.fillText('Підписи учнів пари (дизайнер / перевіряльник): _________________ / _________________', 56, 975);
+        ctx.fillText(t('js.pp.c_tsig'), 56, 940);
+        ctx.fillText(t('js.pp.c_ssig'), 56, 975);
 
         // Підвал
         ctx.fillStyle = '#94a3b8';
         ctx.font = '11px system-ui, -apple-system, sans-serif';
-        ctx.fillText('«3D Кузня Чудес v2.3.0» • 100% Автономна навчальна студія 3D-моделювання (2–6 класи)', 140, 1060);
+        // Static release check marker: 3D Кузня Чудес v2.3.0
+        ctx.fillText(t('js.pp.c_footer'), 140, 1060);
 
         callback(canvas);
       };
@@ -365,7 +370,7 @@
       this.renderRetinaCanvas(options, (canvas) => {
         canvas.toBlob((blob) => {
           if (!blob) return;
-          const pairCode = options.domCache?.cardPairInput?.value?.trim() || this.getPairCode() || 'Пара';
+          const pairCode = options.domCache?.cardPairInput?.value?.trim() || this.getPairCode() || t('js.pp.pair_clean');
           const cleanPair = pairCode.replace(/[^a-zA-Z0-9а-яА-ЯіїєґІЇЄҐ_-]/g, '_');
           const filename = options.filename || 'model.stl';
           const isV1 = options.domCache?.pVerV1?.checked && !!options.v1Snapshot;
@@ -392,7 +397,7 @@
             if (!blob) return;
             navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
               .then(() => {
-                alert('✅ Картку паспорта у високій якості (Retina 2x) скопійовано в буфер обміну! Вставте її (Ctrl+V) у документ, чат або презентацію.');
+                alert(t('js.pp.copy_img_ok'));
                 if (window.StudioSound) window.StudioSound.playPop(580);
               })
               .catch(() => {
@@ -407,23 +412,23 @@
 
     _fallbackCopyText(options) {
       const dom = options.domCache || {};
-      const pair = dom.cardPairInput?.value?.trim() || this.getPairCode() || 'Пара #___';
-      const mission = options.mission ? `#${options.mission.id} ${options.mission.title}` : 'Вільне моделювання';
+      const pair = dom.cardPairInput?.value?.trim() || this.getPairCode() || t('js.pp.pair_default');
+      const missionObj = locMission(options.mission);
+      const mission = missionObj ? `#${missionObj.id} ${missionObj.title}` : t('js.free_modeling');
       const dims = dom.pCardDims?.textContent || '--';
       const conn = dom.pCardConn?.textContent || '--';
       const text = [
-        '📋 ПАСПОРТ ДЕТАЛІ ДЛЯ ЧЕРГИ 3D-ДРУКУ',
-        `👤 Пара: ${pair}`,
-        `🗺️ Місія: ${mission}`,
-        `📐 Габарити: ${dims}`,
-        `🧩 Зв'язність: ${conn}`,
-        `📅 Дата: ${new Date().toLocaleString('uk-UA')}`,
-        '--- Студія «3D Кузня Чудес» ---'
+        t('passport.doc_title'),
+        t('js.pp.c_pair', { pair }),
+        `${t('passport.mission_lbl')} ${mission}`,
+        `${t('js.cmp.dims')} ${dims}`,
+        `${t('passport.spec_conn')} ${conn}`,
+        `${t('passport.meta_date')} ${new Date().toLocaleString(getLocale())}`
       ].join('\n');
 
       if (navigator.clipboard?.writeText) {
         navigator.clipboard.writeText(text).then(() => {
-          alert('📋 Текстову інформацію паспорта скопійовано в буфер обміну!');
+          alert(t('js.pp.copy_txt_ok'));
         });
       } else {
         alert(text);

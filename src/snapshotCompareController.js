@@ -1,5 +1,7 @@
 // Контролер фіксації ескізу (V1), аналітичного порівняння поступу (V1 ↔ V2) та дельти метрик
 (function () {
+  const t = (key, vars) => (typeof window !== 'undefined' && typeof window.t === 'function') ? window.t(key, vars) : key;
+
   const getPixelGridGroups = (snapshot) => {
     if (!snapshot || snapshot.activeTab !== 'minecraft') return null;
     if (Number(snapshot.activeCount) === 0) return 0;
@@ -54,7 +56,7 @@
         thumbnail: thumbUrl,
         activeTab: activeTab,
         missionId: mission ? mission.id : 1,
-        missionTitle: mission ? mission.title : 'Вільне моделювання',
+        missionTitle: mission ? mission.title : t('js.free_modeling'),
         dimensions: { x: d.x, y: d.y, z: d.z },
         gridGroups: activeTab === 'minecraft' ? (conn.activeCount > 0 ? conn.finalIslands : 0) : null,
         islands: conn.finalIslands || 1,
@@ -98,18 +100,18 @@
       const dom = domCache || {};
       const v1 = this.v1Snapshot;
       if (dom.btnReSnapshotV1) {
-        dom.btnReSnapshotV1.textContent = v1 ? '📸 Оновити чернетку' : '📸 Зберегти чернетку';
+        dom.btnReSnapshotV1.textContent = v1 ? t('js.cmp.btn_update') : t('js.cmp.btn_save');
       }
       if (dom.pieceV1Status) {
         dom.pieceV1Status.textContent = v1
-          ? `Чернетку V1 збережено о ${v1.displayTime}. Можна зберегти нову, вона замінить стару.`
-          : 'Чернетки ще немає. Збережи поточну модель, щоб потім побачити, що змінилось.';
+          ? t('js.cmp.v1_saved', { time: v1.displayTime })
+          : t('js.cmp.v1_empty');
       }
       if (dom.btnRunCompare) dom.btnRunCompare.disabled = !v1;
       if (dom.pieceCompareHint) {
         dom.pieceCompareHint.textContent = v1
-          ? 'Покажу чернетку V1 поруч із поточною моделлю та різницю габаритів.'
-          : 'Спершу збережи чернетку (крок 1), потім змінюй модель і порівнюй.';
+          ? t('js.cmp.hint_ready')
+          : t('js.cmp.hint_need_v1');
       }
       if (!v1 && dom.compareResults) dom.compareResults.hidden = true;
     }
@@ -160,31 +162,31 @@
         const gridGroups = getPixelGridGroups(snapshot);
         const gridGroupsRow = gridGroups === null
           ? ''
-          : `<div class="metric-row"><span>🧩 Групи клітинок у редакторі:</span><b class="num-tabular">${gridGroups}</b></div>`;
+          : `<div class="metric-row"><span>${t('js.cmp.grid_groups')}</span><b class="num-tabular">${gridGroups}</b></div>`;
         const baseRow = snapshot.activeTab === 'minecraft'
-          ? `<div class="metric-row"><span>🪨 Підкладка в редакторі:</span><b>${snapshot.solidBase ? 'Увімкнено' : 'Вимкнено'}</b></div>`
+          ? `<div class="metric-row"><span>${t('js.cmp.base_lbl')}</span><b>${snapshot.solidBase ? t('js.cmp.base_on') : t('js.cmp.base_off')}</b></div>`
           : '';
 
         container.innerHTML = `
-          <div class="metric-row"><span>📐 Габарити:</span><b class="num-tabular">${dimensions.x} × ${dimensions.y} × ${dimensions.z} мм</b></div>
+          <div class="metric-row"><span>${t('js.cmp.dims')}</span><b class="num-tabular">${dimensions.x} × ${dimensions.y} × ${dimensions.z} ${t('js.unit_mm')}</b></div>
           ${gridGroupsRow}
           ${baseRow}
-          <div class="metric-row"><span>⏱️ Запис зі слайсера:</span><b class="num-tabular" data-slicer-record></b></div>
+          <div class="metric-row"><span>${t('js.cmp.slicer_rec')}</span><b class="num-tabular" data-slicer-record></b></div>
         `;
         const recordNode = container.querySelector('[data-slicer-record]');
-        if (recordNode) recordNode.textContent = getSlicerRecord(snapshot) || 'Не записано';
+        if (recordNode) recordNode.textContent = getSlicerRecord(snapshot) || t('js.cmp.not_recorded');
       };
 
       // Оновлення V1 картки
       if (dom.v1PreviewImg) dom.v1PreviewImg.src = v1.thumbnail;
-      if (dom.v1Timestamp) dom.v1Timestamp.textContent = `Зафіксовано: ${v1.displayTime}`;
+      if (dom.v1Timestamp) dom.v1Timestamp.textContent = t('js.cmp.v1_time', { time: v1.displayTime });
       if (dom.v1Metrics) {
         renderMetrics(dom.v1Metrics, v1);
       }
 
       // Оновлення V2 картки
       if (dom.v2PreviewImg) dom.v2PreviewImg.src = v2Thumb;
-      if (dom.v2Timestamp) dom.v2Timestamp.textContent = `Поточний стан: ${v2Time}`;
+      if (dom.v2Timestamp) dom.v2Timestamp.textContent = t('js.cmp.v2_time', { time: v2Time });
       if (dom.v2Metrics) {
         renderMetrics(dom.v2Metrics, v2State);
       }
@@ -194,16 +196,16 @@
         const deltaBadges = [];
 
         if (delta.gridGroups) {
-          deltaBadges.push(`<span class="delta-chip chip-neutral">🧩 Групи клітинок у редакторі: ${delta.gridGroups.v1} → ${delta.gridGroups.v2}</span>`);
+          deltaBadges.push(`<span class="delta-chip chip-neutral">${t('js.cmp.groups_delta', { v1: delta.gridGroups.v1, v2: delta.gridGroups.v2 })}</span>`);
         }
 
         // Габарити
-        const dimStr = `Δ: ${delta.dims.dx >= 0 ? '+' : ''}${delta.dims.dx} × ${delta.dims.dy >= 0 ? '+' : ''}${delta.dims.dy} × ${delta.dims.dz >= 0 ? '+' : ''}${delta.dims.dz} мм`;
+        const dimStr = `Δ: ${delta.dims.dx >= 0 ? '+' : ''}${delta.dims.dx} × ${delta.dims.dy >= 0 ? '+' : ''}${delta.dims.dy} × ${delta.dims.dz >= 0 ? '+' : ''}${delta.dims.dz} ${t('js.unit_mm')}`;
         deltaBadges.push(`<span class="delta-chip chip-neutral">📐 ${dimStr}</span>`);
 
         dom.compareSummaryBanner.className = 'compare-summary-banner';
         dom.compareSummaryBanner.innerHTML = `
-          <div class="summary-headline">Порівняння параметрів знімків V1 і V2</div>
+          <div class="summary-headline">${t('js.cmp.headline')}</div>
           <div class="summary-chips-row">${deltaBadges.join(' ')}</div>
         `;
       }

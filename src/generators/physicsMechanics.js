@@ -1,5 +1,7 @@
 // Генератор 3: Фізика без Шестерень — катапульта, баліста й балансир.
 (function () {
+  const t = (key, vars) => (typeof window !== 'undefined' && typeof window.t === 'function') ? window.t(key, vars) : key;
+
   const PH_CONFIG = {
     CATAPULT: {
       DEFAULT_EXTRUDE_HEIGHT: 10.0,
@@ -186,7 +188,7 @@
     constructor() {}
 
     build3D(params) {
-      setDemoResult('Екранна демонстрація — не прогноз сили або міцності.');
+      setDemoResult(t('js.ph.demo_idle'));
       geoCache.clear();
       try {
         const submode = params.submode || 'catapult'; // 'catapult' або 'balancer'
@@ -807,7 +809,7 @@
       model?.traverse(object => {
         if (object.name === 'restingAmmo') object.visible = true;
       });
-      setDemoResult('Екранна демонстрація — не прогноз сили або міцності.');
+      setDemoResult(t('js.ph.demo_idle'));
     }
 
     // All targets and moving projectiles belong to effectsGroup and stay out of STL.
@@ -824,16 +826,17 @@
         const momentProxy = wingWeight * span;
         const settleAngle = 0.04 + 0.35 * Math.sqrt((7 * 52) / momentProxy);
         const settleDegrees = Math.round(settleAngle * 180 / Math.PI);
-        const animal = params.design === 'balance_owl' ? 'сова' : params.design === 'balance_turtle' ? 'черепаха' : 'дракон';
+        const animalKey = params.design === 'balance_owl' ? 'js.ph.animal_owl' : params.design === 'balance_turtle' ? 'js.ph.animal_turtle' : 'js.ph.animal_dragon';
+        const animal = t(animalKey);
         if (window.StudioSound?.playBalancerWobble) window.StudioSound.playBalancerWobble();
-        setDemoResult(`Екранний нахил «${animal}» після умовного поштовху: ${settleDegrees}°. Більша вага × розмах зменшує нахил у цій моделі; це не вимір сили.`);
+        setDemoResult(t('js.ph.demo_balance_animal', { animal, deg: settleDegrees }));
         let elapsed = 0;
         sceneManager.physicsUpdateFn = (dt) => {
           elapsed += dt;
           if (elapsed > PH_CONFIG.DEMO.BALANCER_DURATION) {
             balancer.rotation.set(0, 0, settleAngle);
             sceneManager.physicsUpdateFn = null;
-            setDemoResult(`Модель осіла на ${settleDegrees}°. Зміни вагу крил або розмах і порівняй екранну реакцію; це не доказ реальної стійкості чи міцності.`);
+            setDemoResult(t('js.ph.demo_balance', { deg: settleDegrees }));
             return;
           }
           const damp = Math.exp(-elapsed * 0.72);
@@ -853,7 +856,7 @@
         const landing = endAnchor.getWorldPosition(new THREE.Vector3());
         const target = addScreenTarget(sceneManager, landing);
         const probe = addScreenProjectile(sceneManager, design === 'truss_bridge' ? 0x38bdf8 : 0xf59e0b);
-        setDemoResult('Екранний пробник перетинає прогін мосту; навантаження не вимірюється.');
+        setDemoResult(t('js.ph.demo_bridge_start'));
         let elapsed = 0;
         const duration = 1.55;
         sceneManager.physicsUpdateFn = dt => {
@@ -866,7 +869,7 @@
           if (progress >= 1) {
             target.children.forEach(ring => ring.material.color.setHex(0x22c55e));
             sceneManager.physicsUpdateFn = null;
-            setDemoResult('Екранний пробник дістався кінця прогону. Це анімація маршруту, не перевірка вантажності чи міцності.');
+            setDemoResult(t('js.ph.demo_bridge_end'));
           }
         };
         return;
@@ -899,7 +902,7 @@
       const hit = landing.distanceTo(targetPosition) <= 6;
       if (isBallista && window.StudioSound?.playCatapultLaunch) window.StudioSound.playCatapultLaunch();
       if (!isBallista && window.StudioSound?.playCatapultLaunch) window.StudioSound.playCatapultLaunch();
-      setDemoResult('Екранна демонстрація: снаряд летить до кільцевої мішені.');
+      setDemoResult(t('js.ph.demo_launch'));
 
       let elapsed = 0;
       const launchDelay = 0.22;
@@ -935,8 +938,8 @@
           target.children.forEach(ring => ring.material.color.setHex(hit ? 0x22c55e : 0xf59e0b));
           sceneManager.physicsUpdateFn = null;
           setDemoResult(hit
-            ? 'Влучання в екранну мішень! Це візуальна вправа, не вимір сили чи дальності.'
-            : 'Спробуй іншу довжину важеля й повтори екранний запуск.');
+            ? t('js.ph.demo_hit')
+            : t('js.ph.demo_miss'));
         }
       };
     }

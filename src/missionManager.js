@@ -1,5 +1,9 @@
 // Менеджер навчальних місій (12 місій гуртка, чек-листи, фільтри) для студії «3D Кузня Чудес»
 (function () {
+  const t = (key, vars) => (typeof window !== 'undefined' && typeof window.t === 'function') ? window.t(key, vars) : key;
+  const getLang = () => (typeof window !== 'undefined' && window.StudioI18n && typeof window.StudioI18n.getLang === 'function') ? window.StudioI18n.getLang() : 'uk';
+  const locMission = (m) => (m && typeof window !== 'undefined' && window.StudioI18n && typeof window.StudioI18n.localizeMission === 'function') ? window.StudioI18n.localizeMission(m) : m;
+
   // Missions whose every row in verification/content-evidence/manifest.json is PASS
   // (rows link to missions via row.missionKeys). All others show the experimental badge.
   const ACCEPTED_MISSION_KEYS = [
@@ -508,17 +512,18 @@
 
     updateActiveMissionUI(domCache) {
       const dom = domCache || {};
-      const m = this.getActiveMission();
-      if (!m) return;
+      const raw = this.getActiveMission();
+      if (!raw) return;
+      const m = locMission(raw);
 
       if (dom.activeMissionBadge) {
-        dom.activeMissionBadge.textContent = `🗺️ Місія #${m.id} • ${m.categoryLabel}`;
+        dom.activeMissionBadge.textContent = t('js.mm.badge', { id: m.id, cat: m.categoryLabel });
       }
       if (dom.activeMissionTitle) {
         dom.activeMissionTitle.textContent = m.title;
       }
       if (dom.activeMissionMeta) {
-        dom.activeMissionMeta.textContent = `🎯 Габарит: ${m.targetSize} • ${m.generatorLabel}`;
+        dom.activeMissionMeta.textContent = t('js.mm.meta', { size: m.targetSize, gen: m.generatorLabel });
       }
       if (dom.activeMissionRiddle) {
         dom.activeMissionRiddle.textContent = m.riddle;
@@ -531,11 +536,11 @@
       }
       if (dom.activeMissionSteps) {
         dom.activeMissionSteps.innerHTML = [
-          `<span class="mission-step-pill"><b>1. Загадка:</b> ${m.steps.riddle}</span>`,
-          `<span class="mission-step-pill"><b>2. Власний дизайн:</b> ${m.steps.design}</span>`,
-          `<span class="mission-step-pill"><b>3. Перевірка 1 пластиком:</b> ${m.steps.mono}</span>`,
-          `<span class="mission-step-pill"><b>4. Вдосконалення:</b> ${m.steps.improve}</span>`,
-          `<span class="mission-step-pill"><b>5. Результат (і без друку):</b> ${m.steps.result}</span>`
+          `<span class="mission-step-pill"><b>${t('js.mm.step_1')}</b> ${m.steps.riddle}</span>`,
+          `<span class="mission-step-pill"><b>${t('js.mm.step_2')}</b> ${m.steps.design}</span>`,
+          `<span class="mission-step-pill"><b>${t('js.mm.step_3')}</b> ${m.steps.mono}</span>`,
+          `<span class="mission-step-pill"><b>${t('js.mm.step_4')}</b> ${m.steps.improve}</span>`,
+          `<span class="mission-step-pill"><b>${t('js.mm.step_5')}</b> ${m.steps.result}</span>`
         ].join('');
       }
 
@@ -568,8 +573,8 @@
         card.style.display = this.cardVisible ? 'flex' : 'none';
       }
       if (btnToggle) {
-        btnToggle.innerHTML = this.bodyCollapsed ? '🔽 Розгорнути' : '🔼 Згорнути';
-        btnToggle.title = this.bodyCollapsed ? 'Розгорнути опис місії' : 'Згорнути опис місії';
+        btnToggle.innerHTML = this.bodyCollapsed ? t('mission.expand') : t('mission.collapse');
+        btnToggle.title = this.bodyCollapsed ? t('mission.expand_title') : t('mission.collapse_title');
       }
     }
 
@@ -578,16 +583,22 @@
       const container = dom.missionsGrid;
       if (!container) return;
 
+      const lang = getLang();
       const categoryList = this.missionFilter === 'all'
         ? this.missions
         : this.missions.filter((m) => m.category === this.missionFilter);
-      const query = (this.catalogQuery || '').trim().toLocaleLowerCase('uk');
-      const list = categoryList.filter(m => (!this.catalogTheme || m.theme === this.catalogTheme) &&
-        (!query || [m.title, m.riddle, m.theme || '', m.generatorLabel].join(' ').toLocaleLowerCase('uk').includes(query)));
+      const query = (this.catalogQuery || '').trim().toLocaleLowerCase(lang);
+      const list = categoryList.filter((raw) => {
+        if (this.catalogTheme && raw.theme !== this.catalogTheme) return false;
+        if (!query) return true;
+        const m = locMission(raw);
+        return [m.title, m.riddle, m.theme || '', m.generatorLabel, raw.title, raw.theme || '']
+          .join(' ').toLocaleLowerCase(lang).includes(query);
+      });
 
       const countBadge = document.getElementById('missions-count-badge');
       if (countBadge) {
-        countBadge.textContent = `Знайдено: ${list.length}`;
+        countBadge.textContent = t('js.mm.found', { n: list.length });
       }
 
       container.innerHTML = '';
@@ -595,44 +606,45 @@
         container.innerHTML = `
           <div class="missions-empty-state">
             <span class="empty-icon">🔍</span>
-            <p>За цим запитом пригод не знайдено. Спробуй інше слово або обери іншу категорію.</p>
+            <p>${t('js.mm.empty')}</p>
           </div>
         `;
         return;
       }
 
-      list.forEach((m) => {
+      list.forEach((raw) => {
+        const m = locMission(raw);
         const card = document.createElement('article');
         card.className = 'mission-card' + (m.id === this.activeMissionId ? ' active-mission' : '');
         if (m.modelKey) card.dataset.modelKey = m.modelKey;
 
-        const stars = m.id <= 12 ? '⭐ 2–3 кл' : (m.id <= 30 ? '⭐⭐ 3–5 кл' : '⭐⭐⭐ 4–6 кл');
+        const stars = m.id <= 12 ? t('js.mm.diff_23') : (m.id <= 30 ? t('js.mm.diff_35') : t('js.mm.diff_46'));
 
         card.innerHTML = `
           <div class="mission-card-inner">
             <div class="mission-card-header">
               <span class="mission-card-num">#${m.id} • ${m.categoryLabel}</span>
-              <span class="mission-card-difficulty" title="Рекомендований вік">${stars}</span>
+              <span class="mission-card-difficulty" title="${t('js.mm.diff_title')}">${stars}</span>
               <span class="mission-card-size">📏 ${m.targetSize}</span>
             </div>
-            ${ACCEPTED_MISSION_KEYS.indexOf(m.key) === -1 ? '<span class="mission-experimental-badge" title="Ще не пройшла фінальну перевірку друку" aria-label="Експериментальна: ще не пройшла фінальну перевірку друку">🧪 Експериментальна</span>' : ''}
+            ${ACCEPTED_MISSION_KEYS.indexOf(m.key) === -1 ? `<span class="mission-experimental-badge" title="${t('js.mm.exp_title')}" aria-label="${t('js.mm.exp_title')}">${t('js.mm.exp_badge')}</span>` : ''}
             <h3 class="mission-card-title">${m.title}</h3>
-            <div class="mission-riddle-box">💡 <b>Загадка:</b> ${m.riddle}</div>
+            <div class="mission-riddle-box">💡 <b>${t('js.mm.riddle_lbl')}</b> ${m.riddle}</div>
             <div class="mission-grades-row">
-              <div class="mission-grade-item"><span class="grade-tag grade-23">👶 2–3 кл</span><span>${m.grade23}</span></div>
-              <div class="mission-grade-item"><span class="grade-tag grade-46">🧑 4–6 кл</span><span>${m.grade46}</span></div>
+              <div class="mission-grade-item"><span class="grade-tag grade-23">${t('js.mm.g23_short')}</span><span>${m.grade23}</span></div>
+              <div class="mission-grade-item"><span class="grade-tag grade-46">${t('js.mm.g46_short')}</span><span>${m.grade46}</span></div>
             </div>
             <details class="mission-card-details">
-              <summary class="mission-details-summary">📖 Кроки місії та чек-лист ▾</summary>
+              <summary class="mission-details-summary">${t('js.mm.details_summary')}</summary>
               <div class="mission-card-steps">
-                <div><b>1. Загадка →</b> ${m.steps.riddle}</div>
-                <div><b>2. Власний дизайн →</b> ${m.steps.design}</div>
-                <div><b>3. Огляд в 1 кольорі →</b> ${m.steps.mono}</div>
-                <div><b>4. Вдосконалення →</b> ${m.steps.improve}</div>
-                <div><b>5. Результат →</b> ${m.steps.result}</div>
+                <div><b>${t('js.mm.c_step_1')}</b> ${m.steps.riddle}</div>
+                <div><b>${t('js.mm.c_step_2')}</b> ${m.steps.design}</div>
+                <div><b>${t('js.mm.c_step_3')}</b> ${m.steps.mono}</div>
+                <div><b>${t('js.mm.c_step_4')}</b> ${m.steps.improve}</div>
+                <div><b>${t('js.mm.c_step_5')}</b> ${m.steps.result}</div>
               </div>
               <div class="mission-card-checklist">
-                <div class="checklist-title">✅ Чек-лист:</div>
+                <div class="checklist-title">${t('js.mm.chk_lbl')}</div>
                 <div>• ${m.checklist[0]}</div>
                 <div>• ${m.checklist[1]}</div>
                 <div>• ${m.checklist[2]}</div>
@@ -641,7 +653,7 @@
           </div>
           <div class="mission-card-footer">
             <span class="mission-gen-label">${m.generatorLabel}</span>
-            <button class="btn-start-mission" data-start-mission="${m.id}">🚀 Обрати цю місію</button>
+            <button class="btn-start-mission" data-start-mission="${m.id}">${t('js.mm.choose_btn')}</button>
           </div>
         `;
         const startBtn = card.querySelector('[data-start-mission]');

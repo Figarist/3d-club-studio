@@ -1,6 +1,9 @@
 // Головний контролер студії «3D Кузня Чудес» (Чистий Vanilla JS + Three.js r128, 100% офлайн)
 (function () {
   const STORAGE_KEY = '3d_kuznya_project_autosave_v1';
+  const t = (key, vars) => (typeof window !== 'undefined' && typeof window.t === 'function') ? window.t(key, vars) : key;
+  const locLabel = (str) => (typeof window !== 'undefined' && window.StudioI18n && typeof window.StudioI18n.localizePackLabel === 'function') ? window.StudioI18n.localizePackLabel(str) : str;
+  const locMission = (m) => (m && typeof window !== 'undefined' && window.StudioI18n && typeof window.StudioI18n.localizeMission === 'function') ? window.StudioI18n.localizeMission(m) : m;
 
   class StudioApp {
     constructor() {
@@ -232,6 +235,7 @@
       }
 
       this.bindTabs();
+      this.bindLanguageSwitcher();
       this.bindModelCatalog();
       this.bindTopActions();
       this.bindMissionControls();
@@ -244,6 +248,10 @@
       this.bindHeightmapControls();
       this.bindCameraControls();
 
+      if (window.StudioI18n) {
+        window.StudioI18n.applyI18n(document);
+      }
+
       // Відновлюємо автозбереження або рендеримо стартову модель
       const restored = this.restoreAutosave();
       this.missions.updateActiveMissionUI(this._domCache);
@@ -254,6 +262,7 @@
         this.mcGen.renderCanvasUI();
         this.rebuildCurrentModel(true);
       }
+      this.refreshLocalizedUI();
       this.history.updateUI(this._domCache.btnUndo, this._domCache.btnRedo);
       if (window.location.hash === '#about') {
         setTimeout(() => this.openAboutModal(), 150);
@@ -404,8 +413,8 @@
           if (dom.phWeightGroup) dom.phWeightGroup.style.display = isBalancer ? 'block' : 'none';
           if (dom.btnPhysicsDemo) {
             dom.btnPhysicsDemo.textContent = isBalancer
-              ? '👆 Протестувати Магічний Баланс!'
-              : '🚀 ВИСТРІЛИТИ З КАТАПУЛЬТИ!';
+              ? t('js.ph_btn_balance_big')
+              : t('js.ph_btn_catapult_big');
           }
         }
 
@@ -488,7 +497,7 @@
           this.applyState(restoredState, false);
         } catch (error) {
           this.history.redo(restoredState);
-          this.showToast('⚠️ Не вдалося скасувати дію: ' + error.message);
+          this.showToast(t('js.toast.undo_err', { msg: error.message }));
           return;
         }
         this.autosave();
@@ -503,7 +512,7 @@
           this.applyState(restoredState, false);
         } catch (error) {
           this.history.undo(restoredState);
-          this.showToast('⚠️ Не вдалося повторити дію: ' + error.message);
+          this.showToast(t('js.toast.redo_err', { msg: error.message }));
           return;
         }
         this.autosave();
@@ -520,14 +529,14 @@
       const musicOn = !!(snd.enabled && snd.musicEnabled);
       if (btnSound) {
         btnSound.classList.toggle('muted', !soundOn);
-        btnSound.textContent = soundOn ? '🔊 Звук' : '🔇 Звук: ВИМК';
-        btnSound.title = soundOn ? 'Звукові ефекти увімкнено (натисніть, щоб вимкнути)' : 'Звукові ефекти вимкнено (натисніть, щоб увімкнути)';
+        btnSound.textContent = soundOn ? t('js.sound_on') : t('js.sound_off');
+        btnSound.title = soundOn ? t('js.sound_on_title') : t('js.sound_off_title');
         btnSound.setAttribute('aria-checked', soundOn ? 'true' : 'false');
       }
       if (btnMusic) {
         btnMusic.classList.toggle('playing', musicOn);
-        btnMusic.textContent = musicOn ? '🎵 Мелодія: ГРАЄ' : '🎵 Музика';
-        btnMusic.title = musicOn ? 'Фонова мелодія грає (натисніть для паузи)' : 'Увімкнути фонову мелодію кузні';
+        btnMusic.textContent = musicOn ? t('js.music_on') : t('js.music_off');
+        btnMusic.title = musicOn ? t('js.music_on_title') : t('js.music_off_title');
         btnMusic.setAttribute('aria-checked', musicOn ? 'true' : 'false');
       }
     }
@@ -553,9 +562,10 @@
       const dom = this._domCache || {};
       if (dom.btnMyPiece) {
         dom.btnMyPiece.classList.toggle('has-v1', Boolean(hasV1));
+        const timePart = this.compare.getV1()?.displayTime ? t('js.piece_saved_at', { time: this.compare.getV1().displayTime }) : '';
         dom.btnMyPiece.title = hasV1
-          ? `Мій виріб: чернетку V1 збережено${this.compare.getV1()?.displayTime ? ` о ${this.compare.getV1().displayTime}` : ''}`
-          : 'Мій виріб: чернетка V1, порівняння з поточною моделлю та паспорт деталі';
+          ? t('js.piece_saved_title', { time: timePart })
+          : t('js.piece_default_title');
       }
       this.compare.syncSteps(dom);
     }
@@ -618,18 +628,18 @@
       try {
         const payload = JSON.stringify(this.serializeState());
         if (this.safeStorage.setItem(STORAGE_KEY, payload) === false) {
-          console.warn('Автозбереження не вдалося: сховище браузера недоступне або заповнене');
-          this._updateAutosaveTag('⚠️ Не збережено', '• сховище повне', 'Не збережено: сховище повне або недоступне');
+          console.warn('Autosave failed: browser storage unavailable or full');
+          this._updateAutosaveTag(t('js.autosave_not_saved'), t('js.autosave_full_short'), t('js.autosave_full_title'));
           return;
         }
         const now = new Date();
         const hh = String(now.getHours()).padStart(2, '0');
         const mm = String(now.getMinutes()).padStart(2, '0');
         const ss = String(now.getSeconds()).padStart(2, '0');
-        this._updateAutosaveTag('Авто', `• ${hh}:${mm}:${ss}`, `Автозбережено о ${hh}:${mm}:${ss} у пам'яті браузера`);
+        this._updateAutosaveTag(t('bar.autosave_short'), `• ${hh}:${mm}:${ss}`, t('js.autosave_saved_title', { time: `${hh}:${mm}:${ss}` }));
       } catch (error) {
-        console.warn('Автозбереження не вдалося:', error);
-        this._updateAutosaveTag('⚠️ Не збережено', '• помилка', 'Не збережено: ' + (error && error.message || 'помилка'));
+        console.warn('Autosave failed:', error);
+        this._updateAutosaveTag(t('js.autosave_not_saved'), t('js.autosave_err_short'), t('js.autosave_err_title', { msg: (error && error.message) || 'error' }));
       }
     }
 
@@ -640,7 +650,7 @@
         const parsed = JSON.parse(raw);
         if (!parsed || parsed.app !== '3d-club-studio') return false;
         this.applyState(parsed, false);
-        this._updateAutosaveTag('Авто', '• Відновлено', 'Відновлено попередній проєкт із пам\'яті браузера');
+        this._updateAutosaveTag(t('bar.autosave_short'), t('js.autosave_restored_short'), t('js.autosave_restored_title'));
         return true;
       } catch (_) {
         return false;
@@ -668,20 +678,20 @@
       if (!file) return;
       const MAX_BYTES = 2 * 1024 * 1024;
       if (file.size > MAX_BYTES) {
-        this.showToast('⚠️ Файл завеликий (максимум 2 МБ).');
+        this.showToast(t('js.toast.file_too_big'));
         if (inputEl) inputEl.value = '';
         return;
       }
       const reader = new FileReader();
       reader.onerror = () => {
-        this.showToast('⚠️ Не вдалося прочитати файл.');
+        this.showToast(t('js.toast.file_read_err'));
         if (inputEl) inputEl.value = '';
       };
       reader.onload = (e) => {
         try {
           const parsed = JSON.parse(e.target.result);
           if (!parsed || parsed.app !== '3d-club-studio') {
-            this.showToast('⚠️ Цей файл не є файлом проєкту «3D Кузня Чудес».');
+            this.showToast(t('js.toast.invalid_project'));
             return;
           }
           const candidate = window.ProjectState.normalize(parsed, {
@@ -691,14 +701,14 @@
           try {
             this.applyState(candidate, true);
           } catch (error) {
-            try { this.applyState(previous, false); } catch (restoreError) { console.warn('Не вдалося відновити попередній стан:', restoreError); }
+            try { this.applyState(previous, false); } catch (restoreError) { console.warn('Could not restore previous state:', restoreError); }
             throw error;
           }
           this.history.recordSnapshot(previous);
           this.autosave();
           if (window.StudioSound) window.StudioSound.playMagicGenerate();
         } catch (error) {
-          this.showToast('⚠️ Не вдалося відкрити проєкт: ' + error.message);
+          this.showToast(t('js.toast.open_err', { msg: error.message }));
         } finally {
           if (inputEl) inputEl.value = '';
         }
@@ -724,7 +734,7 @@
         dom.btnToggleMono.classList.toggle('active', active);
         dom.btnToggleMono.setAttribute('aria-pressed', active ? 'true' : 'false');
         dom.btnToggleMono.setAttribute('aria-checked', active ? 'true' : 'false');
-        this._setButtonLabel(dom.btnToggleMono, '🪨', active ? '1 Пластик ✓' : '1 Пластик');
+        this._setButtonLabel(dom.btnToggleMono, '🪨', active ? t('js.mono_on') : t('js.mono_off'));
       }
       return active;
     }
@@ -770,19 +780,19 @@
 
       const conn = this.mcGen?.lastConnectivity;
       if (!d.fitsBed) {
-        pill.textContent = `🚨 Габарит ${d.x}×${d.y} мм за межами столу!`;
+        pill.textContent = t('js.diag_out_of_bed', { x: d.x, y: d.y });
         pill.className = 'geom-check-pill danger';
       } else if (!d.safeBed) {
-        pill.textContent = `⚠️ ${d.x}×${d.y} мм — близько до краю столу (>190 мм)`;
+        pill.textContent = t('js.diag_near_edge', { x: d.x, y: d.y });
         pill.className = 'geom-check-pill warn';
       } else if (this.activeTab === 'minecraft' && conn && conn.activeCount > 0 && conn.finalIslands > 1) {
-        pill.textContent = `⚠️ Деталь розірвана на ${conn.finalIslands} частини!`;
+        pill.textContent = t('js.diag_split', { n: conn.finalIslands });
         pill.className = 'geom-check-pill danger';
       } else if (d.isMini) {
-        pill.textContent = '🌟 Міні-формат (≤35 мм) • Стоїть рівно на столі (Z=0)';
+        pill.textContent = t('js.diag_mini');
         pill.className = 'geom-check-pill';
       } else {
-        pill.textContent = '📐 Поміщається на столі • Стоїть рівно на столі (Z=0)';
+        pill.textContent = t('js.diag_fits');
         pill.className = 'geom-check-pill';
       }
     }
@@ -794,19 +804,19 @@
 
       const c = this.mcGen.lastConnectivity;
       if (!c || c.activeCount === 0) {
-        pill.textContent = '✏️ Полотно порожнє: намалюй власний знак або обери зразок вище.';
+        pill.textContent = t('js.mc_conn_empty');
         pill.className = 'connectivity-pill warn';
       } else if (c.finalIslands === 1 && c.bridgedCount > 0) {
-        pill.textContent = `🔗 Суцільна підкладка з'єднала ${c.rawIslands} деталі в 1 міцну фігурку!`;
+        pill.textContent = t('js.mc_conn_bridged', { n: c.rawIslands });
         pill.className = 'connectivity-pill bridged';
       } else if (c.finalIslands === 1 && c.hasDiagonalOnly && !dom.mcSolidBase?.checked) {
-        pill.textContent = '⚠️ Є тонкі діагональні кутики: увімкни підкладку для міцності!';
+        pill.textContent = t('js.mc_conn_diag');
         pill.className = 'connectivity-pill warn';
       } else if (c.finalIslands === 1) {
-        pill.textContent = '✅ Чудово! Усі деталі з’єднані в одну міцну фігурку.';
+        pill.textContent = t('js.mc_conn_ok');
         pill.className = 'connectivity-pill';
       } else {
-        pill.textContent = `🚨 Розірвано на ${c.finalIslands} окремі частини! Вони розпадуться при друці. Додай підкладку або з'єднай їх.`;
+        pill.textContent = t('js.mc_conn_split', { n: c.finalIslands });
         pill.className = 'connectivity-pill danger';
       }
     }
@@ -892,7 +902,7 @@
       if (snap) {
         this._setSnapshotButtonState(true);
         if (this._domCache?.compareResults && !this._domCache.compareResults.hidden) this.renderComparison();
-        this.showToast('📸 V1 (Ескіз) зафіксовано для порівняння!');
+        this.showToast(t('js.toast.v1_saved'));
         this.autosave();
       }
     }
@@ -926,7 +936,7 @@
       const closeBtn = document.createElement('button');
       closeBtn.className = 'toast-close-btn';
       closeBtn.textContent = '✕';
-      closeBtn.setAttribute('aria-label', 'Закрити сповіщення');
+      closeBtn.setAttribute('aria-label', t('js.toast.close_aria'));
       closeBtn.addEventListener('click', () => {
         toast.classList.remove('visible');
       });
@@ -1033,12 +1043,13 @@
       }
     }
 
-    triggerCelebration(message = '🎉 STL-файл завантажено і готовий до друку!') {
+    triggerCelebration(message) {
+      const msg = message || t('js.toast.stl_default');
       this.launchConfetti();
       this.recordAccomplishment();
-      this.showToast(message, {
+      this.showToast(msg, {
         duration: 6000,
-        actionText: '📋 Паспорт друку',
+        actionText: t('js.toast.passport_btn'),
         onAction: () => this.openPrintCardModal('V2')
       });
     }
@@ -1136,7 +1147,7 @@
         const balance = dom.phSubmode.value === 'balancer';
         if (dom.phSpringGroup) dom.phSpringGroup.style.display = balance ? 'none' : 'block';
         if (dom.phWeightGroup) dom.phWeightGroup.style.display = balance ? 'block' : 'none';
-        if (dom.btnPhysicsDemo) dom.btnPhysicsDemo.textContent = balance ? '👆 Перевірити баланс' : '🚀 Запустити';
+        if (dom.btnPhysicsDemo) dom.btnPhysicsDemo.textContent = balance ? t('js.ph_btn_balance_sm') : t('js.ph_btn_launch_sm');
       }
 
       if (cfg.tab === 'minecraft') {
@@ -1176,6 +1187,67 @@
       this.autosave();
     }
 
+    bindLanguageSwitcher() {
+      document.querySelectorAll('.lang-btn[data-lang]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const lang = btn.getAttribute('data-lang');
+          if (window.StudioI18n && window.StudioI18n.setLang(lang)) {
+            if (window.StudioSound) window.StudioSound.playPop(520);
+          }
+        });
+      });
+      window.addEventListener('studio:langchange', () => {
+        this.refreshLocalizedUI();
+      });
+    }
+
+    refreshLocalizedUI() {
+      const models = window.StudioContentRegistry ? window.StudioContentRegistry.listModels() : [];
+      ['mobDesign', 'ilDesign', 'phDesign'].forEach((key) => {
+        const control = this._domCache?.[key];
+        if (!control) return;
+        Array.from(control.options).forEach((opt) => {
+          if (opt.value === 'classic') return;
+          const m = models.find((item) => item.config?.controls?.[key] === opt.value);
+          if (m) opt.textContent = locMission(m).title;
+        });
+      });
+      const theme = document.getElementById('model-theme');
+      if (theme) {
+        Array.from(theme.options).forEach((opt) => {
+          if (opt.value) opt.textContent = locLabel(opt.value);
+        });
+      }
+      this.updateValueLabels();
+      this.updateDiagnosticsUI();
+      this.updateMinecraftConnectivityUI();
+      this._syncAudioButtons();
+      this._setSnapshotButtonState(this.compare.hasV1());
+      this.missions.updateActiveMissionUI(this._domCache);
+      this.missions.renderMissionsModal(this._domCache, (id) => this.startMission(id));
+      if (this._domCache?.btnToggleMono && this.sceneManager) {
+        this._setButtonLabel(this._domCache.btnToggleMono, '🪨', this.sceneManager.isMonochrome ? t('js.mono_on') : t('js.mono_off'));
+      }
+      if (this._domCache?.btnToggleOrtho && this.sceneManager) {
+        const isOrtho = !!this.sceneManager.isOrtho;
+        this._domCache.btnToggleOrtho.textContent = isOrtho ? t('js.ortho_on') : t('js.ortho_off');
+        this._domCache.btnToggleOrtho.title = isOrtho ? t('js.ortho_on_title') : t('js.ortho_off_title');
+      }
+      if (this._domCache?.btnToggleHud) {
+        const isCollapsed = document.getElementById('viewport-hud-top')?.classList.contains('hud-collapsed');
+        this._domCache.btnToggleHud.textContent = isCollapsed ? t('js.hud_show') : t('js.hud_hide');
+      }
+      const btnToggleSlicer = document.getElementById('btn-toggle-slicer-notes');
+      const slicerPanel = document.getElementById('slicer-notes-panel');
+      if (btnToggleSlicer && slicerPanel) {
+        const isHidden = slicerPanel.style.display === 'none' || !slicerPanel.style.display;
+        btnToggleSlicer.textContent = isHidden ? t('js.slicer_notes_hide') : t('js.slicer_notes_show');
+      }
+      if (this.pixelTools && document.getElementById('pixel-editor-tools')) {
+        this.pixelTools.mount(document.getElementById('pixel-editor-tools'));
+      }
+    }
+
     bindModelCatalog() {
       const models = window.StudioContentRegistry.listModels();
       ['mobDesign', 'ilDesign', 'phDesign'].forEach(key => {
@@ -1188,7 +1260,7 @@
           seen.add(value);
           const option = document.createElement('option');
           option.value = value;
-          option.textContent = m.title;
+          option.textContent = locMission(m).title;
           control.appendChild(option);
         });
         control.addEventListener('change', () => {
@@ -1211,7 +1283,7 @@
       const theme = document.getElementById('model-theme');
       if (theme) Array.from(new Set(models.map(m => m.theme))).forEach(value => {
         const option = document.createElement('option');
-        option.value = value; option.textContent = value; theme.appendChild(option);
+        option.value = value; option.textContent = locLabel(value); theme.appendChild(option);
       });
       const render = () => {
         this.missions.catalogQuery = search ? search.value : '';
@@ -1402,7 +1474,7 @@
         btnToggleSlicer.addEventListener('click', () => {
           const isHidden = slicerPanel.style.display === 'none' || !slicerPanel.style.display;
           slicerPanel.style.display = isHidden ? 'flex' : 'none';
-          btnToggleSlicer.textContent = isHidden ? '🧾 Нотатки друку ▴' : '🧾 Нотатки друку ▾';
+          btnToggleSlicer.textContent = isHidden ? t('js.slicer_notes_show') : t('js.slicer_notes_hide');
           btnToggleSlicer.classList.toggle('active', isHidden);
           window.StudioSound?.playPop?.(isHidden ? 520 : 360);
         });
@@ -1488,7 +1560,7 @@
       if (dom.autosaveTag) {
         dom.autosaveTag.addEventListener('click', () => {
           this._autosaveNow();
-          this.showToast(`💾 ${dom.autosaveTag.title || 'Проєкт збережено у пам\'яті браузера'}`);
+          this.showToast(`💾 ${dom.autosaveTag.title || t('js.toast.saved_browser')}`);
           window.StudioSound?.playPop?.(520);
         });
       }
@@ -1498,10 +1570,10 @@
         btnSim.addEventListener('click', () => {
           const active = this.sceneManager.startSlicerSimulation();
           if (active) {
-            this._setButtonLabel(btnSim, '⏹️', 'Стоп');
+            this._setButtonLabel(btnSim, '⏹️', t('js.sim_stop'));
             if (window.StudioSound) window.StudioSound.playSimStart();
           } else {
-            this._setButtonLabel(btnSim, '🔥', 'Симуляція');
+            this._setButtonLabel(btnSim, '🔥', t('js.sim_start'));
           }
         });
       }
@@ -1512,10 +1584,10 @@
           const fname = this.getSuggestedFilename();
           const ok = this.sceneManager.exportBinarySTL(fname);
           if (ok === false) {
-            this.showToast('⚠️ Не вдалося зберегти STL.');
+            this.showToast(t('js.toast.stl_err'));
             return;
           }
-          this.triggerCelebration('🎉 Ура! Твій STL-файл завантажено і готовий до друку!');
+          this.triggerCelebration(t('js.toast.stl_ok'));
         });
       }
 
@@ -1715,7 +1787,7 @@
       if (dom.btnToggleHud && dom.viewportHudTop) {
         dom.btnToggleHud.addEventListener('click', () => {
           const isCollapsed = dom.viewportHudTop.classList.toggle('hud-collapsed');
-          dom.btnToggleHud.textContent = isCollapsed ? '👁️ Показати інфо' : '👁️ Інфо';
+          dom.btnToggleHud.textContent = isCollapsed ? t('js.hud_show') : t('js.hud_hide');
           if (window.StudioSound) window.StudioSound.playPop(420);
         });
       }
@@ -1768,10 +1840,10 @@
       const btn = this._domCache?.btnToggleOrtho || document.getElementById('btn-toggle-ortho');
       if (!btn) return;
       btn.classList.toggle('active-cam', !!isOrtho);
-      btn.textContent = isOrtho ? '📐 Орто: УВІМК' : '📐 Орто';
+      btn.textContent = isOrtho ? t('js.ortho_on') : t('js.ortho_off');
       btn.title = isOrtho
-        ? 'Ортографічна проєкція активна (паралельні лінії без спотворень). Натисніть для переходу на Перспективу (Клавіша O)'
-        : 'Перспективна проєкція. Натисніть для переходу на Ортографічну проєкцію (Клавіша O)';
+        ? t('js.ortho_on_title')
+        : t('js.ortho_off_title');
     }
 
     bindMinecraftControls() {
@@ -1825,9 +1897,9 @@
           );
           this.mcGen.clearGrid();
           if (hadPixels) {
-            this.showToast('🧽 Полотно очищено', {
+            this.showToast(t('js.toast.canvas_cleared'), {
               duration: 5000,
-              actionText: '↩️ Скасувати',
+              actionText: t('js.toast.undo_btn'),
               onAction: () => this.undo()
             });
           }
@@ -2048,14 +2120,14 @@
 
         const handleImageFile = (file) => {
           if (!file || !file.type.startsWith('image/')) return;
-          if (file.type === 'image/svg+xml') { this.showToast('⚠️ SVG не підтримується. Оберіть PNG або JPG.'); return; }
-          if (file.size > 8 * 1024 * 1024) { this.showToast('⚠️ Зображення завелике (максимум 8 МБ).'); return; }
+          if (file.type === 'image/svg+xml') { this.showToast(t('js.toast.svg_unsupported')); return; }
+          if (file.size > 8 * 1024 * 1024) { this.showToast(t('js.toast.img_too_big')); return; }
           const reader = new FileReader();
-          reader.onerror = () => this.showToast('⚠️ Не вдалося прочитати зображення.');
+          reader.onerror = () => this.showToast(t('js.toast.img_read_err'));
           reader.onload = (e) => {
             const rawUrl = e.target.result;
             const img = new Image();
-            img.onerror = () => this.showToast('⚠️ Не вдалося відкрити зображення.');
+            img.onerror = () => this.showToast(t('js.toast.img_open_err'));
             img.onload = () => {
               const maxDim = 256;
               let w = img.width;
@@ -2155,23 +2227,23 @@
       if (!dom.hmGeomCheck) return;
       if (!window.MeshValidator || !group) {
         dom.hmGeomCheck.className = 'connectivity-pill bridged';
-        dom.hmGeomCheck.textContent = '🛡️ Модель сформовано';
+        dom.hmGeomCheck.textContent = t('js.hm_formed');
         return;
       }
 
       const res = window.MeshValidator.analyze(group);
       if (res.ok) {
         dom.hmGeomCheck.className = 'connectivity-pill';
-        dom.hmGeomCheck.textContent = `🛡️ Монолітна суцільна оболонка (${res.triangles} поліг.) ✅`;
-        dom.hmGeomCheck.title = 'Модель замкнена, не має дірок і повністю готова до слайсера (Cura / PrusaSlicer)';
+        dom.hmGeomCheck.textContent = t('js.hm_watertight', { n: res.triangles });
+        dom.hmGeomCheck.title = t('js.hm_watertight_title');
       } else {
         dom.hmGeomCheck.className = 'connectivity-pill warn';
         if (!res.isWatertight) {
-          dom.hmGeomCheck.textContent = `⚠️ Незамкнена оболонка (дірки: ${res.boundaryEdges})`;
+          dom.hmGeomCheck.textContent = t('js.hm_open', { n: res.boundaryEdges });
         } else if (!res.hasConsistentNormals) {
-          dom.hmGeomCheck.textContent = `⚠️ Вивернуті грані (${res.flippedEdges})`;
+          dom.hmGeomCheck.textContent = t('js.hm_flipped', { n: res.flippedEdges });
         } else {
-          dom.hmGeomCheck.textContent = '⚠️ Потребує перевірки';
+          dom.hmGeomCheck.textContent = t('js.hm_check');
         }
       }
     }
@@ -2197,14 +2269,15 @@
 
     updateValueLabels() {
       const dom = this._domCache || {};
+      const mmUnit = ' ' + t('js.unit_mm');
       const pairs = [
-        [dom.mcVoxelSize, dom.valMcVoxel, ' мм'],
-        [dom.mcHeightStep, dom.valMcStep, ' мм'],
-        [dom.ilVoxelSize, dom.valIlVoxel, ' мм'],
-        [dom.phExtrudeHeight, dom.valPhHeight, ' мм'],
-        [dom.phSpringThickness, dom.valPhSpring, ' мм'],
-        [dom.phWingWeight, dom.valPhWeight, ' мм'],
-        [dom.phArmLength, dom.valPhArm, ' мм'],
+        [dom.mcVoxelSize, dom.valMcVoxel, mmUnit],
+        [dom.mcHeightStep, dom.valMcStep, mmUnit],
+        [dom.ilVoxelSize, dom.valIlVoxel, mmUnit],
+        [dom.phExtrudeHeight, dom.valPhHeight, mmUnit],
+        [dom.phSpringThickness, dom.valPhSpring, mmUnit],
+        [dom.phWingWeight, dom.valPhWeight, mmUnit],
+        [dom.phArmLength, dom.valPhArm, mmUnit],
         [dom.mobHeadScale, dom.valMobHead, 'x'],
         [dom.mobBodyBulk, dom.valMobBulk, 'x']
       ];
@@ -2224,20 +2297,20 @@
         dom.valHmGamma.textContent = Number(dom.hmGamma.value).toFixed(1);
       }
       if (dom.valHmSmooth && dom.hmSmooth) {
-        dom.valHmSmooth.textContent = dom.hmSmooth.value === '0' ? 'Вимк' : dom.hmSmooth.value + ' px';
+        dom.valHmSmooth.textContent = dom.hmSmooth.value === '0' ? t('js.off') : dom.hmSmooth.value + ' px';
       }
       if (dom.valHmWidth && dom.hmWidth) {
-        dom.valHmWidth.textContent = dom.hmWidth.value + ' мм';
+        dom.valHmWidth.textContent = dom.hmWidth.value + mmUnit;
       }
       if (dom.valHmReliefHeight && dom.hmReliefHeight) {
-        dom.valHmReliefHeight.textContent = Number(dom.hmReliefHeight.value).toFixed(1) + ' мм';
+        dom.valHmReliefHeight.textContent = Number(dom.hmReliefHeight.value).toFixed(1) + mmUnit;
       }
       if (dom.valHmBaseThickness && dom.hmBaseThickness) {
-        dom.valHmBaseThickness.textContent = Number(dom.hmBaseThickness.value).toFixed(1) + ' мм';
+        dom.valHmBaseThickness.textContent = Number(dom.hmBaseThickness.value).toFixed(1) + mmUnit;
       }
 
       if (dom.mcSlotWidth && dom.valMcSlot) {
-        dom.valMcSlot.textContent = dom.mcSlotWidth.value + ' мм';
+        dom.valMcSlot.textContent = dom.mcSlotWidth.value + mmUnit;
       }
       if (dom.mcSlotWidthGroup) {
         const isStandOrCalib = this.mcGen?.currentPresetKey === 'cardboard_stand' ||
@@ -2246,7 +2319,7 @@
         dom.mcSlotWidthGroup.style.display = isStandOrCalib ? 'flex' : 'none';
         const label = dom.mcSlotWidthGroup.querySelector('.control-label span');
         if (label) label.textContent = this.mcGen?.currentPresetKey === 'slot_calibrator'
-          ? 'Позначити паз калібратора для порівняння:' : 'Номінальна товщина картону:';
+          ? t('js.slot_calibrator_lbl') : t('js.slot_nominal_lbl');
       }
     }
 
@@ -2413,8 +2486,8 @@
       document.querySelectorAll('#illusion-camera-bar [data-camera-view]').forEach(button => {
         const first = button.dataset.cameraView === 'front';
         button.textContent = customOptical
-          ? (first ? '👁️ Відкрити силует 1 (0°)' : '🔄 Відкрити силует 2 (90°)')
-          : (first ? '👁️ Показати СЛОВО 1 (0°)' : '🔄 Показати СЛОВО 2 (90°)');
+          ? (first ? t('js.il_sil_1') : t('js.il_sil_2'))
+          : (first ? t('js.il_word_1') : t('js.il_word_2'));
       });
       const customMob = (dom.mobDesign?.value || 'classic') !== 'classic';
       ['mobHeadgear', 'mobBackgear', 'mobWeapon', 'mobName'].forEach(key => {
